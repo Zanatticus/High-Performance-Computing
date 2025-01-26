@@ -8,7 +8,7 @@ CFLAGS = -pthread
 TARGET = merge_sort
 
 # Source file
-SRC = src/merge_sort.cpp
+SRC = merge_sort.cpp
 
 # Default rule
 all: $(TARGET)
