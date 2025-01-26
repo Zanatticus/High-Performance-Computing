@@ -1,0 +1,13 @@
+### Explorer Commands ###
+
+# Availability of Resources
+sinfo -p courses-gpu --Format=nodes,cpus,gres,statecompact
+
+# Obtain a CPU-based node
+srun -p courses -N 1 --pty --time=03:00:00 /bin/bash
+
+# Obtain a GPU-based node
+srun -p courses-gpu -N 1 -n 1 --gres=gpu:1 --pty --time=03:00:00 /bin/bash
+
+# Obtain a CPU-based node with AVX512 support
+srun -p courses -N 1 --constraint=cascadelake --pty --time=03:00:00 /bin/bash
