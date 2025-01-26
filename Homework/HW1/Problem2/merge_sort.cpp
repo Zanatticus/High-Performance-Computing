@@ -1,15 +1,16 @@
 // CPP Program to implement merge sort using multi-threading
 // Code taken from: https://www.geeksforgeeks.org/merge-sort-using-multi-threading/
+// Code modified by: Zander Ingare
 
 #include <iostream>
 #include <pthread.h>
 #include <time.h>
 
 // number of elements in array
-#define MAX 20
+#define MAX 10000
 
 // number of threads
-#define THREAD_MAX 4
+#define THREAD_MAX 2
 
 using namespace std;
 
