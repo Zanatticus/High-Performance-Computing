@@ -17,6 +17,10 @@ all: $(TARGET)
 $(TARGET): $(SRC)
 	$(CC) $(CFLAGS) $(SRC) -o $(TARGET)
 
+# Run rule
+run: $(TARGET)
+	./$(TARGET)
+
 # Clean rule
 clean:
 	rm -f $(TARGET)

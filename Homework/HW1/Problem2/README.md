@@ -13,10 +13,11 @@ Running the program with 1, 2, 4, 8, 32 threads:
 Surprisingly, the latency increases as the number of threads increases. 
 
 ## Part (b)
-Describe some of the challenges face when performing sorting with multiple threads:
+Describe some of the challenges faced when performing sorting with multiple threads:
 
 1. **Thread Creation Overhead**: Creating threads is an expensive operation. The overhead of creating threads is likely to be more than the time saved by parallelizing the merge sort algorithm.
-2. **Thread Synchronization**: When multiple threads are working on the same data, it is essential to synchronize the threads 
+2. **Thread Synchronization**: When multiple threads are working on the same data, it is essential to synchronize the threads. This means that access to shared data structures and resources (like merging sorted subarrays) needs to be synchronized which leads to delays.
+3. **Memory Contention**: Multiple threads accessing the same memory locations can lead to memory contention. This can slow down the program due to cache misses and other memory access delays.
 
 
 ## Part (c)
@@ -40,7 +41,12 @@ Number of Elements: 10000
 | **Latency (ms)** 	| 6.643 	| 6.851 	| 8.509 	| 9.357 	| 11.575 	| 14.121 	| 19.89 	| 30.428 	| 44.603 	|
 
 #### Evaluation of Scaling:
-**Weak Scaling:** The program shows an increase in latency as the number of threads and problem size increase, indicating overheads in managing larger problem sizes and more threads.
-**Strong Scaling:** The program does not exhibit good strong scaling, as the latency increases with the number of threads. This suggests that the overheads of thread management and synchronization are significant.
+**Weak Scaling:** The program shows an increase in latency as the number of threads and problem size increase.
+**Strong Scaling:** The program does not exhibit good strong scaling, as the latency increases with the number of threads.
 
 
+## Miscellaneous
+- The program was compiled using the following command:
+```g++ -pthread merge_sort.cpp -o merge_sort``` or simply ```make```
+- The program was run using the following command:
+```./merge_sort``` or ```make run```
