@@ -132,9 +132,9 @@ int main() {
   for (int i = 0; i < MAX; i++)
     cout << a[i] << " ";
 
-  // time taken by merge sort in seconds
+  // time taken by merge sort in miliseconds
   cout << "\n\nSuccessfully Merge Sorted!\nTime taken: "
-       << (t2 - t1) / (double)CLOCKS_PER_SEC << endl;
+       << 1000*(t2 - t1) / (double)CLOCKS_PER_SEC << " ms" << endl;
 
   return 0;
 }
