@@ -24,8 +24,7 @@ void merge(int low, int mid, int high)
 	int* left = new int[mid - low + 1];
 	int* right = new int[high - mid];
 
-	// n1 is size of left part and n2 is size
-	// of right part
+	// n1 is size of left part and n2 is size of right part
 	int n1 = mid - low + 1, n2 = high - mid, i, j;
 
 	// storing values in left part
@@ -104,20 +103,19 @@ int main()
 	for (int i = 0; i < MAX; i++)
 		a[i] = rand() % 100;
 
-	// t1 and t2 for calculating time for
-	// merge sort
+	// t1 and t2 for calculating time for merge sort
 	clock_t t1, t2;
 
 	t1 = clock();
 	pthread_t threads[THREAD_MAX];
 
-	// creating 4 threads
+	// creating [THREAD_MAX] threads
 	for (int i = 0; i < THREAD_MAX; i++)
 		pthread_create(&threads[i], NULL, merge_sort,
 										(void*)NULL);
 
-	// joining all 4 threads
-	for (int i = 0; i < 4; i++)
+	// joining all [THREAD_MAX] threads
+	for (int i = 0; i < THREAD_MAX; i++)
 		pthread_join(threads[i], NULL);
 
 	// merging the final 4 parts
