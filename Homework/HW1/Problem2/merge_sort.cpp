@@ -10,7 +10,7 @@
 #define MAX 10000
 
 // number of threads
-#define THREAD_MAX 2
+#define THREAD_MAX 4
 
 using namespace std;
 
@@ -133,7 +133,7 @@ int main()
 		cout << a[i] << " ";
 
 	// time taken by merge sort in seconds
-	cout << "Time taken: " << (t2 - t1) / 
+	cout << "\n\nSuccessfully Merge Sorted!\nTime taken: " << (t2 - t1) / 
 			(double)CLOCKS_PER_SEC << endl;
 
 	return 0;
