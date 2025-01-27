@@ -5,8 +5,7 @@ int sum = 0;
 pthread_mutex_t lock;
 pthread_t threads[NTHREADS];
 
-void adder()
-{
+void adder() {
   int t;
   pthread_mutex_lock(&lock);
   t = sum;
@@ -17,21 +16,19 @@ void adder()
   return;
 }
 
-int main()
-{
+int main() {
   int i;
-  if(pthread_mutex_init(&lock, NULL) != 0)
-    {
-      printf("\n mutex init has failed\n");
-      return 1;
-    }
+  if (pthread_mutex_init(&lock, NULL) != 0) {
+    printf("\n mutex init has failed\n");
+    return 1;
+  }
 
   printf("forking\n");
-  for(i = 0; i < NTHREADS; i++)
+  for (i = 0; i < NTHREADS; i++)
     pthread_create(&threads[i], NULL, &adder, NULL);
   printf("join\n");
 
-  for(i = 0; i < NTHREADS; i++)
+  for (i = 0; i < NTHREADS; i++)
     pthread_join(threads[i], NULL);
   pthread_mutex_destroy(&lock);
   printf("The final sum computed: %d\n", sum);

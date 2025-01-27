@@ -22,8 +22,7 @@
  *   unchanged from the sequential version.
  *   */
 
-typedef struct
-{
+typedef struct {
   double *a;
   double *b;
   double sum;
@@ -49,8 +48,7 @@ pthread_mutex_t mutexsum;
  * function is accessed from the globally accessible structure.
  * */
 
-void *dotprod(void *arg)
-{
+void *dotprod(void *arg) {
   /* Define and use local variables for convenience */
 
   int i, start, end, len;
@@ -69,10 +67,9 @@ void *dotprod(void *arg)
    * to the appropriate variable in the structure.
    * */
   mysum = 0;
-  for(i = start; i < end; i++)
-    {
-      mysum += (x[i] * y[i]);
-    }
+  for (i = start; i < end; i++) {
+    mysum += (x[i] * y[i]);
+  }
 
   /*
    * Lock a mutex prior to updating the value in the shared
@@ -98,8 +95,7 @@ void *dotprod(void *arg)
  * no longer needed.
  * */
 
-int main(int argc, char *argv[])
-{
+int main(int argc, char *argv[]) {
   long i;
   double *a, *b;
   void *status;
@@ -110,11 +106,10 @@ int main(int argc, char *argv[])
   a = (double *)malloc(NUMTHRDS * VECLEN * sizeof(double));
   b = (double *)malloc(NUMTHRDS * VECLEN * sizeof(double));
 
-  for(i = 0; i < VECLEN * NUMTHRDS; i++)
-    {
-      a[i] = 1;
-      b[i] = a[i];
-    }
+  for (i = 0; i < VECLEN * NUMTHRDS; i++) {
+    a[i] = 1;
+    b[i] = a[i];
+  }
 
   dotstr.veclen = VECLEN;
   dotstr.a = a;
@@ -127,22 +122,20 @@ int main(int argc, char *argv[])
   pthread_attr_init(&attr);
   pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_JOINABLE);
 
-  for(i = 0; i < NUMTHRDS; i++)
-    {
-      /* Each thread works on a different set of data.
-       *    * The offset is specified by 'i'. The size of
-       *       * the data for each thread is indicated by VECLEN.
-       *          */
-      pthread_create(&callThd[i], &attr, dotprod, (void *)i);
-    }
+  for (i = 0; i < NUMTHRDS; i++) {
+    /* Each thread works on a different set of data.
+     *    * The offset is specified by 'i'. The size of
+     *       * the data for each thread is indicated by VECLEN.
+     *          */
+    pthread_create(&callThd[i], &attr, dotprod, (void *)i);
+  }
 
   pthread_attr_destroy(&attr);
   /* Wait on the other threads */
 
-  for(i = 0; i < NUMTHRDS; i++)
-    {
-      pthread_join(callThd[i], &status);
-    }
+  for (i = 0; i < NUMTHRDS; i++) {
+    pthread_join(callThd[i], &status);
+  }
   /* After joining, print out the results and cleanup */
 
   printf("Sum =  %f \n", dotstr.sum);
