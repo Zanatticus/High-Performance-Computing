@@ -1,4 +1,4 @@
-## Problem 4 (15 Points)
+# Problem 4 (15 Points)
 
 Find the current listing (64th) for the Top500 list for November 2024. Review the system architecture for each of the top 10 systems on this list. Provide a summary of trends that you find and discuss what kind of system you would design in the future so that it could be included in this impressive list. Make sure to provide a diagram of the architecture you would develop, and include details of the CPUs, memory and interconnect used. 
 
@@ -6,7 +6,7 @@ Find the current listing (64th) for the Top500 list for November 2024. Review th
 
 ***Top500 List:** https://www.top500.org/lists/top500/list/2024/11/ *
 
-### Answers
+## Answers
 
 **Listing #64: [SuperMUC-NG](https://www.top500.org/system/179566/)**
 
