@@ -86,7 +86,8 @@ Find the current listing (64th) for the Top500 list for November 2024. Review th
 **Trends**:
 
 - **CPU**: AMD and Intel CPUs are the most popular choices for the top systems.
-- **Interconnect**: Slingshot-11 and Intel Omni-Path are the most common interconnects.
+- **Interconnect**: Slingshot-11 and NVIDIA InfiniBand are the most common interconnects.
 - **GPU**: AMD INSTINCT and NVIDIA GPUs are the most common accelerators.
+- **CPU**: The most common CPUs are AMD EPYC and Intel Xeon chips.
 - **Cores**: The number of cores is increasing, with the top systems having millions of cores.
-- **Performance**: Theoretical peak performance is in the range of hundreds of PFlop/s.
+- **Performance**: Theoretical peak performance is in the range of hundreds to low-thousands of PFlop/s.

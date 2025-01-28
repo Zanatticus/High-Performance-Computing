@@ -1,6 +1,16 @@
-# Problem 3
+# Problem 3 (10 Points)
 
-Obtaining Node **c0745** on the Explorer Cluster
+Select a node on the Explorer Cluster and report the following information about that node: (please do not ask the system admins for this information)
+
+&nbsp;&nbsp;&nbsp;&nbsp;a. The CPU model
+&nbsp;&nbsp;&nbsp;&nbsp;b. The cache memory hierarchy, including the size and associativity.
+&nbsp;&nbsp;&nbsp;&nbsp;c. The main memory size of this node.
+&nbsp;&nbsp;&nbsp;&nbsp;d. The version of Linux installed.
+
+*Answers to this question should be included in your homework 1 write-up in pdf format.
+
+
+*Obtaining Node **c0745** on the Explorer Cluster*
 
 ## Part (a)
 Node CPU Model: `Intel(R) Xeon(R) CPU E5-2680 v4 @ 2.40GHz`
