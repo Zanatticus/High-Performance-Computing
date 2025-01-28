@@ -93,3 +93,9 @@ Find the current listing (64th) for the Top500 list for November 2024. Review th
 - **CPU**: The most common CPUs are AMD EPYC and Intel Xeon chips.
 - **Cores**: The number of cores is increasing, with the top systems having millions of cores.
 - **Performance**: Theoretical peak performance is in the range of hundreds to low-thousands of PFlop/s.
+
+
+**Future System Design**:
+If I were to design a system to be included in this list, I would most likely be using an APU-style architecture where the CPU and GPU share internal on-chip coherent interconnects. The CPU would be a high-core count AMD EPYC Zen 4 processor combined with a CDNA3 GPU architecture. Each APU would be connected to its own external High Bandwidth Memory (M.2 NVMe) and would be connected to each other via a high-speed interconnect like the AMD Infinity Fabric interface, allowing for a torus-connectivity topology. Each APU connects directly to a Network Interface Chip using HPE Slingshot interconnect to connect to the rest of the Slingshot Fabric network.
+
+![alt text](image.png)
