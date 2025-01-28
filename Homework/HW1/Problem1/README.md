@@ -16,13 +16,20 @@ In this problem, you are to select a set of 3 single-threaded benchmark programs
 ## Part (a)
 
 
+
 ## Part (b)
+
 
 
 ## Part (c)
 
 
+
 ## Part (d)
 
 
+
 ## Part (e)
+
+
+
