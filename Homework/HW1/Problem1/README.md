@@ -15,7 +15,7 @@ In this problem, you are to select a set of 3 single-threaded benchmark programs
 
 ## Part (a)
 
-**Explorer Cluster, Node c0746:**
+**Explorer Cluster, Node c0744:**
 - CPU Model: Intel(R) Xeon(R) CPU E5-2680 v4 @ 2.40GHz
 - CPU Frequency: Min=1200.0000 MHz, Max=3300.0000 MHz
 - CPU Cores: 28
@@ -34,14 +34,14 @@ In this problem, you are to select a set of 3 single-threaded benchmark programs
 |               **Operation**               	| **MulBigDouble** 	| **DivBigDouble** 	| **MulSmallDouble** 	| **DivSmallDouble** 	| **AddBigDouble** 	| **SubBigDouble** 	| **AddSmallDouble** 	| **SubSmallDouble** 	|
 |:-----------------------------------------:	|:----------------:	|:----------------:	|:------------------:	|:------------------:	|:----------------:	|:----------------:	|:------------------:	|:------------------:	|
 | **Explorer Cluster Average Latency (ms)** 	|        45        	|        143       	|         69         	|         158        	|        45        	|         69        	|         69         	|         75         	|
-|      **Vector Average Latency (ms)**      	|        63        	|        128       	|         67         	|         139        	|        61        	|        61        	|         67         	|         67         	|
+|      **Vector Average Latency (ms)**      	|        167        	|        350       	|         184         	|         260        	|        111        	|        111        	|         106         	|         100         	|
 
 ### Integer Benchmark
 
 |               **Operation**               	| **MulBigInt** 	| **DivBigInt** 	| **MulSmallInt** 	| **DivSmallInt** 	| **AddBigInt** 	| **SubBigInt** 	| **AddSmallInt** 	| **SubSmallInt** 	|
 |:-----------------------------------------:	|:-------------:	|:-------------:	|:---------------:	|:---------------:	|:-------------:	|:-------------:	|:---------------:	|:---------------:	|
-| **Explorer Cluster Average Latency (ms)** 	|       43      	|      347      	|        50       	|       386       	|       48      	|       46      	|        49       	|        50       	|
-|      **Vector Average Latency (ms)**      	|       71      	|      1174     	|        65       	|       1057      	|       50      	|       46      	|        56       	|        53       	|
+| **Explorer Cluster Average Latency (ms)** 	|       46      	|      843      	|        41       	|       935       	|       50      	|       38      	|        41       	|        41       	|
+|      **Vector Average Latency (ms)**      	|       112      	|      1309     	|        64       	|       1110      	|       52      	|       48      	|        56       	|        57       	|
 
 ### Memory Intensive Benchmark
 
