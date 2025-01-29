@@ -29,19 +29,26 @@ In this problem, you are to select a set of 3 single-threaded benchmark programs
 - Memory Size: 755 GiB (792237220)
 - Operating System: Rocky Linux 8.7 (Green Obsidian)
 
-### Benchmark Programs
+### Floating Point Benchmark
 
-Integer Benchmark:
+|               **Operation**               	| **MulBigDouble** 	| **DivBigDouble** 	| **MulSmallDouble** 	| **DivSmallDouble** 	| **AddBigDouble** 	| **SubBigDouble** 	| **AddSmallDouble** 	| **SubSmallDouble** 	|
+|:-----------------------------------------:	|:----------------:	|:----------------:	|:------------------:	|:------------------:	|:----------------:	|:----------------:	|:------------------:	|:------------------:	|
+| **Explorer Cluster Average Latency (ms)** 	|        45        	|        143       	|         69         	|         158        	|        45        	|         69        	|         69         	|         75         	|
+|      **Vector Average Latency (ms)**      	|        63        	|        128       	|         67         	|         139        	|        61        	|        61        	|         67         	|         67         	|
 
+### Integer Benchmark
 
+|               **Operation**               	| **MulBigInt** 	| **DivBigInt** 	| **MulSmallInt** 	| **DivSmallInt** 	| **AddBigInt** 	| **SubBigInt** 	| **AddSmallInt** 	| **SubSmallInt** 	|
+|:-----------------------------------------:	|:-------------:	|:-------------:	|:---------------:	|:---------------:	|:-------------:	|:-------------:	|:---------------:	|:---------------:	|
+| **Explorer Cluster Average Latency (ms)** 	|       43      	|      347      	|        50       	|       386       	|       48      	|       46      	|        49       	|        50       	|
+|      **Vector Average Latency (ms)**      	|       71      	|      1174     	|        65       	|       1057      	|       50      	|       46      	|        56       	|        53       	|
 
-Floating Point Benchmark:
+### Memory Intensive Benchmark
 
-
-
-Memory Benchmark:
-
-
+|               **Operation**              	| Forward Sum 	| Reverse Sum 	| Random Sum 	|
+|:----------------------------------------:	|:-----------:	|:-----------:	|:----------:	|
+| **Explorer Cluster Average Latency (s)** 	|  21.444922  	|   5.386331  	| 174.070636 	|
+|      **Vector Average Latency (s)**      	|  18.711402  	|   4.402960  	| 105.419321 	|
 
 
 
