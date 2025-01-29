@@ -17,16 +17,26 @@ In this problem, you are to select a set of 3 single-threaded benchmark programs
 
 **Explorer Cluster, Node c0744:**
 - CPU Model: Intel(R) Xeon(R) CPU E5-2680 v4 @ 2.40GHz
-- CPU Frequency: Min=1200.0000 MHz, Max=3300.0000 MHz
+- CPU Frequency: Min=1200.0000 MHz, Max=3300.0000 MHz, Current=3300.0000 MHz
 - CPU Cores: 28
 - Memory Size: 251 GiB (263358376)
+- Cache Hierarchy: 
+    - L1d: 32K, 8-way set associative
+    - L1i: 32K, 8-way set associative
+    - L2: 256K, 8-way set associative
+    - L3: 35M, 20-way set associative
 - Operating System: Rocky Linux 9.3 (Blue Onyx)
 
 **Vector:**
 - CPU Model: Intel(R) Xeon(R) CPU E5-2698 v4 @ 2.20GHz
-- CPU Frequency: Min=1200.0000 MHz, Max=3600.0000 MHz
+- CPU Frequency: Min=1200.0000 MHz, Max=3600.0000 MHz, Current=3600.0000 MHz
 - CPU Cores: 80
 - Memory Size: 755 GiB (792237220)
+- Cache Hierarchy:
+    - L1d: 32K
+    - L1i: 32K
+    - L2: 256K
+    - L3: 51M
 - Operating System: Rocky Linux 8.7 (Green Obsidian)
 
 ### Floating Point Benchmark
@@ -51,10 +61,17 @@ In this problem, you are to select a set of 3 single-threaded benchmark programs
 |      **Vector Average Latency (s)**      	|  18.711402  	|   4.402960  	| 105.419321 	|
 
 
+Overall, there were no outlier runs of each benchmark (i.e. every benchmark run had consistently the same latency values with very little variance).
+
 
 ## Part (b)
 
+The Explorer Cluster had better performance compared to the Vector system for 2/3 benchmarks. The Explorer Cluster had a lower average latency for the floating-point and integer benchmarks, while the Vector system had a lower average latency for the memory-intensive benchmark.
 
+In the cases where Explorer outperformed Vector, the most likely cause is because 
+
+In the case where Vector outperformed Explorer, the most likely cause is because 
+ 
 
 ## Part (c)
 

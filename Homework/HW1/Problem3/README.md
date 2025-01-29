@@ -22,16 +22,16 @@ Node CPU Model: `Intel(R) Xeon(R) CPU E5-2680 v4 @ 2.40GHz`
 **Caches:**
 - L1d:
     - Size: 896 KiB (28 instances)
-    - Associativity: 8
+    - Associativity: 8-way set associative
 - L1i:
     - Size: 896 KiB (28 instances)
-    - Associativity: 8
+    - Associativity: 8-way set associative
 - L2:
     - Size: 7 MiB (28 instances)
-    - Associativity: 8
+    - Associativity: 8-way set associative
 - L3:
     - Size: 70 MiB (2 instance)
-    - Associativity: 20
+    - Associativity: 20-way set associative
 
 *```lscpu -C```*
 
