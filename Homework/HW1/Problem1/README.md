@@ -15,6 +15,34 @@ In this problem, you are to select a set of 3 single-threaded benchmark programs
 
 ## Part (a)
 
+**Explorer Cluster, Node c0746:**
+- CPU Model: Intel(R) Xeon(R) CPU E5-2680 v4 @ 2.40GHz
+- CPU Frequency: Min=1200.0000 MHz, Max=3300.0000 MHz
+- CPU Cores: 28
+- Memory Size: 251 GiB (263358376)
+- Operating System: Rocky Linux 9.3 (Blue Onyx)
+
+**Vector:**
+- CPU Model: Intel(R) Xeon(R) CPU E5-2698 v4 @ 2.20GHz
+- CPU Frequency: Min=1200.0000 MHz, Max=3600.0000 MHz
+- CPU Cores: 80
+- Memory Size: 755 GiB (792237220)
+- Operating System: Rocky Linux 8.7 (Green Obsidian)
+
+### Benchmark Programs
+
+Integer Benchmark:
+
+
+
+Floating Point Benchmark:
+
+
+
+Memory Benchmark:
+
+
+
 
 
 ## Part (b)
