@@ -1,26 +1,28 @@
 # Compiler
-CC = g++
+CXX = g++
 
-# Compiler flags
-CFLAGS = -pthread
+# Compiler flags. The first commented line is for the baseline performance. The second line is the optimized performance.
+CXXFLAGS = -std=c++11
 
 # Target executable
-TARGET = merge_sort
+TARGET = build/merge_sort
 
-# Source file
-SRC = merge_sort.cpp
+# Source files
+SRCS = src/merge_sort.cpp
 
-# Default rule
-all: $(TARGET)
+# Default target
+all: clean $(TARGET) run
 
-# Rule to build the target
-$(TARGET): $(SRC)
-	$(CC) $(CFLAGS) $(SRC) -o $(TARGET)
+# Link the target executable
+$(TARGET):
+	$(CXX) $(CXXFLAGS) -o $@ $(SRCS)
 
-# Run rule
+# Run the target executable
 run: $(TARGET)
 	./$(TARGET)
 
-# Clean rule
+# Clean up build files
 clean:
 	rm -f $(TARGET)
+
+.PHONY: all clean run
