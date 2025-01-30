@@ -1,8 +1,9 @@
 # Compiler
 CXX = g++
 
-# Compiler flags
-CXXFLAGS = -std=c++11 -O2
+# Compiler flags. The first commented line is for the baseline performance. The second line is the optimized performance.
+# CXXFLAGS = -std=c++11 -O2
+CXXFLAGS = -std=c++11 -O3 -funroll-loops -finline-functions -fomit-frame-pointer -march=native -flto
 
 # Target executable
 TARGET = build/floating_point_benchmark
