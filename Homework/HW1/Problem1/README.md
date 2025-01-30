@@ -123,5 +123,5 @@ The FLDPS metric was plotted for the baseline and optimized benchmarks on the Ex
 Assuming I was going to rewrite these benchmarks with pthreads to obtain additional speedup by running the benchmarks on multiple cores, I would split up the major parts of each benchmark and allocate the workload to individual threads. For example, the floating point and integer benchmarks loop a billion times for each operation type (addition, subtraction, division, etc...). A simple thread-workload allocation could be allocating a thread to the additions, another thread to the subtractions, and so on. This way, the workload is split up evenly among the threads, and the threads can run in parallel to complete the benchmark faster. Even further than that, more threads could be spawned to handle a certain amount of a loop since the loops carry no data dependencies. This means that the threads can run in parallel without any synchronization overhead. Similarly with the memory benchmark, the looping mechanism works in the same way, and thus the threading would be highly similar to the floating point and integer benchmarks.
 
 ## Miscellaneous
-- The program was compiled and run using the following command:
+- The program was compiled and run using the following command within each benchmark subdirectory:
 ```make```
