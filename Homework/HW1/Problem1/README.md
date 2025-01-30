@@ -66,12 +66,12 @@ Overall, there were no outlier runs of each benchmark (i.e. every benchmark run 
 
 ## Part (b)
 
-The Explorer Cluster had better performance compared to the Vector system for 2/3 benchmarks. The Explorer Cluster had a lower average latency for the floating-point and integer benchmarks, while the Vector system had a lower average latency for the memory-intensive benchmark.
+The Explorer Cluster node had worse performance compared to the Vector system for all benchmarks. Specifically, the Explorer system had a higher average latency for the floating-point, integer, and memory-intensive benchmarks compared to the Vector system. The most likely cause of this, since these were single-threaded programs, must be to do with the CPU model and frequency. The Explorer system had an Intel(R) Xeon(R) CPU E5-2680 v4 @ 2.40GHz, while the Vector system had an Intel(R) Xeon(R) CPU E5-2698 v4 @ 2.20GHz. The Vector system had a higher current CPU frequency (3600 MHz), which could explain the better performance of the benchmarks on the Vector system as opposed to the Explorer system (3300 MHz). 
 
-In the cases where Explorer outperformed Vector, the most likely cause is because 
+The Vector system also had more cores than the Explorer system, which could have also contributed to the better performance of the benchmarks on the Vector system. The memory size of the Vector system was also larger than the Explorer system, which may have also contributed to the better performance of the memory-intensive benchmark (however, this is highly unlikely since the cache hierarchies between the two CPUs were nearly identical up until the L3 cache).
 
-In the case where Vector outperformed Explorer, the most likely cause is because 
- 
+If we also compare the raw benchmarks of the two CPUs, we can see that overall, the Vector system CPU outperforms the Explorer system CPU (see https://www.cpu-world.com/Compare/424/Intel_Xeon_E5-2680_v4_vs_Intel_Xeon_E5-2698_v4.html). Notably, the Vector system CPU can run at a higher power (wattage) which is known to lead to direct performance improvements since it drives the clockspeed at higher rates.
+
 
 ## Part (c)
 
@@ -120,12 +120,4 @@ The FLDPS metric was plotted for the baseline and optimized benchmarks on the Ex
 
 ## Part (e)
 
-Assuming I was going to rewrite these benchmarks with pthreads to obtain additional speedup by running the benchmarks on multiple cores, I would use the following strategy:
-- For each benchmark, I would identify the most time-consuming operation.
-- I would create a thread for each operation.
-- I would use a thread pool to manage the threads.
-- I would use a mutex to ensure that the threads do not interfere with each other.
-- I would use a barrier to ensure that all threads have completed before the next iteration of the benchmark begins.
-- I would use a condition variable to signal when the threads have completed their operations.
-
-
+Assuming I was going to rewrite these benchmarks with pthreads to obtain additional speedup by running the benchmarks on multiple cores, I would split up the major parts of each benchmark and allocate the workload to individual threads. For example, the floating point and integer benchmarks loop a billion times for each operation type (addition, subtraction, division, etc...). A simple thread-workload allocation could be allocating a thread to the additions, another thread to the subtractions, and so on. This way, the workload is split up evenly among the threads, and the threads can run in parallel to complete the benchmark faster. Even further than that, more threads could be spawned to handle a certain amount of a loop since the loops carry no data dependencies. This means that the threads can run in parallel without any synchronization overhead. Similarly with the memory benchmark, the looping mechanism works in the same way, and thus the threading would be highly similar to the floating point and integer benchmarks.
