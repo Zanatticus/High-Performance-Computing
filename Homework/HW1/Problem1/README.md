@@ -39,26 +39,26 @@ In this problem, you are to select a set of 3 single-threaded benchmark programs
     - L3: 51M
 - Operating System: Rocky Linux 8.7 (Green Obsidian)
 
-### Floating Point Benchmark
+### Floating Point Baseline Benchmark
 
-|               **Operation**               	| **MulBigDouble** 	| **DivBigDouble** 	| **MulSmallDouble** 	| **DivSmallDouble** 	| **AddBigDouble** 	| **SubBigDouble** 	| **AddSmallDouble** 	| **SubSmallDouble** 	|
+|          **Baseline Benchmark**          	| **MulBigDouble** 	| **DivBigDouble** 	| **MulSmallDouble** 	| **DivSmallDouble** 	| **AddBigDouble** 	| **SubBigDouble** 	| **AddSmallDouble** 	| **SubSmallDouble** 	|
 |:-----------------------------------------:	|:----------------:	|:----------------:	|:------------------:	|:------------------:	|:----------------:	|:----------------:	|:------------------:	|:------------------:	|
-| **Explorer Cluster Average Latency (ms)** 	|        45        	|        143       	|         69         	|         158        	|        45        	|         69        	|         69         	|         75         	|
-|      **Vector Average Latency (ms)**      	|        167        	|        350       	|         184         	|         260        	|        111        	|        111        	|         106         	|         100         	|
+| **Explorer Average Latency (ms)** 	|       6209       	|       6220       	|        7704        	|        8672        	|       6208       	|       6156       	|        8656        	|        8639        	|
+|      **Vector Average Latency (ms)**      	|       4969       	|       5028       	|        6880        	|        6212        	|       4945       	|       5013       	|        6125        	|        6206        	|
 
-### Integer Benchmark
+### Integer Baseline Benchmark
 
-|               **Operation**               	| **MulBigInt** 	| **DivBigInt** 	| **MulSmallInt** 	| **DivSmallInt** 	| **AddBigInt** 	| **SubBigInt** 	| **AddSmallInt** 	| **SubSmallInt** 	|
+|          **Baseline Benchmark**          	| **MulBigInt** 	| **DivBigInt** 	| **MulSmallInt** 	| **DivSmallInt** 	| **AddBigInt** 	| **SubBigInt** 	| **AddSmallInt** 	| **SubSmallInt** 	|
 |:-----------------------------------------:	|:-------------:	|:-------------:	|:---------------:	|:---------------:	|:-------------:	|:-------------:	|:---------------:	|:---------------:	|
-| **Explorer Cluster Average Latency (ms)** 	|       46      	|      843      	|        41       	|       935       	|       50      	|       38      	|        41       	|        41       	|
-|      **Vector Average Latency (ms)**      	|       112      	|      1309     	|        64       	|       1110      	|       52      	|       48      	|        56       	|        57       	|
+| **Explorer Average Latency (ms)** 	|      5814     	|     14251     	|       8147      	|      18040      	|      5976     	|      5794     	|       7195      	|       8278      	|
+|      **Vector Average Latency (ms)**      	|      4688     	|     11293     	|       5857      	|      13819      	|      4709     	|      4712     	|       6579      	|       6657      	|
 
-### Memory Intensive Benchmark
+### Memory Intensive Baseline Benchmark
 
-|               **Operation**              	| Forward Sum 	| Reverse Sum 	| Random Sum 	|
-|:----------------------------------------:	|:-----------:	|:-----------:	|:----------:	|
-| **Explorer Cluster Average Latency (s)** 	|  21.444922  	|   5.386331  	| 174.070636 	|
-|      **Vector Average Latency (s)**      	|  18.711402  	|   4.402960  	| 105.419321 	|
+|               **Baseline Benchmark**              	| **Forward Sum** 	| **Reverse Sum** 	| **Random Sum** 	|
+|:----------------------------------------:	|:---------------:	|:---------------:	|:--------------:	|
+| **Explorer Average Latency (s)** 	|    24.088428    	|     26.4901     	|   195.464314   	|
+|      **Vector Average Latency (s)**      	|    19.375647    	|    21.372409    	|   135.990249   	|
 
 
 Overall, there were no outlier runs of each benchmark (i.e. every benchmark run had consistently the same latency values with very little variance).
@@ -75,13 +75,57 @@ In the case where Vector outperformed Explorer, the most likely cause is because
 
 ## Part (c)
 
+For each benchmark, the following compiler optimizations were applied:
+- O3: Enable more aggressive optimizations, including those that may increase the size of the binary.
+- funroll-loops: Unroll loops whose trip counts can be determined at compile time.
+- march=native: Generate code optimized for the host machine's CPU.
 
+### Floating Point Optimized Benchmark
+
+|          **Optimized Benchmark**          	| **MulBigDouble** 	| **DivBigDouble** 	| **MulSmallDouble** 	| **DivSmallDouble** 	| **AddBigDouble** 	| **SubBigDouble** 	| **AddSmallDouble** 	| **SubSmallDouble** 	|
+|:-----------------------------------------:	|:----------------:	|:----------------:	|:------------------:	|:------------------:	|:----------------:	|:----------------:	|:------------------:	|:------------------:	|
+| **Explorer Average Latency (ms)** 	|        29        	|        74        	|         35         	|         83         	|        29        	|        29        	|         35         	|         35         	|
+|      **Vector Average Latency (ms)**      	|        25        	|        59        	|         26         	|         73         	|        22        	|        22        	|         25         	|         25         	|
+
+### Integer Optimized Benchmark
+
+|          **Optimized Benchmark**          	| **MulBigInt** 	| **DivBigInt** 	| **MulSmallInt** 	| **DivSmallInt** 	| **AddBigInt** 	| **SubBigInt** 	| **AddSmallInt** 	| **SubSmallInt** 	|
+|:-----------------------------------------:	|:-------------:	|:-------------:	|:---------------:	|:---------------:	|:-------------:	|:-------------:	|:---------------:	|:---------------:	|
+| **Explorer Average Latency (ms)** 	|       41      	|      212      	|        43       	|       202       	|       27      	|       31      	|        31       	|        31       	|
+|      **Vector Average Latency (ms)**      	|       34      	|      169      	|        33       	|       171       	|       22      	|       23      	|        25       	|        25       	|
+
+### Memory Intensive Optimized Benchmark
+
+|          **Optimized Benchmark**         	| **Forward Sum** 	| **Reverse Sum** 	| **Random Sum** 	|
+|:----------------------------------------:	|:---------------:	|:---------------:	|:--------------:	|
+| **Explorer Average Latency (s)** 	|     0.389829    	|     0.389937    	|   173.787937   	|
+|      **Vector Average Latency (s)**      	|     0.316233    	|     0.319048    	|   106.332679   	|
+
+The reason why each benchmark benefitted from the specific compiler optimization applied is because the benchmarks were highly looped. Every operation in every benchmark was able to be fully unrolled (`-funroll-loops`) since the looping mechanism had no loop dependencies, except for the Random Sum operation in the Memory-Intensive benchmark. The Random Sum operation had a loop dependency because the loop was dependent on the random number generator. The compiler optimizations that were able to fully unroll the loops resulted in a significant performance improvement for each benchmark. The `-O3` and `-march=native` compiler flags were general optimizations that also gave an overall speedup to the benchmarks.
 
 ## Part (d)
 
+**Metric Devised:** Floating Point Divisions Per Second (FLDPS)
 
+Taking the average latency of the baseline and optimized floating point benchmarks, the FLDPS metric was calculated as follows:
+
+```
+num_divisions = 1000000000
+fldps = num_divisions / average_latency
+```
+
+The FLDPS metric was plotted for the baseline and optimized benchmarks on the Explorer and Vector systems in Giga-FLDPS (GFLDPS).
+
+![alt text](<Floating-Point Divisions Per Second for DivBigDouble and DivSmallDouble.png>)
 
 ## Part (e)
 
+Assuming I was going to rewrite these benchmarks with pthreads to obtain additional speedup by running the benchmarks on multiple cores, I would use the following strategy:
+- For each benchmark, I would identify the most time-consuming operation.
+- I would create a thread for each operation.
+- I would use a thread pool to manage the threads.
+- I would use a mutex to ensure that the threads do not interfere with each other.
+- I would use a barrier to ensure that all threads have completed before the next iteration of the benchmark begins.
+- I would use a condition variable to signal when the threads have completed their operations.
 
 
