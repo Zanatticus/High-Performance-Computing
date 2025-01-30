@@ -56,7 +56,5 @@ Number of Elements: 10000
 
 
 ## Miscellaneous
-- The program was compiled using the following command:
+- The program was compiled and run using the following command:
 ```g++ -pthread merge_sort.cpp -o merge_sort``` or simply ```make```
-- The program was run using the following command:
-```./merge_sort``` or ```make run```
