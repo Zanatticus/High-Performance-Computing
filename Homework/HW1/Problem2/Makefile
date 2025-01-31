@@ -2,7 +2,7 @@
 CXX = g++
 
 # Compiler flags. The first commented line is for the baseline performance. The second line is the optimized performance.
-CXXFLAGS = -std=c++11
+CXXFLAGS = -pthread -std=c++11
 
 # Target executable
 TARGET = build/merge_sort
