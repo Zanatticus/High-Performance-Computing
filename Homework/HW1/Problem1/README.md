@@ -76,9 +76,9 @@ If we also compare the raw benchmarks of the two CPUs, we can see that overall, 
 ## Part (c)
 
 For each benchmark, the following compiler optimizations were applied:
-- O3: Enable more aggressive optimizations, including those that may increase the size of the binary.
-- funroll-loops: Unroll loops whose trip counts can be determined at compile time.
-- march=native: Generate code optimized for the host machine's CPU.
+- **O3:** Enable more aggressive optimizations, including those that may increase the size of the binary.
+- **funroll-loops:** Unroll loops whose trip counts can be determined at compile time.
+- **march=native:** Generate code optimized for the host machine's CPU.
 
 ### Floating Point Optimized Benchmark
 
