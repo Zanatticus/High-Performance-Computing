@@ -10,12 +10,12 @@ In this problem, you will start by selecting a sorting algorithm to sort 10,000 
 
 
 
-*Sources Cited: https://www.geeksforgeeks.org/merge-sort-using-multi-threading/*
+*Sources Cited: https://malithjayaweera.com/2019/02/parallel-merge-sort/*
 
 *Code compiled and run on vector.coe.neu.edu (nproc=80)*
 
 ## Part (a)
-Running the program with 1, 2, 4, 8, 32 threads:
+Running the program with 1, 2, 4, 8, 16, 32 threads:
 |    **Threads**   	|   1   	| 2     	| 4     	| 8     	| 32     	|
 |:------------:	|:-----:	|-------	|-------	|-------	|--------	|
 | **Latency (ms)** 	| 6.643 	| 6.851 	| 8.509 	| 9.357 	| 14.121 	|
