@@ -80,7 +80,7 @@ int main(int argc, const char * argv[]) {
     gettimeofday(&end, NULL);
     time_spent = ((double) ((double) (end.tv_usec - start.tv_usec) / 1000000 +
                             (double) (end.tv_sec - start.tv_sec)));
-    printf("Time taken for execution: %f seconds\n", time_spent);
+    printf("Time taken for execution: %f miliseconds\n", 1000*time_spent);
     /* test to ensure that the array is in sorted order */
     test_array_is_in_order(arr);
     return 0;
