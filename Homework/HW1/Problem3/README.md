@@ -13,7 +13,7 @@ Select a node on the Explorer Cluster and report the following information about
 *Obtaining Node **c0745** on the Explorer Cluster*
 
 ## Part (a)
-Node CPU Model: `Intel(R) Xeon(R) CPU E5-2680 v4 @ 2.40GHz`
+**Node CPU Model:** Intel(R) Xeon(R) CPU E5-2680 v4 @ 2.40GHz
 
 *```lscpu | grep "Model name"```*
 

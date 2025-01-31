@@ -49,7 +49,7 @@ Number of Elements: 10000
 | **Latency (ms)** 	| 7.706 	| 4.208 	| 2.729 	| 2.42 	| 2.876 	| 3.971 	| 6.412 	| 10.99 	| 20.571 	|
 
 #### Evaluation of Scaling:
-**Weak Scaling:** The program shows an increase in latency as the number of threads and problem size increase. This shows that the weak scaling of this merge sort algorithm is very poor since the algorithm does not efficientyly handle larger problem sizes with more threads.
+**Weak Scaling:** The program shows an increase in latency as the number of threads and problem size increase. This shows that the weak scaling of this merge sort algorithm is very poor since the algorithm does not efficiently handle larger problem sizes with more threads.
 **Strong Scaling:** The program shows a decrease in latency up until 8 threads, where it starts to then increase in latency for threads larger than 8. In other words, the merge sort algorithm benefits from parallelism up until a certain point, after which the overhead of managing more threads becomes a bottleneck. This means that the program exhibits good strong scaling up until 8 threads, after which the scaling starts to degrade.
 
 
