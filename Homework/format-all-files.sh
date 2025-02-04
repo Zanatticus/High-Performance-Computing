@@ -1,6 +1,5 @@
 #!/bin/bash
 
-
 # Define the file extensions to look for
 extensions=("*.c" "*.cpp" "*.h" "*.hpp")
 
