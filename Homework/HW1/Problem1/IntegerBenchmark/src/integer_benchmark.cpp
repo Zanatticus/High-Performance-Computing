@@ -1,44 +1,43 @@
-// Code taken from https://github.com/shaovoon/arithmeticbench/blob/master/CppFloatMulDivBench/CppFloatMulDivBench.cpp
+// Code taken from
+// https://github.com/shaovoon/arithmeticbench/blob/master/CppFloatMulDivBench/CppFloatMulDivBench.cpp
 // Modified by: Zander Ingare
 
-#include <vector>
-#include <iostream>
-#include <iomanip>
-#include <string>
-#include <cstring>
-#include <cmath>
 #include <cassert>
-#include <sstream>
-#include <cstdlib>
 #include <chrono>
+#include <cmath>
+#include <cstdlib>
+#include <cstring>
+#include <iomanip>
+#include <iostream>
+#include <sstream>
+#include <string>
+#include <vector>
 
-class timer
-{
-public:
+class timer {
+	public:
 	timer() = default;
-	void start(const std::string& text_)
-	{
-		text = text_;
+	void start(const std::string& text_) {
+		text  = text_;
 		begin = std::chrono::high_resolution_clock::now();
 	}
-	void stop()
-	{
+	void stop() {
 		auto end = std::chrono::high_resolution_clock::now();
 		auto dur = end - begin;
-		auto ms = std::chrono::duration_cast<std::chrono::milliseconds>(dur).count();
-		std::cout << std::setw(19) << text << ":" << std::setw(5) << ms << "ms" << std::endl;
+		auto ms  = std::chrono::duration_cast< std::chrono::milliseconds >(dur)
+		              .count();
+		std::cout << std::setw(19) << text << ":" << std::setw(5) << ms << "ms"
+		          << std::endl;
 	}
 
-private:
-	std::string text;
+	private:
+	std::string                                    text;
 	std::chrono::high_resolution_clock::time_point begin;
 };
 
-std::vector<int64_t> smallIntList;
-std::vector<int64_t> bigIntList;
+std::vector< int64_t > smallIntList;
+std::vector< int64_t > bigIntList;
 
-void Init()
-{
+void Init() {
 	smallIntList.push_back(158);
 	smallIntList.push_back(21);
 	smallIntList.push_back(7813);
@@ -61,18 +60,14 @@ void Init()
 	bigIntList.push_back(558721);
 }
 
-int64_t MulBigInt(size_t loop)
-{
+int64_t MulBigInt(size_t loop) {
 	timer stopwatch;
 	stopwatch.start("MulBigInt");
 
 	int64_t result = 0;
-	for (size_t k = 0; k < loop; ++k)
-	{
-		for (size_t i = 0; i < bigIntList.size(); ++i)
-		{
-			for (size_t j = 0; j < bigIntList.size(); ++j)
-			{
+	for (size_t k = 0; k < loop; ++k) {
+		for (size_t i = 0; i < bigIntList.size(); ++i) {
+			for (size_t j = 0; j < bigIntList.size(); ++j) {
 				result = bigIntList[i] * bigIntList[j];
 			}
 		}
@@ -82,18 +77,14 @@ int64_t MulBigInt(size_t loop)
 	return result;
 }
 
-int64_t DivBigInt(size_t loop)
-{
+int64_t DivBigInt(size_t loop) {
 	timer stopwatch;
 	stopwatch.start("DivBigInt");
 
 	int64_t result = 0;
-	for (size_t k = 0; k < loop; ++k)
-	{
-		for (size_t i = 0; i < bigIntList.size(); ++i)
-		{
-			for (size_t j = 0; j < bigIntList.size(); ++j)
-			{
+	for (size_t k = 0; k < loop; ++k) {
+		for (size_t i = 0; i < bigIntList.size(); ++i) {
+			for (size_t j = 0; j < bigIntList.size(); ++j) {
 				result = bigIntList[i] / bigIntList[j];
 			}
 		}
@@ -103,18 +94,14 @@ int64_t DivBigInt(size_t loop)
 	return result;
 }
 
-int64_t MulSmallInt(size_t loop)
-{
+int64_t MulSmallInt(size_t loop) {
 	timer stopwatch;
 	stopwatch.start("MulSmallInt");
 
 	int64_t result = 0;
-	for (size_t k = 0; k < loop; ++k)
-	{
-		for (size_t i = 0; i < smallIntList.size(); ++i)
-		{
-			for (size_t j = 0; j < smallIntList.size(); ++j)
-			{
+	for (size_t k = 0; k < loop; ++k) {
+		for (size_t i = 0; i < smallIntList.size(); ++i) {
+			for (size_t j = 0; j < smallIntList.size(); ++j) {
 				result = smallIntList[i] * smallIntList[j];
 			}
 		}
@@ -124,18 +111,14 @@ int64_t MulSmallInt(size_t loop)
 	return result;
 }
 
-int64_t DivSmallInt(size_t loop)
-{
+int64_t DivSmallInt(size_t loop) {
 	timer stopwatch;
 	stopwatch.start("DivSmallInt");
 
 	int64_t result = 0;
-	for (size_t k = 0; k < loop; ++k)
-	{
-		for (size_t i = 0; i < smallIntList.size(); ++i)
-		{
-			for (size_t j = 0; j < smallIntList.size(); ++j)
-			{
+	for (size_t k = 0; k < loop; ++k) {
+		for (size_t i = 0; i < smallIntList.size(); ++i) {
+			for (size_t j = 0; j < smallIntList.size(); ++j) {
 				result = smallIntList[i] / smallIntList[j];
 			}
 		}
@@ -145,18 +128,14 @@ int64_t DivSmallInt(size_t loop)
 	return result;
 }
 
-int64_t AddBigInt(size_t loop)
-{
+int64_t AddBigInt(size_t loop) {
 	timer stopwatch;
 	stopwatch.start("AddBigInt");
 
 	int64_t result = 0;
-	for (size_t k = 0; k < loop; ++k)
-	{
-		for (size_t i = 0; i < bigIntList.size(); ++i)
-		{
-			for (size_t j = 0; j < bigIntList.size(); ++j)
-			{
+	for (size_t k = 0; k < loop; ++k) {
+		for (size_t i = 0; i < bigIntList.size(); ++i) {
+			for (size_t j = 0; j < bigIntList.size(); ++j) {
 				result = bigIntList[i] + bigIntList[j];
 			}
 		}
@@ -166,18 +145,14 @@ int64_t AddBigInt(size_t loop)
 	return result;
 }
 
-int64_t SubBigInt(size_t loop)
-{
+int64_t SubBigInt(size_t loop) {
 	timer stopwatch;
 	stopwatch.start("SubBigInt");
 
 	int64_t result = 0;
-	for (size_t k = 0; k < loop; ++k)
-	{
-		for (size_t i = 0; i < bigIntList.size(); ++i)
-		{
-			for (size_t j = 0; j < bigIntList.size(); ++j)
-			{
+	for (size_t k = 0; k < loop; ++k) {
+		for (size_t i = 0; i < bigIntList.size(); ++i) {
+			for (size_t j = 0; j < bigIntList.size(); ++j) {
 				result = bigIntList[i] - bigIntList[j];
 			}
 		}
@@ -187,18 +162,14 @@ int64_t SubBigInt(size_t loop)
 	return result;
 }
 
-int64_t AddSmallInt(size_t loop)
-{
+int64_t AddSmallInt(size_t loop) {
 	timer stopwatch;
 	stopwatch.start("AddSmallInt");
 
 	int64_t result = 0;
-	for (size_t k = 0; k < loop; ++k)
-	{
-		for (size_t i = 0; i < smallIntList.size(); ++i)
-		{
-			for (size_t j = 0; j < smallIntList.size(); ++j)
-			{
+	for (size_t k = 0; k < loop; ++k) {
+		for (size_t i = 0; i < smallIntList.size(); ++i) {
+			for (size_t j = 0; j < smallIntList.size(); ++j) {
 				result = smallIntList[i] + smallIntList[j];
 			}
 		}
@@ -208,18 +179,14 @@ int64_t AddSmallInt(size_t loop)
 	return result;
 }
 
-int64_t SubSmallInt(size_t loop)
-{
+int64_t SubSmallInt(size_t loop) {
 	timer stopwatch;
 	stopwatch.start("SubSmallInt");
 
 	int64_t result = 0;
-	for (size_t k = 0; k < loop; ++k)
-	{
-		for (size_t i = 0; i < smallIntList.size(); ++i)
-		{
-			for (size_t j = 0; j < smallIntList.size(); ++j)
-			{
+	for (size_t k = 0; k < loop; ++k) {
+		for (size_t i = 0; i < smallIntList.size(); ++i) {
+			for (size_t j = 0; j < smallIntList.size(); ++j) {
 				result = smallIntList[i] - smallIntList[j];
 			}
 		}
@@ -229,9 +196,7 @@ int64_t SubSmallInt(size_t loop)
 	return result;
 }
 
-
-int main()
-{
+int main() {
 	Init();
 	size_t loop = 10000000;
 	std::cout << "Multiplication and Division Benchmark" << std::endl;
@@ -249,5 +214,3 @@ int main()
 
 	return 0;
 }
-
-
