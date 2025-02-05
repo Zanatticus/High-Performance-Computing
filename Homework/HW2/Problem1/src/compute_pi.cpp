@@ -41,6 +41,9 @@ int main() {
     pthread_t threads[MAX_THREADS];
     int thread_ids[MAX_THREADS];
 
+    // Start the timer
+    auto start = std::chrono::high_resolution_clock::now();
+
     // Create threads to approximate PI
     for (int i = 0; i < MAX_THREADS; i++) {
         thread_ids[i] = i;
@@ -59,5 +62,10 @@ int main() {
     }
     approximated_pi *= 4;
 
+    // Stop the timer
+    auto end = std::chrono::high_resolution_clock::now();
+    std::chrono::duration<double> elapsed_time = end - start;
+
     std::cout << "Approximated value of PI: " << std::setprecision(20) << approximated_pi << std::endl;
+    std::cout << "Elapsed time: " << elapsed_time.count() << " seconds" << std::endl;
 }
