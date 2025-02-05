@@ -2,7 +2,7 @@
 CXX = g++
 
 # Compiler flags
-CXXFLAGS = -std=c++11 -O3
+CXXFLAGS = -std=c++11
 
 # Target executable
 TARGET = build/compute_pi

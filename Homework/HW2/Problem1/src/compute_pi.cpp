@@ -16,28 +16,35 @@
 #define MAX_THREADS 4
 
 // Array to store the sum of the series computed by each thread
-float thread_sums[MAX_THREADS];     
+float thread_sums[MAX_THREADS] = {0};     
 
 void* compute_pi(void* arg) {
-    pthread_t thread_id = pthread_self();
-
+    int thread_id = *(int*) arg;
     int start = thread_id * DEPTH / MAX_THREADS;
     int end = (thread_id + 1) * DEPTH / MAX_THREADS;
 
     for (int i = start; i < end; i++) {
-        thread_sums[thread_id] += (1 - 1 / (2 * i + 1));
-    }
+        if (i % 2 == 0) {
+            thread_sums[thread_id] += 1.0 / (2*i + 1);
+        } else {
+            thread_sums[thread_id] -= 1.0 / (2*i + 1);
+        }
 
+        // This line showcases the inaccuracies of floating point arithmetic in programming (use a DEPTH value of 10 to see the difference)
+        // std::cout << std::setprecision(20) << thread_sums[thread_id] << std::endl;
+    }
     return NULL;
 }
 
 int main() {
     
     pthread_t threads[MAX_THREADS];
+    int thread_ids[MAX_THREADS];
 
     // Create threads to approximate PI
     for (int i = 0; i < MAX_THREADS; i++) {
-        pthread_create(&threads[i], NULL, compute_pi, (void*) NULL);
+        thread_ids[i] = i;
+        pthread_create(&threads[i], NULL, compute_pi, &thread_ids[i]);
     }
 
     // Join threads after all threads complete
@@ -50,6 +57,7 @@ int main() {
     for (int i = 0; i < MAX_THREADS; i++) {
         approximated_pi += thread_sums[i];
     }
+    approximated_pi *= 4;
 
-    std::cout << "Approximated value of PI: " << std::setprecision(15) << approximated_pi << std::endl;
+    std::cout << "Approximated value of PI: " << std::setprecision(20) << approximated_pi << std::endl;
 }
