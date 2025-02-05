@@ -15,6 +15,25 @@ c. Now compare the two implementations in terms of strong and weak scaling, wher
 ## Part (a)
 
 
+Running with a depth of 5 and on one thread:
+
+
+SUM: 1
+SUM: 0.6666666*865*348815918
+SUM: 0.8666666*746*1395263672
+SUM: 0.7238095*402*717590332
+SUM: 0.8349206*447*6013183594
+Approximated value of PI: 3.3396825790405273438
+
+It should be:
+SUM: 1
+SUM: 0.6666666*667*
+SUM: 0.8666666*667*
+SUM: 0.7238095*238*
+SUM: 0.8349206*349*
+
+you can clearly see the inaccuracies and lack of precision with floating point data types on computers. There is a limit to the precision!
+
 ## Part (b)
 
 
