@@ -2,13 +2,13 @@
 CXX = g++
 
 # Compiler flags
-CXXFLAGS = -pthread -std=c++11
+CXXFLAGS = -std=c++11 -O3
 
 # Target executable
-TARGET = build/merge_sort
+TARGET = build/compute_pi
 
 # Source files
-SRCS = src/merge_sort.cpp
+SRCS = src/compute_pi.cpp
 
 # Default target
 all: clean $(TARGET) run
