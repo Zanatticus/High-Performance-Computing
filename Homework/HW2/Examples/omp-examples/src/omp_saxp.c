@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
+#include <sys/time.h>
 #define dt(start, end)             \
 	((end.tv_sec - start.tv_sec) + \
 	 1 / 1000000.0 * (end.tv_usec - start.tv_usec))
