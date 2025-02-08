@@ -17,6 +17,7 @@ void *thread(void *arg) {
 	// signal
 	printf("\nJust Exiting...\n");
 	sem_post(&mutex);
+	return NULL;
 }
 
 int main() {

@@ -1,5 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <pthread.h>
+#include <unistd.h>
 
 #define NTHREADS 10
 
@@ -7,15 +9,15 @@ int             sum = 0;
 pthread_mutex_t lock;
 pthread_t       threads[NTHREADS];
 
-void adder() {
-	int t;
-	pthread_mutex_lock(&lock);
-	t = sum;
-	sleep(2);
-	sum = t + 1;
-	printf("sum computed: %d\n", sum);
-	pthread_mutex_unlock(&lock);
-	return;
+void* adder(void* arg) {
+    int t;
+    pthread_mutex_lock(&lock);
+    t = sum;
+    sleep(2);
+    sum = t + 1;
+    printf("sum computed: %d\n", sum);
+    pthread_mutex_unlock(&lock);
+    return NULL;
 }
 
 int main() {

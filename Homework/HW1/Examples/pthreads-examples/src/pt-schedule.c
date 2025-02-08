@@ -13,7 +13,7 @@
 		exit(EXIT_FAILURE);      \
 	} while (0)
 
-static void usage(char *prog_name, char *msg) {
+static void usage(char *prog_name, const char *msg) {
 	if (msg != NULL)
 		fputs(msg, stderr);
 
@@ -60,7 +60,7 @@ static void display_sched_attr(int policy, struct sched_param *param) {
 	       param->sched_priority);
 }
 
-static void display_thread_sched_attr(char *msg) {
+static void display_thread_sched_attr(const char *msg) {
 	int                policy, s;
 	struct sched_param param;
 
