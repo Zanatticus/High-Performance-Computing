@@ -33,6 +33,7 @@ typedef struct {
 
 #define NUMTHRDS 4
 #define VECLEN   100000
+
 DOTDATA         dotstr;
 pthread_t       callThd[NUMTHRDS];
 pthread_mutex_t mutexsum;

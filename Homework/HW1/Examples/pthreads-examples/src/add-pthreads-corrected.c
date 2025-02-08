@@ -1,6 +1,8 @@
 #include <stdio.h>
 #include <stdlib.h>
+
 #define NTHREADS 10
+
 int             sum = 0;
 pthread_mutex_t lock;
 pthread_t       threads[NTHREADS];

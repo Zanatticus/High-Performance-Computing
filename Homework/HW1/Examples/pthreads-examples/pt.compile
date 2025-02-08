@@ -1,1 +1,0 @@
-gcc -lpthread pt.c -o pt

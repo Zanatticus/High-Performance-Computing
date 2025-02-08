@@ -1,5 +1,6 @@
 #include <omp.h>
 #include <stdio.h>
+
 #define N 1000000
 
 int main(int argc, char *argv[]) {
