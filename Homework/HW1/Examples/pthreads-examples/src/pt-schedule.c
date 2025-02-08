@@ -19,7 +19,7 @@ static void usage(char *prog_name, const char *msg) {
 
 	fprintf(stderr, "Usage: %s [options]\n", prog_name);
 	fprintf(stderr, "Options are:\n");
-	
+
 #define fpe(msg) fprintf(stderr, "\t%s", msg); /* Shorter */
 	fpe("-a<policy><prio> Set scheduling policy and priority in\n");
 	fpe("                 thread attributes object\n");

@@ -1,21 +1,21 @@
+#include <pthread.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <pthread.h>
 #include <time.h>
 
 #define NTHREADS 10
 
-int  sum = 0;
+int sum = 0;
 
 void* adder(void* arg) {
-    int t = sum;
-    struct timespec ts;
-    ts.tv_sec = 0;
-    ts.tv_nsec = 100000000; // 100 milliseconds
-    nanosleep(&ts, NULL);
-    sum = t + 1;
-    printf("sum computed: %d\n", sum);
-    return NULL;
+	int             t = sum;
+	struct timespec ts;
+	ts.tv_sec  = 0;
+	ts.tv_nsec = 100000000;   // 100 milliseconds
+	nanosleep(&ts, NULL);
+	sum = t + 1;
+	printf("sum computed: %d\n", sum);
+	return NULL;
 }
 
 int main() {
