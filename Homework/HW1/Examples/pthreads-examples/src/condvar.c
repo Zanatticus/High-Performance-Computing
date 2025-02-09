@@ -38,15 +38,11 @@ void *inc_count(void *t) {
 		 * is reached.  Note that this occurs while mutex is locked.
 		 *             */
 		if (count == COUNT_LIMIT) {
-			printf("inc_count(): thread %ld, count = %d  Threshold reached. ",
-			       my_id,
-			       count);
+			printf("inc_count(): thread %ld, count = %d  Threshold reached. ", my_id, count);
 			pthread_cond_signal(&count_threshold_cv);
 			printf("Just sent signal.\n");
 		}
-		printf("inc_count(): thread %ld, count = %d, unlocking mutex\n",
-		       my_id,
-		       count);
+		printf("inc_count(): thread %ld, count = %d, unlocking mutex\n", my_id, count);
 		pthread_mutex_unlock(&count_mutex);
 
 		/* Do some work so threads can alternate on mutex lock */
@@ -69,14 +65,9 @@ void *watch_count(void *t) {
 	 **/
 	pthread_mutex_lock(&count_mutex);
 	while (count < COUNT_LIMIT) {
-		printf("watch_count(): thread %ld Count= %d. Going into wait...\n",
-		       my_id,
-		       count);
+		printf("watch_count(): thread %ld Count= %d. Going into wait...\n", my_id, count);
 		pthread_cond_wait(&count_threshold_cv, &count_mutex);
-		printf(
-		    "watch_count(): thread %ld Condition signal received. Count= %d\n",
-		    my_id,
-		    count);
+		printf("watch_count(): thread %ld Condition signal received. Count= %d\n", my_id, count);
 	}
 	printf("watch_count(): thread %ld Updating the value of count...\n", my_id);
 	count += 125;

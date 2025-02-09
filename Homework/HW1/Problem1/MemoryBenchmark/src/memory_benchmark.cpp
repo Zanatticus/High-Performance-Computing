@@ -83,15 +83,9 @@ int main() {
 		sum_random_ex_time = std::chrono::high_resolution_clock::now() - start;
 	}
 
-	printf("Forward sum result: %i, tooks: %.6f\n",
-	       sum_forward,
-	       sum_forward_ex_time.count());
-	printf("Reverse sum result: %i, tooks: %.6f\n",
-	       sum_reverse,
-	       sum_reverse_ex_time.count());
-	printf("Random sum result: %i, tooks: %.6f\n",
-	       sum_random,
-	       sum_random_ex_time.count());
+	printf("Forward sum result: %i, tooks: %.6f\n", sum_forward, sum_forward_ex_time.count());
+	printf("Reverse sum result: %i, tooks: %.6f\n", sum_reverse, sum_reverse_ex_time.count());
+	printf("Random sum result: %i, tooks: %.6f\n", sum_random, sum_random_ex_time.count());
 
 	return 0;
 }

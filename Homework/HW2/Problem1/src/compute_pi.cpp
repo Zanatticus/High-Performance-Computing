@@ -64,11 +64,10 @@ int main() {
 	approximated_pi *= 4;
 
 	// Stop the timer
-	auto end = std::chrono::high_resolution_clock::now();
+	auto                            end          = std::chrono::high_resolution_clock::now();
 	std::chrono::duration< double > elapsed_time = end - start;
 
-	std::cout << "Approximated value of PI: " << std::setprecision(20)
-	          << approximated_pi << std::endl;
-	std::cout << "Elapsed time: " << elapsed_time.count() << " seconds"
+	std::cout << "Approximated value of PI: " << std::setprecision(20) << approximated_pi
 	          << std::endl;
+	std::cout << "Elapsed time: " << elapsed_time.count() << " seconds" << std::endl;
 }

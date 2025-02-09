@@ -7,8 +7,7 @@ int work1() {
 	tid = omp_get_thread_num();
 #pragma omp parallel for
 	for (j = 0; j < 10; j++)
-		printf(
-		    "The value of j as printed by work 1, thread %li = %li\n", tid, j);
+		printf("The value of j as printed by work 1, thread %li = %li\n", tid, j);
 	return 0;
 }
 int work2() {
@@ -17,8 +16,7 @@ int work2() {
 #pragma omp parallel for
 	for (j = 0; j < 10; j++) {
 		tid = omp_get_thread_num();
-		printf(
-		    "The value of j as printed by work 2, thread %li = %li\n", tid, j);
+		printf("The value of j as printed by work 2, thread %li = %li\n", tid, j);
 	}
 	return 0;
 }

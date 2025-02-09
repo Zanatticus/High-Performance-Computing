@@ -40,9 +40,9 @@ const int OFFSET             = LENGTH % NUM_THREADS;
 int       arr[LENGTH];
 
 /* function definitions */
-int  generate_random_number(unsigned int lower_limit, unsigned int upper_limit);
-void merge_sort(int arr[], int left, int right);
-void merge(int arr[], int left, int middle, int right);
+int   generate_random_number(unsigned int lower_limit, unsigned int upper_limit);
+void  merge_sort(int arr[], int left, int right);
+void  merge(int arr[], int left, int middle, int right);
 void* thread_merge_sort(void* arg);
 void  merge_sections_of_array(int arr[], int number, int aggregation);
 void  test_array_is_in_order(int arr[]);
@@ -63,8 +63,7 @@ int main(int argc, const char* argv[]) {
 
 	/* create threads */
 	for (long i = 0; i < NUM_THREADS; i++) {
-		int rc =
-		    pthread_create(&threads[i], NULL, thread_merge_sort, (void*) i);
+		int rc = pthread_create(&threads[i], NULL, thread_merge_sort, (void*) i);
 		if (rc) {
 			printf("ERROR; return code from pthread_create() is %d\n", rc);
 			exit(-1);
@@ -89,8 +88,7 @@ int main(int argc, const char* argv[]) {
 
 /* generate random numbers within the specified limit */
 int generate_random_number(unsigned int lower_limit, unsigned int upper_limit) {
-	return lower_limit +
-	       (upper_limit - lower_limit) * ((double) rand() / RAND_MAX);
+	return lower_limit + (upper_limit - lower_limit) * ((double) rand() / RAND_MAX);
 }
 
 /* merge locally sorted sections */

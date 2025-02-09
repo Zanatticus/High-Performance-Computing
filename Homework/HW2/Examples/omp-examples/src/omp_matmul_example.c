@@ -29,8 +29,7 @@ int main(int argc, char *argv[]) {
 		tid = omp_get_thread_num();
 		if (tid == 0) {
 			nthreads = omp_get_num_threads();
-			printf("Starting matrix multiple example with %d threads\n",
-			       nthreads);
+			printf("Starting matrix multiple example with %d threads\n", nthreads);
 			printf("Initializing matrices...\n");
 		}
 

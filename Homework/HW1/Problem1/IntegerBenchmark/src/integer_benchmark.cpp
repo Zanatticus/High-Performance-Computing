@@ -23,10 +23,8 @@ class timer {
 	void stop() {
 		auto end = std::chrono::high_resolution_clock::now();
 		auto dur = end - begin;
-		auto ms  = std::chrono::duration_cast< std::chrono::milliseconds >(dur)
-		              .count();
-		std::cout << std::setw(19) << text << ":" << std::setw(5) << ms << "ms"
-		          << std::endl;
+		auto ms  = std::chrono::duration_cast< std::chrono::milliseconds >(dur).count();
+		std::cout << std::setw(19) << text << ":" << std::setw(5) << ms << "ms" << std::endl;
 	}
 
 	private:

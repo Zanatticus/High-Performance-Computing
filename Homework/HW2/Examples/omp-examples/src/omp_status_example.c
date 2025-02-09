@@ -21,16 +21,15 @@ int main(int argc, char *argv[]) {
 
 			nthreads = omp_get_num_threads(); /* Returns no. of threads in the
 			                                     current team */
-			maxt = omp_get_max_threads(); /* Returns an upper bound on the no.
-			                                 of threads that cold be used to
-			                                 form a new team */
-			inpar =
-			    omp_in_parallel();       /* Returns true if the current task is
-			                                enclosed iby the active parallel region */
-			dynamic = omp_get_dynamic(); /* Returns true if dynamic adjustment
-			                                of the no. of threads is enabled */
-			nested = omp_get_nested(); /* Returns true if nested parallelism is
-			                              enabled */
+			maxt = omp_get_max_threads();     /* Returns an upper bound on the no.
+			                                     of threads that cold be used to
+			                                     form a new team */
+			inpar = omp_in_parallel();        /* Returns true if the current task is
+			                                     enclosed iby the active parallel region */
+			dynamic = omp_get_dynamic();      /* Returns true if dynamic adjustment
+			                                     of the no. of threads is enabled */
+			nested = omp_get_nested();        /* Returns true if nested parallelism is
+			                                     enabled */
 
 			/* Print environment information */
 			printf("Number of processors = %d\n", procs);
