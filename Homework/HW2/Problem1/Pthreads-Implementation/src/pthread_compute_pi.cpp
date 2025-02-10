@@ -1,5 +1,5 @@
-// Program to compute PI using approximation based on Leibniz's formula and
-// Pthreads Leibniz's formula: PI = 4 * (1 - 1/3 + 1/5 - 1/7 + 1/9 - 1/11 + ...)
+// Program to compute PI using approximation based on Leibniz's formula and Pthreads
+// Leibniz's formula: PI = 4 * (1 - 1/3 + 1/5 - 1/7 + 1/9 - 1/11 + ...)
 // Author: Zander Ingare
 
 #include <chrono>

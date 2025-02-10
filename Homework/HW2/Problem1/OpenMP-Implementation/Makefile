@@ -5,10 +5,10 @@ CXX = g++
 CXXFLAGS = -std=c++11
 
 # Target executable
-TARGET = build/compute_pi
+TARGET = build/openmp_compute_pi
 
 # Source files
-SRCS = src/compute_pi.cpp
+SRCS = src/openmp_compute_pi.cpp
 
 # Default target
 all: clean $(TARGET) run
