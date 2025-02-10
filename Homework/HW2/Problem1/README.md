@@ -41,5 +41,5 @@ you can clearly see the inaccuracies and lack of precision with floating point d
 
 
 ## Miscellaneous
-- The program was compiled and run using the following command within the makefile directory:
+- The program was compiled and run using the following command within the respective makefile directory for each implementation:
 ```make```
