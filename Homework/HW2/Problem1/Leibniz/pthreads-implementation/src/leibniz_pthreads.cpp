@@ -30,9 +30,9 @@ void* compute_pi(void* arg) {
 			thread_sums[thread_id] -= 1.0 / (2 * i + 1);
 		}
 
-		/* 
+		/*
 		This line showcases the inaccuracies of floating point arithmetic in
-		programming (use a DEPTH value of 5 to see the difference) 
+		programming (use a DEPTH value of 5 to see the difference)
 		*/
 		// std::cout << std::setprecision(20) << "SUM: " <<thread_sums[thread_id] << std::endl;
 	}
