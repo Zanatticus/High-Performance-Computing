@@ -10,7 +10,12 @@
 // Number of points to use in the Monte Carlo simulation
 #define NUM_POINTS 1000000
 
+// Number of threads to use in the OpenMP implementation
+#define NUM_THREADS 1
+
 int main() {
+	omp_set_num_threads(NUM_THREADS);
+
 	// Start the timer
 	auto start = std::chrono::high_resolution_clock::now();
 

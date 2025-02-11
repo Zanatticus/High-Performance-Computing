@@ -11,7 +11,12 @@
 // Number of terms in the infinite series to use in the approximation
 #define DEPTH 1000000
 
+// Number of threads to use in the OpenMP implementation
+#define NUM_THREADS 1
+
 int main() {
+	omp_set_num_threads(NUM_THREADS);
+
 	// Start the timer
 	auto start = std::chrono::high_resolution_clock::now();
 
