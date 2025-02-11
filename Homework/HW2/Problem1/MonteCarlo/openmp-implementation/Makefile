@@ -5,10 +5,10 @@ CXX = g++
 CXXFLAGS = -std=c++11
 
 # Target executable
-TARGET = build/openmp_compute_pi
+TARGET = build/montecarlo_omp
 
 # Source files
-SRCS = src/openmp_compute_pi.cpp
+SRCS = src/montecarlo_omp.cpp
 
 # Default target
 all: clean $(TARGET) run

@@ -5,10 +5,10 @@ CXX = g++
 CXXFLAGS = -std=c++11
 
 # Target executable
-TARGET = build/pthread_compute_pi
+TARGET = build/montecarlo_pthreads
 
 # Source files
-SRCS = src/pthread_compute_pi.cpp
+SRCS = src/montecarlo_pthreads.cpp
 
 # Default target
 all: clean $(TARGET) run
