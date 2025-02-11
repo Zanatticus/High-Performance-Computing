@@ -13,15 +13,15 @@
 #define DEPTH 1000000
 
 // Number of threads to use in the computation
-#define MAX_THREADS 4
+#define NUM_THREADS 4
 
 // Array to store the sum of the series computed by each thread
-float thread_sums[MAX_THREADS] = {0};
+float thread_sums[NUM_THREADS] = {0};
 
 void* compute_pi(void* arg) {
 	int thread_id = *(int*) arg;
-	int start     = thread_id * DEPTH / MAX_THREADS;
-	int end       = (thread_id + 1) * DEPTH / MAX_THREADS;
+	int start     = thread_id * DEPTH / NUM_THREADS;
+	int end       = (thread_id + 1) * DEPTH / NUM_THREADS;
 
 	for (int i = start; i < end; i++) {
 		if (i % 2 == 0) {
@@ -40,26 +40,26 @@ void* compute_pi(void* arg) {
 }
 
 int main() {
-	pthread_t threads[MAX_THREADS];
-	int       thread_ids[MAX_THREADS];
+	pthread_t threads[NUM_THREADS];
+	int       thread_ids[NUM_THREADS];
 
 	// Start the timer
 	auto start = std::chrono::high_resolution_clock::now();
 
 	// Create threads to approximate PI
-	for (int i = 0; i < MAX_THREADS; i++) {
+	for (int i = 0; i < NUM_THREADS; i++) {
 		thread_ids[i] = i;
 		pthread_create(&threads[i], NULL, compute_pi, &thread_ids[i]);
 	}
 
 	// Join threads after all threads complete
-	for (int i = 0; i < MAX_THREADS; i++) {
+	for (int i = 0; i < NUM_THREADS; i++) {
 		pthread_join(threads[i], NULL);
 	}
 
 	// Add the sum of all thread parts to get the final approximation
 	float approximated_pi = 0.0;
-	for (int i = 0; i < MAX_THREADS; i++) {
+	for (int i = 0; i < NUM_THREADS; i++) {
 		approximated_pi += thread_sums[i];
 	}
 	approximated_pi *= 4;
