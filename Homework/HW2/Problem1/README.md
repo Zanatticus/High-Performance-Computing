@@ -14,25 +14,42 @@ c. Now compare the two implementations in terms of strong and weak scaling, wher
 
 ## Part (a)
 
+Data was collected on the following system:
 
-Running with a depth of 5 and on one thread:
+
+### Monte Carlo Method for Approximating PI using Pthreads
 
 
-SUM: 1
-SUM: 0.6666666*865*348815918
-SUM: 0.8666666*746*1395263672
-SUM: 0.7238095*402*717590332
-SUM: 0.8349206*447*6013183594
-Approximated value of PI: 3.3396825790405273438
+### Leibniz's Formula for Approximating PI using Pthreads
 
-It should be:
-SUM: 1
-SUM: 0.6666666*667*
-SUM: 0.8666666*667*
-SUM: 0.7238095*238*
-SUM: 0.8349206*349*
 
-you can clearly see the inaccuracies and lack of precision with floating point data types on computers. There is a limit to the precision!
+### Monte Carlo Method for Approximating PI using OpenMP
+
+
+### Leibniz's Formula for Approximating PI using OpenMP
+
+
+### Miscellaneous Observations
+
+When running Leibniz's Formula with a depth of 5 and on one thread:
+
+> SUM: 1  
+> SUM: 0.6666666**865**348815918  
+> SUM: 0.8666666**746**1395263672  
+> SUM: 0.7238095**402**717590332  
+> SUM: 0.8349206**447**6013183594  
+> Approximated value of PI: **3.3396825**790405273438
+
+The actual values (according to a calculator) should be:
+
+> SUM: 1  
+> SUM: 0.6666666**667**  
+> SUM: 0.8666666**667**  
+> SUM: 0.7238095**238**  
+> SUM: 0.8349206**349**  
+> Approximated value of PI: **3.3396825**397  
+
+This clearly showcases the inaccuracies and lack of precision with floating point data types on computers. There is a limit to precision!
 
 ## Part (b)
 
