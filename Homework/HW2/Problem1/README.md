@@ -58,6 +58,7 @@ Vector Node Xi, Intel(R) Xeon(R) CPU E5-2698 v4 @ 2.20GHz, 80 cores, running at 
 <p align="center">Table 4: Strong Scaling for Leibniz's Formula to Approximate PI using Pthreads. Speedup is compared against single-threaded performance.</p>
 
 ### Observations
+Both the Monte Carlo and Leibniz's Formula methods for approximating PI using Pthreads show a decrease in speedup as the number of threads increases while the number of "darts" also increases. On the other hand, when the number of "darts" is fixed and the number of threads increases, the speedup for both methods increases, with the Monte Carlo method exhibiting greater speedups compared to the Leibniz's Formula method when using their respective single-threaded performance as a baseline.
 
 ### Miscellaneous Observations
 
@@ -122,6 +123,9 @@ This clearly showcases the inaccuracies and lack of precision with floating poin
 |      Speedup*     	|      1      	| 0.899731859 	| 0.8964605215 	| 0.8979977341 	| 0.7260505862 	| 0.6931661612 	| 0.5485753578 	| 0.1840328584 	|
 
 <p align="center">Table 8: Strong Scaling for Leibniz's Formula to Approximate PI using OpenMP. Speedup is compared against single-threaded performance.</p>
+
+### Observations
+Both the Monte Carlo and Leibniz's Formula methods for approximating PI using OpenMP show a decrease in speedup as the number of threads increases while the number of "darts" also increases. On the other hand, when the number of "darts" is fixed and the number of threads increases, the speedup for both methods increases, with the Monte Carlo method exhibiting greater speedups compared to the Leibniz's Formula method when using their respective single-threaded performance as a baseline.
 
 ## Part (c)
 
