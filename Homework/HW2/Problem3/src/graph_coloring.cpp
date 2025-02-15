@@ -11,21 +11,21 @@
 #include <algorithm>
 
 #define NUM_THREADS 4
-#define NUM_VERTICES 100
+#define NUM_VERTICES 10
 
 // Generates an adjacency list where each vertex stores its neighbors
-std::map<int, std::vector<int>> generate_graph(int graph_size) {
-    std::map<int, std::vector<int>> graph;
+std::map<int, std::set<int>> generate_graph(int graph_size) {
+    std::map<int, std::set<int>> graph;
 
     // Loop over the vertices in the graph
     for (int i = 0; i < graph_size; i++) {
-        std::vector<int> neighbors;
+        std::set<int> neighbors;
         for (int j = 0; j < graph_size; j++) {
             if (i != j) {
                 // Random generation of neighbors for the vertex
                 if (rand() % 2 == 0) {
-                    neighbors.push_back(j);
-                    graph[j].push_back(i); // Ensure the neighbor relationship is bidirectional
+                    neighbors.insert(j);
+                    graph[j].insert(i); // Ensure the neighbor relationship is bidirectional
                 }
             }
         }
@@ -35,10 +35,10 @@ std::map<int, std::vector<int>> generate_graph(int graph_size) {
 }
 
 // Colors the graph using a greedy algorithm and OpenMP
-std::map<int, int> color_vertices(const std::map<int, std::vector<int>> &graph) {
+std::map<int, int> color_vertices(const std::map<int, std::set<int>> &graph) {
     std::map<int, int> colored_vertices; // A map of the vertex and its assigned color value
     std::map<int, std::set<int>> unavailable_colors_map; // A dictionary of unavailable colors for each vertex
-    
+
     for (int v = 0; v < NUM_VERTICES; v++) {
         int color = 0;
 
@@ -65,7 +65,7 @@ std::map<int, int> color_vertices(const std::map<int, std::vector<int>> &graph) 
 }
 
 // Validates that the colored graph is properly colored
-bool validate_colored_vertices(const std::map<int, std::vector<int>> &graph, const std::map<int, int> &colored_graph) {
+bool validate_colored_vertices(const std::map<int, std::set<int>> &graph, const std::map<int, int> &colored_graph) {
     for (const auto &entry : graph) {
         int vertex = entry.first;
         for (int neighbor : entry.second) {
@@ -79,7 +79,7 @@ bool validate_colored_vertices(const std::map<int, std::vector<int>> &graph, con
 }
 
 // Prints the adjacency list of the graph in a readable format
-void print_graph(const std::map<int, std::vector<int>> &graph) {
+void print_graph(const std::map<int, std::set<int>> &graph) {
     std::cout << "Graph Adjacency Neighbors List:\n";
     for (const auto &entry : graph) {
         std::cout << "\t" << "Vertex " << entry.first << " --> ";
@@ -106,7 +106,7 @@ int main() {
     srand(time(0)); // Seed for randomness
 
     // Generate a random graph and print it
-    std::map<int, std::vector<int>> graph = generate_graph(NUM_VERTICES);
+    std::map<int, std::set<int>> graph = generate_graph(NUM_VERTICES);
     print_graph(graph);
     
     auto start_time = std::chrono::high_resolution_clock::now();
