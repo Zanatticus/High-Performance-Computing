@@ -11,7 +11,7 @@
 #include <algorithm>
 
 #define NUM_THREADS 4
-#define NUM_VERTICES 10
+#define NUM_VERTICES 100
 
 // Generates an adjacency list where each vertex stores its neighbors
 std::map<int, std::vector<int>> generate_graph(int graph_size) {
@@ -56,10 +56,9 @@ std::map<int, int> color_vertices(const std::map<int, std::vector<int>> &graph) 
         // Mark the current vertex color as unavailable for all of its neighbors (if they exist)
         if (graph.find(v) != graph.end()) {
             for (int neighbor : graph.at(v)) {
-            unavailable_colors_map[neighbor].insert(color);
+                unavailable_colors_map[neighbor].insert(color);
             }
         }
-
     }
 
     return colored_vertices;
@@ -71,6 +70,7 @@ bool validate_colored_vertices(const std::map<int, std::vector<int>> &graph, con
         int vertex = entry.first;
         for (int neighbor : entry.second) {
             if (colored_graph.at(vertex) == colored_graph.at(neighbor)) {
+                std::cout << "Vertex " << vertex << " and Vertex " << neighbor << " have the same color!" << std::endl;
                 return false;
             }
         }
