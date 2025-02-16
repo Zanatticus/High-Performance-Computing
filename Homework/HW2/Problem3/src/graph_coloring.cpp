@@ -27,7 +27,7 @@ std::map<int, std::set<int>> generate_graph(int graph_size) {
         for (int j = 0; j < graph_size; j++) {
             if (i != j) {
                 // Random generation of neighbors for the vertex
-                if (rand() % NUM_VERTICES == 0) {
+                if (rand() % 2 == 0) {
                     graph[i].insert(j);
                     graph[j].insert(i); // Ensure the neighbor relationship is bidirectional
                 }
@@ -46,10 +46,8 @@ std::map<int, int> color_vertices(const std::map<int, std::set<int>> &graph) {
         int color = 0;
 
         // Check the unavailable colors for the current vertex
-        if (unavailable_colors_map.find(v) != unavailable_colors_map.end()) {
-            std::set<int> unavailable_colors = unavailable_colors_map[v];
-            
-            while (unavailable_colors.find(color) != unavailable_colors.end()) {
+        if (unavailable_colors_map.find(v) != unavailable_colors_map.end()) {        
+            while (unavailable_colors_map[v].find(color) != unavailable_colors_map[v].end()) {
                 color++;
             }
         }
