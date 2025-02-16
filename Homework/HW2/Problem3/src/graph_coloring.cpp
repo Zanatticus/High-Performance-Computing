@@ -9,6 +9,7 @@
 #include <set>
 #include <chrono>
 #include <algorithm>
+#include <iomanip>
 
 #define NUM_THREADS 4
 #define NUM_VERTICES 10
@@ -65,6 +66,88 @@ std::map<int, int> color_vertices_sequential(const std::map<int, std::set<int>> 
     return colored_vertices;
 }
 
+// Colors the graph using the Jones-Plassmann algorithm (parallel) and OpenMP
+std::map<int, int> color_vertices_parallel(const std::map<int, std::set<int>> &graph) {
+    int n = graph.size();
+    std::vector<int> priorities(n);
+    std::vector<bool> colored(n, false);
+    std::map<int, int> colored_graph;  // Resultant colored graph (vertex -> color)
+
+    // Assign random priorities to each vertex
+    #pragma omp parallel for num_threads(NUM_THREADS)
+    for (int i = 0; i < n; i++) {
+        priorities[i] = rand();
+    }
+
+    std::vector<int> uncolored_nodes;
+    for (const auto &entry : graph) {
+        uncolored_nodes.push_back(entry.first);
+    }
+
+    while (!uncolored_nodes.empty()) {
+        std::vector<int> to_color;
+
+        // Select nodes that have the highest priority in their neighborhood
+        #pragma omp parallel
+        {
+            std::vector<int> local_to_color;
+
+            #pragma omp for nowait
+            for (size_t i = 0; i < uncolored_nodes.size(); i++) {
+                int node = uncolored_nodes[i];
+                bool highest_priority = true;
+
+                for (int neighbor : graph.at(node)) {
+                    if (!colored[neighbor] && priorities[neighbor] > priorities[node]) {
+                        highest_priority = false;
+                        break;
+                    }
+                }
+
+                if (highest_priority) {
+                    local_to_color.push_back(node);
+                }
+            }
+
+            #pragma omp critical
+            to_color.insert(to_color.end(), local_to_color.begin(), local_to_color.end());
+        }
+
+        // Assign colors to selected nodes
+        #pragma omp parallel for num_threads(NUM_THREADS)
+        for (size_t i = 0; i < to_color.size(); i++) {
+            int node = to_color[i];
+            std::set<int> neighbor_colors;
+
+            for (int neighbor : graph.at(node)) {
+                if (colored[neighbor]) {
+                    neighbor_colors.insert(colored_graph[neighbor]);
+                }
+            }
+
+            int color = 1;
+            while (neighbor_colors.find(color) != neighbor_colors.end()) {
+                color++;
+            }
+
+            colored_graph[node] = color;
+            colored[node] = true;
+        }
+
+        // Update uncolored nodes
+        std::vector<int> new_uncolored_nodes;
+        for (int node : uncolored_nodes) {
+            if (!colored[node]) {
+                new_uncolored_nodes.push_back(node);
+            }
+        }
+        uncolored_nodes = std::move(new_uncolored_nodes);
+    }
+
+    return colored_graph;
+}
+
+
 // Validates that the colored graph is properly colored
 bool validate_colored_vertices(const std::map<int, std::set<int>> &graph, const std::map<int, int> &colored_graph) {
     for (const auto &entry : graph) {
@@ -109,24 +192,41 @@ int main() {
     std::map<int, std::set<int>> graph = generate_graph(NUM_VERTICES);
     print_graph(graph);
     
-    auto start_time = std::chrono::high_resolution_clock::now();
-
+    auto sequential_start_time = std::chrono::high_resolution_clock::now();
     std::map<int, int> colored_vertices_sequential = color_vertices_sequential(graph);
+    auto sequential_end_time = std::chrono::high_resolution_clock::now();
 
-    auto end_time = std::chrono::high_resolution_clock::now();
-    std::chrono::duration<double> elapsed_time = end_time - start_time;
+    std::chrono::duration<double> sequential_elapsed_time = sequential_end_time - sequential_start_time;
 
-    // Print the assigned graph colors
+    // Print the assigned graph colors for the sequential algorithm
     print_colored_vertices(colored_vertices_sequential);
 
-    // Validate the colored graph
+    // Validate the sequential algorithmically-colored graph
     if (validate_colored_vertices(graph, colored_vertices_sequential)) {
-        std::cout << "Graph coloring is valid!" << std::endl;
+        std::cout << "Sequential algorithm graph coloring is valid!" << std::endl;
     } else {
-        std::cout << "Graph coloring is invalid!" << std::endl;
+        std::cout << "Sequential algorithm graph coloring is invalid!" << std::endl;
     }
 
-    std::cout << "Elapsed time: " << elapsed_time.count() << " seconds" << std::endl;
+    std::cout << "Sequential algorithm elapsed time: " << std::fixed << std::setprecision(15) << sequential_elapsed_time.count() << " seconds" << std::endl << std::endl;
+
+    auto parallel_start_time = std::chrono::high_resolution_clock::now();
+    std::map<int, int> colored_vertices_parallel = color_vertices_parallel(graph);
+    auto parallel_end_time = std::chrono::high_resolution_clock::now();
+
+    std::chrono::duration<double> parallel_elapsed_time = parallel_end_time - parallel_start_time;
+
+    // Print the assigned graph colors for the parallel algorithm
+    print_colored_vertices(colored_vertices_parallel);
+
+    // Validate the parallel algorithmically-colored graph
+    if (validate_colored_vertices(graph, colored_vertices_parallel)) {
+        std::cout << "Parallel algorithm graph coloring is valid!" << std::endl;
+    } else {
+        std::cout << "Parallel algorithm graph coloring is invalid!" << std::endl;
+    }
+
+    std::cout << "Parallel algorithm elapsed time: " << std::fixed << std::setprecision(15) << parallel_elapsed_time.count() << " seconds" << std::endl << std::endl;
 
     return 0;
 }
