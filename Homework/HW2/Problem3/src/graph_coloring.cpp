@@ -37,8 +37,8 @@ std::map<int, std::set<int>> generate_graph(int graph_size) {
     return graph;
 }
 
-// Colors the graph using a greedy algorithm and OpenMP
-std::map<int, int> color_vertices(const std::map<int, std::set<int>> &graph) {
+// Colors the graph using a sequential algorithm
+std::map<int, int> color_vertices_sequential(const std::map<int, std::set<int>> &graph) {
     std::map<int, int> colored_vertices; // A map of the vertex and its assigned color value
     std::map<int, std::set<int>> unavailable_colors_map; // A dictionary of unavailable colors for each vertex
 
@@ -111,16 +111,16 @@ int main() {
     
     auto start_time = std::chrono::high_resolution_clock::now();
 
-    std::map<int, int> colored_vertices = color_vertices(graph);
+    std::map<int, int> colored_vertices_sequential = color_vertices_sequential(graph);
 
     auto end_time = std::chrono::high_resolution_clock::now();
     std::chrono::duration<double> elapsed_time = end_time - start_time;
 
     // Print the assigned graph colors
-    print_colored_vertices(colored_vertices);
+    print_colored_vertices(colored_vertices_sequential);
 
     // Validate the colored graph
-    if (validate_colored_vertices(graph, colored_vertices)) {
+    if (validate_colored_vertices(graph, colored_vertices_sequential)) {
         std::cout << "Graph coloring is valid!" << std::endl;
     } else {
         std::cout << "Graph coloring is invalid!" << std::endl;
