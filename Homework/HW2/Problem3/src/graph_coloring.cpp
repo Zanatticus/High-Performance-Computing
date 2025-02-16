@@ -66,89 +66,8 @@ std::map<int, int> color_vertices_sequential(const std::map<int, std::set<int>> 
     return colored_vertices;
 }
 
-// Colors the graph using the Jones-Plassmann algorithm (parallel) and OpenMP
-std::map<int, int> jones_plassmann_coloring(const std::map<int, std::set<int>> &graph) {
-    int n = graph.size();
-    std::vector<int> priorities(n);
-    std::vector<bool> colored(n, false);
-    std::map<int, int> colored_graph;  // Resultant colored graph (vertex -> color)
-
-    // Assign random priorities to each vertex
-    #pragma omp parallel for num_threads(NUM_THREADS)
-    for (int i = 0; i < n; i++) {
-        priorities[i] = rand();
-    }
-
-    std::vector<int> uncolored_nodes;
-    for (const auto &entry : graph) {
-        uncolored_nodes.push_back(entry.first);
-    }
-
-    while (!uncolored_nodes.empty()) {
-        std::vector<int> to_color;
-
-        // Select nodes that have the highest priority in their neighborhood
-        #pragma omp parallel
-        {
-            std::vector<int> local_to_color;
-
-            #pragma omp for nowait
-            for (size_t i = 0; i < uncolored_nodes.size(); i++) {
-                int node = uncolored_nodes[i];
-                bool highest_priority = true;
-
-                for (int neighbor : graph.at(node)) {
-                    if (!colored[neighbor] && priorities[neighbor] > priorities[node]) {
-                        highest_priority = false;
-                        break;
-                    }
-                }
-
-                if (highest_priority) {
-                    local_to_color.push_back(node);
-                }
-            }
-
-            #pragma omp critical
-            to_color.insert(to_color.end(), local_to_color.begin(), local_to_color.end());
-        }
-
-        // Assign colors to selected nodes
-        #pragma omp parallel for num_threads(NUM_THREADS)
-        for (size_t i = 0; i < to_color.size(); i++) {
-            int node = to_color[i];
-            std::set<int> neighbor_colors;
-
-            for (int neighbor : graph.at(node)) {
-                if (colored[neighbor]) {
-                    neighbor_colors.insert(colored_graph[neighbor]);
-                }
-            }
-
-            int color = 1;
-            while (neighbor_colors.find(color) != neighbor_colors.end()) {
-                color++;
-            }
-
-            colored_graph[node] = color;
-            colored[node] = true;
-        }
-
-        // Update uncolored nodes
-        std::vector<int> new_uncolored_nodes;
-        for (int node : uncolored_nodes) {
-            if (!colored[node]) {
-                new_uncolored_nodes.push_back(node);
-            }
-        }
-        uncolored_nodes = std::move(new_uncolored_nodes);
-    }
-
-    return colored_graph;
-}
-
 // Colors the graph using the Gebremedhin-Manne algorithm (parallel) and OpenMP
-std::map<int, int> gebremedhin_manne_coloring(const std::map<int, std::set<int>> &graph) {
+std::map<int, int> color_vertices_parallel(const std::map<int, std::set<int>> &graph) {
     int n = graph.size();
     std::map<int, int> colors;  // Stores final color for each vertex
     std::vector<int> priorities(n);
@@ -310,7 +229,7 @@ int main() {
     std::cout << "Sequential algorithm elapsed time: " << std::fixed << std::setprecision(15) << sequential_elapsed_time.count() << " seconds" << std::endl << std::endl;
 
     auto parallel_start_time = std::chrono::high_resolution_clock::now();
-    std::map<int, int> colored_vertices_parallel = gebremedhin_manne_coloring(graph);
+    std::map<int, int> colored_vertices_parallel = color_vertices_parallel(graph);
     auto parallel_end_time = std::chrono::high_resolution_clock::now();
 
     std::chrono::duration<double> parallel_elapsed_time = parallel_end_time - parallel_start_time;
