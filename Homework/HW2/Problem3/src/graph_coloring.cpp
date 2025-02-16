@@ -17,19 +17,22 @@
 std::map<int, std::set<int>> generate_graph(int graph_size) {
     std::map<int, std::set<int>> graph;
 
+    // Populate the graph with empty values
+    for (int i = 0; i < graph_size; i++) {
+        graph[i] = std::set<int>();
+    }
+
     // Loop over the vertices in the graph
     for (int i = 0; i < graph_size; i++) {
-        std::set<int> neighbors;
         for (int j = 0; j < graph_size; j++) {
             if (i != j) {
                 // Random generation of neighbors for the vertex
-                if (rand() % 2 == 0) {
-                    neighbors.insert(j);
+                if (rand() % NUM_VERTICES == 0) {
+                    graph[i].insert(j);
                     graph[j].insert(i); // Ensure the neighbor relationship is bidirectional
                 }
             }
         }
-        graph[i] = neighbors;
     }
     return graph;
 }
@@ -99,7 +102,6 @@ void print_colored_vertices(const std::map<int, int> &coloring) {
     }
     std::cout << std::endl;
 }
-
 
 int main() {
     omp_set_num_threads(NUM_THREADS);
