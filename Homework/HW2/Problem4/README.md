@@ -10,13 +10,13 @@ Develop your own SpMV (sparse matrix-vector multiplication) implementation that 
 
 Students can earn an extra 10 points of extra credit for implementing and evaluating each memory reordering algorithm (60 maximum points).
 
-* Written answers to the questions should be included in your homework 2 write-up in pdf format. You should include your C/C++ program and the README file in the zip file submitted.
+*Written answers to the questions should be included in your homework 2 write-up in pdf format. You should include your C/C++ program and the README file in the zip file submitted.
 
 ## Part (a)
 
 ### Scheme 1 Pseudocode (Reverse Cuthill-McKee (CM))
-Assuming a symmetric `n x n` matrix is given:
 
+Assuming a symmetric `n x n` matrix is given:
 1. Initialize a queue `Q` and an empty list for permutation order of objects `R`.
 2. Find the object with the smallest degree whose index has not yet been added to `R` and add it's index to `R`.
 3. When an index is added to `R`. add all of the neighbors of the object at that index to the queue `Q` in increasing order of degree.
@@ -29,11 +29,30 @@ Assuming a symmetric `n x n` matrix is given:
 
 ### Scheme 2 Pseudocode (Gray Ordering)
 
+
+
 ## Part (b)
 
-
-## Part (c)
-
+Associated Memory Hierarchy for the **Milan B** hardware platform:
+- CPU: **[AMD Epyc 7763](https://en.wikichip.org/wiki/amd/epyc/7763), x86-64, 128 cores**
+- Cache Levels:
+    - L1 Instruction Cache (per core): **32 KiB**
+        - Associativity: **8-way**
+        - Total Size: 64 x 32 KiB = 2048 KiB = **2 MiB**
+    - L1 Data Cache (per core): **32 KiB**
+        - Associativity: **8-way**
+        - Total Size: 64 x 32 KiB = 2048 KiB = **2 MiB**
+    - L2 Cache (per core): **512 KiB**
+        - Associativity: **8-way**
+        - Total Size: 64 x 512 KiB = 32768 KiB = **32 MiB**
+    - L3 Cache (per socket): **256 MiB**
+        - Associativity: **16-way**
+        - Total Size: 8 x 32 MiB = **256 MiB**
+- Integrated Memory Controller:
+    - Memory Type: **DDR4-3200**
+    - Memory Channels: **8**
+    - Max Memory Capacity: **4 TiB**
+    - Max Bandwidth: **190.73 GiB/s**
 
 ## Miscellaneous
 - The program was compiled and run using the following command within the makefile directory:
