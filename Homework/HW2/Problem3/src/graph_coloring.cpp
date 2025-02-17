@@ -13,6 +13,7 @@
 
 #define NUM_THREADS  1
 #define NUM_VERTICES 25
+#define PRINT_GRAPH  false
 
 // Generates an adjacency list where each vertex stores its neighbors
 std::map< int, std::set< int > > generate_graph(int graph_size) {
@@ -188,6 +189,10 @@ bool validate_colored_vertices(const std::map< int, std::set< int > > &graph,
 
 // Prints the adjacency list of the graph in a readable format
 void print_graph(const std::map< int, std::set< int > > &graph) {
+	if (!PRINT_GRAPH) {
+		return;
+	}
+
 	std::cout << "Graph Adjacency Neighbors List:\n";
 	for (const auto &entry : graph) {
 		std::cout << "\t" << "Vertex " << entry.first << " --> ";
@@ -201,6 +206,10 @@ void print_graph(const std::map< int, std::set< int > > &graph) {
 
 // Prints the graph coloring results in a readable format
 void print_colored_vertices(const std::map< int, int > &coloring) {
+	if (!PRINT_GRAPH) {
+		return;
+	}
+
 	std::cout << "Graph Coloring Results:\n";
 	for (const auto &entry : coloring) {
 		std::cout << "\t" << "Vertex " << entry.first << " --> Color " << entry.second << "\n";
