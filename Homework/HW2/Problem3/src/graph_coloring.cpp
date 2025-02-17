@@ -13,6 +13,15 @@
 
 #define NUM_THREADS  1
 #define NUM_VERTICES 25
+
+#define LOW_DENSITY NUM_VERTICES
+#define HIGH_DENSITY 2
+
+// Neighbor density refers to the rough average of neighbors per vertex. 
+// To use the lowest neighbor density for our graph, set NEIGHBOR_DENSITY to LOW_DENSITY.
+// To use the highest neighbor density for our graph, set NEIGHBOR_DENSITY to HIGH_DENSITY.
+#define NEIGHBOR_DENSITY HIGH_DENSITY
+
 #define PRINT_GRAPH  false
 
 // Generates an adjacency list where each vertex stores its neighbors
@@ -29,7 +38,7 @@ std::map< int, std::set< int > > generate_graph(int graph_size) {
 		for (int j = 0; j < graph_size; j++) {
 			if (i != j) {
 				// Random generation of neighbors for the vertex
-				if (rand() % 16 == 0) {
+				if (rand() % NEIGHBOR_DENSITY == 0) {
 					graph[i].insert(j);
 					graph[j].insert(i);   // Ensure the neighbor relationship is bidirectional
 				}
