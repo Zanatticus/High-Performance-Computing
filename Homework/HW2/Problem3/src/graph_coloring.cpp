@@ -84,12 +84,12 @@ std::map< int, int > color_vertices_parallel(const std::map< int, std::set< int 
 	while (!vertex_list.empty()) {
 		std::vector< int > independent_set;
 
-// Select independent set of highest-priority vertices
-#pragma omp parallel
+		// Select independent set of highest-priority vertices
+		#pragma omp parallel
 		{
 			std::vector< int > local_independent_set;
 
-#pragma omp for nowait
+			#pragma omp for nowait
 			for (size_t i = 0; i < vertex_list.size(); i++) {
 				int node = vertex_list[i];
 
@@ -114,8 +114,8 @@ std::map< int, int > color_vertices_parallel(const std::map< int, std::set< int 
 				}
 			}
 
-// Thread-safe independent set insertion
-#pragma omp critical
+			// Thread-safe independent set insertion
+			#pragma omp critical
 			independent_set.insert(
 			    independent_set.end(), local_independent_set.begin(), local_independent_set.end());
 		}
@@ -125,15 +125,15 @@ std::map< int, int > color_vertices_parallel(const std::map< int, std::set< int 
 			independent_set.push_back(vertex_list[0]);
 		}
 
-// Assign colors to independent set in parallel
-#pragma omp parallel for num_threads(NUM_THREADS)
+		// Assign colors to independent set in parallel
+		#pragma omp parallel for num_threads(NUM_THREADS)
 		for (size_t i = 0; i < independent_set.size(); i++) {
 			int             node = independent_set[i];
 			std::set< int > neighbor_colors;
 
 			if (graph.find(node) != graph.end()) {   // Prevents out-of-bounds
 				for (int neighbor : graph.at(node)) {
-#pragma omp critical
+					#pragma omp critical
 					{
 						if (colors.find(neighbor) != colors.end()) {
 							neighbor_colors.insert(colors[neighbor]);
@@ -147,7 +147,7 @@ std::map< int, int > color_vertices_parallel(const std::map< int, std::set< int 
 				color++;
 			}
 
-#pragma omp critical
+			#pragma omp critical
 			colors[node] = color;   // Ensure thread safety
 		}
 
