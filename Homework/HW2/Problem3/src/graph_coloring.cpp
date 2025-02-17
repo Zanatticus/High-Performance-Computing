@@ -12,7 +12,7 @@
 #include <vector>
 
 #define NUM_THREADS  1
-#define NUM_VERTICES 25
+#define NUM_VERTICES 50
 
 #define LOW_DENSITY NUM_VERTICES
 #define HIGH_DENSITY 2
