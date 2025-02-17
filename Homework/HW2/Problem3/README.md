@@ -74,6 +74,26 @@ The program was run using the following resources:
 
 ### Algorithmic Complexity and Observations
 
+#### *Algorithmic Complexity*
+Let `n` be the number of vertices and `m` be the number of edges in the graph. The Gebremedhin-Manne algorithm has the following complexity:
+1. The loop that initializes priorities run in **`O(n)`**
+2. The outer while loop `while (!vertex_list.empty())` iterates over the graph until all vertices are colored, with the worst case scenario being **`O(n)`** if only one node is colored per iteration.
+3. The independent set selection which has each vertex chechking its neighbors to determine if it has the highest priority runs in **`O(m)`**
+4. Assigning colors to the vertices runs in **`O(n)`**
+5. Updating the vertex list runs in **`O(n)`**
+
+Since the outer while loop runs in **`O(n)`**, and the independent set selection & coloring step runs in **`O(m)`** and **`O(n)`**, respectively, the overall complexity becomes **`O(nm + n^2)`**.
+
+Considering that I collected data for sparse and dense graphs, it's important to note that the complexity can simplify as follows (applying **`m = O(n)`** for sparse graphs and **`m = O(n^2)`** for dense graphs):
+
+- Sparse Graphs: **`O(n^2)`**
+- Dense Graphs: **`O(n^3)`**
+
+#### *Observations*
+- The sequential algorithm always performed better than the parallel algorithm. Even though the sequential algorithm had a algorithmic complexity of **`O(n^2)`**, it was able to color the graph faster than the parallel algorithm since there was overall less overhead and computations required.
+- The parallel algorithm performed much better on sparse graphs than dense graphs. This is because the parallel algorithm had to perform more computations on dense graphs, which led to more overhead and longer runtimes. This also aligns with the algorithmic complexity of the parallel algorithm on dense graphs, which is **`O(n^3)`** as opposed to **`O(n^2)`** on sparse graphs.
+- Looking at weak scaling, the parallel algorithm did not scale well for low neighbor densities, and exhibited some slight positive scaling for high neghbor densities with low vertex counts. The most notable scaling, however, was for high neighbor densities with high vertex counts, where the parallel algorithm scaled well up until it reached a barrier at 8 threads.
+- Looking at strong scaling, the parallel algorithm did not scale well for both low and high neighbor densities.
 
 ## Miscellaneous
 - The program was compiled and run using the following command within the makefile directory:
