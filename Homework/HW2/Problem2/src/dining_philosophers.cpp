@@ -90,13 +90,6 @@ private:
         update_display();
     }
 
-    // Check if the philosopher can eat
-    bool check_eatability(int id) {
-        return (states[id] == HUNGRY &&
-                states[(id + num_philosophers - 1) % num_philosophers] != EATING &&
-                states[(id + 1) % num_philosophers] != EATING);
-    }
-
     // Update the status of the philosopher to the given state
     void update_philosopher_status(int id, int state) {
         pthread_mutex_lock(&mutex);
