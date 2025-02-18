@@ -125,13 +125,13 @@ private:
             std::cout << "Philosopher " << i << ": ";
             switch (states[i]) {
                 case THINKING:
-                    std::cout << "\033[33mTHINKING\033[0m"; // Yellow
+                    std::cout << "\033[33m THINKING \033[0m"; // Yellow
                     break;
                 case HUNGRY:
-                    std::cout << "\033[31mHUNGRY  \033[0m"; // Red
+                    std::cout << "\033[31m HUNGRY \033[0m"; // Red
                     break;
                 case EATING:
-                    std::cout << "\033[32mEATING  \033[0m"; // Green
+                    std::cout << "\033[32m EATING \033[0m"; // Green
                     break;
             }
             std::cout << "\n";
@@ -141,11 +141,11 @@ private:
 
             std::cout << "  └── Fork " << i << ": ";
             if (states[left_philosopher] == EATING) {
-                std::cout << "\033[36mTaken by Philosopher " << left_philosopher << "\033[0m"; // Cyan
+                std::cout << "\033[36m Taken by Philosopher " << "\033[0m" << left_philosopher; // Cyan
             } else if (states[right_philosopher] == EATING) {
-                std::cout << "\033[36mTaken by Philosopher " << right_philosopher << "\033[0m"; // Cyan
+                std::cout << "\033[36m Taken by Philosopher " << "\033[0m" << right_philosopher; // Cyan
             } else {
-                std::cout << "\033[37mAvailable\033[0m"; // Gray
+                std::cout << "\033[37m Available \033[0m"; // Gray
             }
             std::cout << "\n";
         }
