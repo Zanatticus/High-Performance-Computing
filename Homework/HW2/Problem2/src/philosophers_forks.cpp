@@ -109,7 +109,7 @@ private:
         pthread_mutex_unlock(&mutex);
     }
 
-    // Updates the display with the current state of the philosophers in a fancy, colored way
+    // Updates the display with the current state of the philosophers and forks
     void update_display() {
         if (!USE_FANCY_DISPLAY) {
             return;
@@ -135,10 +135,25 @@ private:
                     break;
             }
             std::cout << "\n";
+
+            int left_philosopher = i;
+            int right_philosopher = (i + 1) % num_philosophers;
+
+            std::cout << "  └── Fork " << i << ": ";
+            if (states[left_philosopher] == EATING) {
+                std::cout << "\033[36mTaken by Philosopher " << left_philosopher << "\033[0m"; // Cyan
+            } else if (states[right_philosopher] == EATING) {
+                std::cout << "\033[36mTaken by Philosopher " << right_philosopher << "\033[0m"; // Cyan
+            } else {
+                std::cout << "\033[37mAvailable\033[0m"; // Gray
+            }
+            std::cout << "\n";
         }
+
         std::cout.flush();
         pthread_mutex_unlock(&cout_mutex);
     }
+
 
     // Thread-safe cout output function
     void print_safe(const std::string& message) {
