@@ -64,7 +64,7 @@ private:
         sleep(distr(gen));
     }
 
-    // Pick up the forks and test if the philosopher can eat
+    // Pick up the forks and check if the philosopher can eat
     void pickup_forks(int id) {
         pthread_mutex_lock(&mutex);
         states[id] = HUNGRY;
@@ -72,26 +72,26 @@ private:
             print_safe("Philosopher " + std::to_string(id) + " is picking up the forks.");
         }
         update_display();
-        test(id);
+        check_eatability(id);
         pthread_mutex_unlock(&mutex);
         pthread_mutex_lock(&forks[id]);  // Wait until allowed to eat
     }
 
-    // Put down the forks and test if neighbors can eat
+    // Put down the forks and check if neighbors can eat
     void putdown_forks(int id) {
         pthread_mutex_lock(&mutex);
         states[id] = THINKING;
         if (!USE_FANCY_DISPLAY) {
             print_safe("Philosopher " + std::to_string(id) + " is putting down the forks.");
         }
-        test((id + num_philosophers - 1) % num_philosophers); // Test left neighbor
-        test((id + 1) % num_philosophers); // Test right neighbor
+        check_eatability((id + num_philosophers - 1) % num_philosophers);   // Check left neighbor
+        check_eatability((id + 1) % num_philosophers);                      // Check right neighbor
         pthread_mutex_unlock(&mutex);
         update_display();
     }
 
-    // Test if the philosopher can eat
-    void test(int id) {
+    // Check if the philosopher can eat
+    void check_eatability(int id) {
         if (states[id] == HUNGRY &&
             states[(id + num_philosophers - 1) % num_philosophers] != EATING &&
             states[(id + 1) % num_philosophers] != EATING) {
@@ -153,7 +153,6 @@ private:
         std::cout.flush();
         pthread_mutex_unlock(&cout_mutex);
     }
-
 
     // Thread-safe cout output function
     void print_safe(const std::string& message) {
