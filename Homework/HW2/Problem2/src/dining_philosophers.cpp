@@ -51,18 +51,6 @@ private:
         std::uniform_int_distribution<> distr(2, 5);
         sleep(distr(gen));
     }
-    
-    // Update the status of the philosopher to eating for a random amount of time
-    void eat(int id) {
-        if (!USE_FANCY_DISPLAY) {
-            print_safe("Philosopher " + std::to_string(id) + " is eating...");
-        }
-        update_philosopher_status(id, EATING);
-        std::random_device rd;
-        std::mt19937 gen(rd());
-        std::uniform_int_distribution<> distr(5, 10);
-        sleep(distr(gen));
-    }
 
     // Pick up the forks and check if the philosopher can eat
     void pickup_forks(int id) {
@@ -75,6 +63,18 @@ private:
         check_eatability(id);
         pthread_mutex_unlock(&mutex);
         pthread_mutex_lock(&forks[id]);  // Wait until allowed to eat
+    }
+
+    // Update the status of the philosopher to eating for a random amount of time
+    void eat(int id) {
+        if (!USE_FANCY_DISPLAY) {
+            print_safe("Philosopher " + std::to_string(id) + " is eating...");
+        }
+        update_philosopher_status(id, EATING);
+        std::random_device rd;
+        std::mt19937 gen(rd());
+        std::uniform_int_distribution<> distr(5, 10);
+        sleep(distr(gen));
     }
 
     // Put down the forks and check if neighbors can eat
