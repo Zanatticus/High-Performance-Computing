@@ -1,6 +1,6 @@
-// Program for solving the dining philosophers problem using pthreads
-// Each philosopher is a thread, and the forks are the synchronizations needed between them.
-// This version provides an updating text-based GUI without ncurses.
+// Program for solving the Dining Philosophers problem using pthreads
+// Each philosopher is a thread, and the forks are the synchronizations (mutexes) needed between them.
+// Philosophers think for a random amount of time and eat for a random amount of time. They are 'HUNGRY' if waiting for forks.
 // Author: Zander Ingare
 
 #include <iostream>
