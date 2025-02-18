@@ -21,8 +21,8 @@ The program was run using the following resources:
 
 ## Part (b)
 
-### Weak Scaling
-#### *Weak Scaling Results (Low Neighbor Density, Low Vertex Count)*
+### Strong Scaling
+#### *Strong Scaling Results (Low Neighbor Density, Low Vertex Count)*
 
 |   Number of Vertices   	|         50        	|         50        	|         50        	|         50        	|         50        	|         50        	|         50        	|         50        	|
 |:----------------------:	|:-----------------:	|:-----------------:	|:-----------------:	|:-----------------:	|:-----------------:	|:-----------------:	|:-----------------:	|:-----------------:	|
@@ -30,7 +30,7 @@ The program was run using the following resources:
 | Sequential Latency (s) 	| 0.000147475000000 	| 0.000123431000000 	| 0.000219751000000 	| 0.000135177000000 	| 0.000131705000000 	| 0.000161019000000 	| 0.000193656000000 	| 0.000216418000000 	|
 | Parallel Latency (s)   	| 0.000247144000000 	| 0.000408772000000 	| 0.000553714000000 	| 0.000990607000000 	| 0.001505155000000 	| 0.002321689000000 	| 0.004029204000000 	| 0.009183830000000 	|
 
-#### *Weak Scaling Results (Low Neighbor Density, High Vertex Count)*
+#### *Strong Scaling Results (Low Neighbor Density, High Vertex Count)*
 
 |   Number of Vertices   	|        5000       	|        5000       	|        5000       	|        5000       	|        5000       	|        5000       	|        5000       	|        5000       	|
 |:----------------------:	|:-----------------:	|:-----------------:	|:-----------------:	|:-----------------:	|:-----------------:	|:-----------------:	|:-----------------:	|:-----------------:	|
@@ -38,7 +38,7 @@ The program was run using the following resources:
 | Sequential Latency (s) 	| 0.019141204000000 	| 0.020462251000000 	| 0.018466747000000 	| 0.017000681000000 	| 0.021097227000000 	| 0.021336284000000 	| 0.021267299000000 	| 0.017734126000000 	|
 | Parallel Latency (s)   	| 0.027271996000000 	| 0.023330019000000 	| 0.019376828000000 	| 0.023762920000000 	| 0.029977729000000 	| 0.030018244000000 	| 0.036650816000000 	| 0.046117249000000 	|
 
-#### *Weak Scaling Results (High Neighbor Density, Low Vertex Count)*
+#### *Strong Scaling Results (High Neighbor Density, Low Vertex Count)*
 
 |   Number of Vertices   	|         50        	|         50        	|         50        	|         50        	|         50        	|         50        	|         50        	|         50        	|
 |:----------------------:	|:-----------------:	|:-----------------:	|:-----------------:	|:-----------------:	|:-----------------:	|:-----------------:	|:-----------------:	|:-----------------:	|
@@ -46,7 +46,7 @@ The program was run using the following resources:
 | Sequential Latency (s) 	| 0.001143292000000 	| 0.001101315000000 	| 0.001098681000000 	| 0.001091475000000 	| 0.001067719000000 	| 0.001267272000000 	| 0.001109860000000 	| 0.001129597000000 	|
 | Parallel Latency (s)   	| 0.002787945000000 	| 0.002365725000000 	| 0.002382072000000 	| 0.002818613000000 	| 0.003771817000000 	| 0.005091095000000 	| 0.008057402000000 	| 0.019890172000000 	|
 
-#### *Weak Scaling Results (High Neighbor Density, High Vertex Count)*
+#### *Strong Scaling Results (High Neighbor Density, High Vertex Count)*
 
 |   Number of Vertices   	|        5000        	|        5000        	|        5000        	|        5000        	|        5000        	|        5000        	|        5000        	|        5000        	|
 |:----------------------:	|:------------------:	|:------------------:	|:------------------:	|:------------------:	|:------------------:	|:------------------:	|:------------------:	|:------------------:	|
@@ -55,8 +55,8 @@ The program was run using the following resources:
 | Parallel Latency (s)   	| 62.028325002999999 	| 44.920666076000003 	| 34.433435312000000 	| 30.521134642000000 	| 29.908935541000002 	| 28.246148859000002 	| 29.340540300000001 	| 30.125050165000001 	|
 
 
-### Strong Scaling
-#### *Strong Scaling Results (Low Neighbor Density)*
+### Weak Scaling
+#### *Weak Scaling Results (Low Neighbor Density)*
 
 |   Number of Vertices   	|         50        	|        100        	|        200        	|        400        	|        800        	|        1600       	|        3200       	|        6400       	|
 |:----------------------:	|:-----------------:	|:-----------------:	|:-----------------:	|:-----------------:	|:-----------------:	|:-----------------:	|:-----------------:	|:-----------------:	|
@@ -64,7 +64,7 @@ The program was run using the following resources:
 | Sequential Latency (s) 	| 0.000119960000000 	| 0.000250363000000 	| 0.000573653000000 	| 0.001131919000000 	| 0.002555596000000 	| 0.004861588000000 	| 0.010552855000000 	| 0.022072515000000 	|
 | Parallel Latency (s)   	| 0.000282503000000 	| 0.000616967000000 	| 0.000988593000000 	| 0.002338956000000 	| 0.005553444000000 	| 0.012509572000000 	| 0.024726601000000 	| 0.053921053000000 	|
 
-#### *Strong Scaling Results (High Neighbor Density)*
+#### *Weak Scaling Results (High Neighbor Density)*
 
 |   Number of Vertices   	|         50        	|        100        	|        200        	|        400        	|        800        	|        1600       	|        3200        	|        6400        	|
 |:----------------------:	|:-----------------:	|:-----------------:	|:-----------------:	|:-----------------:	|:-----------------:	|:-----------------:	|:------------------:	|:------------------:	|
@@ -92,8 +92,8 @@ Considering that I collected data for sparse and dense graphs, it's important to
 #### *Observations*
 - The sequential algorithm always performed better than the parallel algorithm. Even though the sequential algorithm had a algorithmic complexity of **`O(n^2)`**, it was able to color the graph faster than the parallel algorithm since there was overall less overhead and computations required.
 - The parallel algorithm performed much better on sparse graphs than dense graphs. This is because the parallel algorithm had to perform more computations on dense graphs, which led to more overhead and longer runtimes. This also aligns with the algorithmic complexity of the parallel algorithm on dense graphs, which is **`O(n^3)`** as opposed to **`O(n^2)`** on sparse graphs.
-- Looking at weak scaling, the parallel algorithm did not scale well for low neighbor densities, and exhibited some slight positive scaling for high neghbor densities with low vertex counts. The most notable scaling, however, was for high neighbor densities with high vertex counts, where the parallel algorithm scaled well up until it reached a barrier at 8 threads.
-- Looking at strong scaling, the parallel algorithm did not scale well for both low and high neighbor densities.
+- Looking at strong scaling, the parallel algorithm did not scale well for low neighbor densities, and exhibited some slight positive scaling for high neghbor densities with low vertex counts. The most notable scaling, however, was for high neighbor densities with high vertex counts, where the parallel algorithm scaled well up until it reached a barrier at 8 threads.
+- Looking at weak scaling, the parallel algorithm did not scale well for both low and high neighbor densities.
 
 ## Miscellaneous
 - The program was compiled and run using the following command within the makefile directory:
