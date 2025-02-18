@@ -26,6 +26,7 @@ private:
     std::vector<pthread_t> philosophers;
     std::vector<pthread_mutex_t> forks;
     std::vector<int> states;
+    std::vector<int> forks_taken;
     pthread_mutex_t mutex;
 
     static void* philosopher_thread(void* arg) {
@@ -60,9 +61,22 @@ private:
         }
         update_philosopher_status(id, HUNGRY);
 
-        pthread_mutex_lock(&forks[(id + num_philosophers - 1) % num_philosophers]);
-        pthread_mutex_lock(&forks[id]);
-        update_display();
+        int left_fork = (id + num_philosophers - 1) % num_philosophers;
+        int right_fork = id;
+
+        // Lock left fork first and update its status immediately
+        pthread_mutex_lock(&forks[left_fork]);
+        pthread_mutex_lock(&mutex);
+        forks_taken[left_fork] = id;  // Mark fork as taken by this philosopher
+        pthread_mutex_unlock(&mutex);
+        update_display();  // Reflect fork lock immediately
+
+        // Now attempt to lock the right fork and update its status
+        pthread_mutex_lock(&forks[right_fork]);
+        pthread_mutex_lock(&mutex);
+        forks_taken[right_fork] = id;  // Mark fork as taken
+        pthread_mutex_unlock(&mutex);
+        update_display();  // Reflect second fork lock immediately
     }
 
     // Update the status of the philosopher to eating for a random amount of time
@@ -78,16 +92,26 @@ private:
         sleep(distr(gen));
     }
 
-    // Put down the forks and relinquish the forks to the other philosophers
+    // Put down the forks and relinquish their locks
     void putdown_forks(int id) {
         if (!USE_FANCY_DISPLAY) {
             print_safe("Philosopher " + std::to_string(id) + " is putting down the forks.");
         }
         update_philosopher_status(id, THINKING);
 
-        pthread_mutex_unlock(&forks[(id + num_philosophers - 1) % num_philosophers]);
-        pthread_mutex_unlock(&forks[id]);
-        update_display();
+        int left_fork = (id + num_philosophers - 1) % num_philosophers;
+        int right_fork = id;
+
+        // Unlock both forks and mark them as available immediately
+        pthread_mutex_lock(&mutex);
+        forks_taken[left_fork] = -1;
+        forks_taken[right_fork] = -1;
+        pthread_mutex_unlock(&mutex);
+
+        pthread_mutex_unlock(&forks[left_fork]);
+        pthread_mutex_unlock(&forks[right_fork]);
+        
+        update_display();  // Reflect that the forks are now available
     }
 
     // Update the status of the philosopher to the given state
@@ -124,14 +148,10 @@ private:
             }
             std::cout << "\n";
 
-            int left_philosopher = i;
-            int right_philosopher = (i + 1) % num_philosophers;
-
+            // Display fork ownership based on locks taken (THIS TOOK ME FOREVER TO DEBUG)
             std::cout << "  └── Fork " << i << ": ";
-            if (states[left_philosopher] == EATING) {
-                std::cout << "\033[36m Taken by Philosopher " << "\033[0m" << left_philosopher; // Cyan
-            } else if (states[right_philosopher] == EATING) {
-                std::cout << "\033[36m Taken by Philosopher " << "\033[0m" << right_philosopher; // Cyan
+            if (forks_taken[i] != -1) {
+                std::cout << "\033[36m Taken by Philosopher \033[0m" << forks_taken[i]; // Cyan
             } else {
                 std::cout << "\033[37m Available \033[0m"; // Gray
             }
@@ -157,6 +177,7 @@ public:
         philosophers.resize(num);
         forks.resize(num);
         states.resize(num, THINKING);
+        forks_taken.resize(num, -1);
         pthread_mutex_init(&mutex, nullptr);
         for (auto& fork : forks) {
             pthread_mutex_init(&fork, nullptr);
