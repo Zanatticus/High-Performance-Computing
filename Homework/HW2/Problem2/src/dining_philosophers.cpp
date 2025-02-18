@@ -46,6 +46,7 @@ private:
             print_safe("Philosopher " + std::to_string(id) + " is thinking...");
         }
         update_philosopher_status(id, THINKING);
+
         std::random_device rd;
         std::mt19937 gen(rd());
         std::uniform_int_distribution<> distr(2, 5);
@@ -54,15 +55,14 @@ private:
 
     // Pick up the forks and check if the philosopher can eat
     void pickup_forks(int id) {
-        pthread_mutex_lock(&mutex);
-        states[id] = HUNGRY;
         if (!USE_FANCY_DISPLAY) {
             print_safe("Philosopher " + std::to_string(id) + " is picking up the forks.");
         }
+        update_philosopher_status(id, HUNGRY);
+
+        pthread_mutex_lock(&forks[(id + num_philosophers - 1) % num_philosophers]);
+        pthread_mutex_lock(&forks[id]);
         update_display();
-        check_eatability(id);
-        pthread_mutex_unlock(&mutex);
-        pthread_mutex_lock(&forks[id]);  // Wait until allowed to eat
     }
 
     // Update the status of the philosopher to eating for a random amount of time
@@ -71,34 +71,30 @@ private:
             print_safe("Philosopher " + std::to_string(id) + " is eating...");
         }
         update_philosopher_status(id, EATING);
+        
         std::random_device rd;
         std::mt19937 gen(rd());
         std::uniform_int_distribution<> distr(5, 10);
         sleep(distr(gen));
     }
 
-    // Put down the forks and check if neighbors can eat
+    // Put down the forks and relinquish the forks to the other philosophers
     void putdown_forks(int id) {
-        pthread_mutex_lock(&mutex);
-        states[id] = THINKING;
         if (!USE_FANCY_DISPLAY) {
             print_safe("Philosopher " + std::to_string(id) + " is putting down the forks.");
         }
-        check_eatability((id + num_philosophers - 1) % num_philosophers);   // Check left neighbor
-        check_eatability((id + 1) % num_philosophers);                      // Check right neighbor
-        pthread_mutex_unlock(&mutex);
+        update_philosopher_status(id, THINKING);
+
+        pthread_mutex_unlock(&forks[(id + num_philosophers - 1) % num_philosophers]);
+        pthread_mutex_unlock(&forks[id]);
         update_display();
     }
 
     // Check if the philosopher can eat
-    void check_eatability(int id) {
-        if (states[id] == HUNGRY &&
-            states[(id + num_philosophers - 1) % num_philosophers] != EATING &&
-            states[(id + 1) % num_philosophers] != EATING) {
-            states[id] = EATING;
-            pthread_mutex_unlock(&forks[id]);
-            update_display();
-        }
+    bool check_eatability(int id) {
+        return (states[id] == HUNGRY &&
+                states[(id + num_philosophers - 1) % num_philosophers] != EATING &&
+                states[(id + 1) % num_philosophers] != EATING);
     }
 
     // Update the status of the philosopher to the given state
@@ -115,7 +111,6 @@ private:
             return;
         }
         pthread_mutex_lock(&cout_mutex);
-        std::this_thread::sleep_for(std::chrono::milliseconds(150));  // Small delay to reduce flickering
         std::cout << "\033[H\033[J"; // Clears the terminal screen
 
         std::cout << "Dining Philosophers Simulation\n";
