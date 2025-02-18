@@ -26,6 +26,12 @@ In your writeup, also discuss who was Edgar Dijkstra, and what is so important a
 ## Part (c)
 
 
+## Who is Edsger Dijkstra?
+
+Edsger W. Dijkstra was a Dutch computer scientist who made significant contributions to the field of computer science. He was born on May 11, 1930, in Rotterdam, Netherlands, and passed away on August 6, 2002, in Nuenen, Netherlands, following a long struggle with cancer. Dijkstra is very well known for his work on the graph-theory problem of finding the shortest path between two nodes in a graph such that the sum of the weights of its constituent edges is minimized, which is now known as Dijkstra's Algorithm. This algorithm is used in many applications today, such as network routing protocols, transportation systems, and computer networks. Dijkstra later developed the first compiler for the ALGOL-60 programming language along with computer scientiest Jaap A. Zonnefeld. He was awarded the Turing Award in 1972 for his fundamental contributions to developing structured programming languages, where an open letter he wrote called "Go To Statement Considered Harmful" (1968) noted that the usage of "go to" instead of statements such as "if then" led to sloppy programming techniques and that a more rigorous approach with modular units using clear single entrance and exit points should be used instead (https://www.britannica.com/biography/Edsger-Dijkstra). 
+
+With regards to the Dining Philosophers problem (which was proposed be Edsger Dijkstra), the reason why this problem is so important is that it highlights the challenges of concurrent programming and the need for synchronization mechanisms to prevent deadlocks. Since the philosophers need to acquire two forks to eat, with every fork being shared between two philosophers, it easily showcases the issue of race conditions and deadlocks that can occur when multiple threads are trying to access shared resources. Similarly, the synchronization mechanisms used in the solution to the dining philosophers problem showcases the real-life mechanisms needed to prevent deadlocks and ensure that resources are used efficiently.
+
 ## Miscellaneous
 - The program was compiled and run using the following command within the makefile directory:
 ```make```
