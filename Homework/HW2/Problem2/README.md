@@ -45,3 +45,5 @@ Sources:
 
 - To run the program, the following command was used within the makefile directory (where <number_of_philosophers> is the odd number of philosophers at the table):
 ```./build/dining_philosophers <number_of_philosophers>```
+
+I ensured that my program worked properly by checking the output of the simulation for bad behavior. This included checking if two neighbors were `EATING` at the same time, if a philosopher was stuck in the `HUNGRY` stage while there were two forks available, checking if a philosopher was permanently stuck in `THINKING` or `EATING`, and making sure that the philosophers could only take their neighboring forks. Since the program runs indefinitely, I made this check for a state update of more than 12 iterations, which can be easily verified independently by the TA.
