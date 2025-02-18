@@ -114,6 +114,7 @@ private:
         if (!USE_FANCY_DISPLAY) {
             return;
         }
+        pthread_mutex_lock(&cout_mutex);
         std::this_thread::sleep_for(std::chrono::milliseconds(100));  // Small delay to reduce flickering
         std::cout << "\033[H\033[J"; // Clears the terminal screen
 
@@ -136,6 +137,7 @@ private:
             std::cout << "\n";
         }
         std::cout.flush();
+        pthread_mutex_unlock(&cout_mutex);
     }
 
     // Thread-safe cout output function
