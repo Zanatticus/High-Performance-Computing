@@ -45,7 +45,7 @@ private:
         if (!USE_FANCY_DISPLAY) {
             print_safe("Philosopher " + std::to_string(id) + " is thinking...");
         }
-        update_status(id, THINKING);
+        update_philosopher_status(id, THINKING);
         std::random_device rd;
         std::mt19937 gen(rd());
         std::uniform_int_distribution<> distr(2, 5);
@@ -57,7 +57,7 @@ private:
         if (!USE_FANCY_DISPLAY) {
             print_safe("Philosopher " + std::to_string(id) + " is eating...");
         }
-        update_status(id, EATING);
+        update_philosopher_status(id, EATING);
         std::random_device rd;
         std::mt19937 gen(rd());
         std::uniform_int_distribution<> distr(5, 10);
@@ -102,7 +102,7 @@ private:
     }
 
     // Update the status of the philosopher to the given state
-    void update_status(int id, int state) {
+    void update_philosopher_status(int id, int state) {
         pthread_mutex_lock(&mutex);
         states[id] = state;
         update_display();
