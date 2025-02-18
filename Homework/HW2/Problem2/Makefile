@@ -5,10 +5,10 @@ CXX = g++
 CXXFLAGS = -std=c++11 -pthread -O3
 
 # Target executable
-TARGET = build/philosophers_forks
+TARGET = build/dining_philosophers
 
 # Source files
-SRCS = src/philosophers_forks.cpp
+SRCS = src/dining_philosophers.cpp
 
 # Default target
 all: clean $(TARGET)
