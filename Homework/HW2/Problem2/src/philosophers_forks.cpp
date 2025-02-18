@@ -48,7 +48,7 @@ private:
         update_status(id, THINKING);
         std::random_device rd;
         std::mt19937 gen(rd());
-        std::uniform_int_distribution<> distr(1, 10);
+        std::uniform_int_distribution<> distr(2, 5);
         sleep(distr(gen));
     }
     
@@ -60,7 +60,7 @@ private:
         update_status(id, EATING);
         std::random_device rd;
         std::mt19937 gen(rd());
-        std::uniform_int_distribution<> distr(1, 10);
+        std::uniform_int_distribution<> distr(5, 10);
         sleep(distr(gen));
     }
 
@@ -115,7 +115,7 @@ private:
             return;
         }
         pthread_mutex_lock(&cout_mutex);
-        std::this_thread::sleep_for(std::chrono::milliseconds(100));  // Small delay to reduce flickering
+        std::this_thread::sleep_for(std::chrono::milliseconds(150));  // Small delay to reduce flickering
         std::cout << "\033[H\033[J"; // Clears the terminal screen
 
         std::cout << "Dining Philosophers Simulation\n";
