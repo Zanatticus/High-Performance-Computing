@@ -11,7 +11,7 @@ TARGET = build/philosophers_forks
 SRCS = src/philosophers_forks.cpp
 
 # Default target
-all: clean $(TARGET) run
+all: clean $(TARGET)
 
 # Link the target executable
 $(TARGET):
