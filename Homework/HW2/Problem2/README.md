@@ -39,3 +39,6 @@ Sources:
 ## Miscellaneous
 - The program was compiled and run using the following command within the makefile directory:
 ```make```
+
+- To run the program, the following command was used within the makefile directory (where <number_of_philosophers> is the odd number of philosophers at the table):
+```./build/dining_philosophers <number_of_philosophers>```
