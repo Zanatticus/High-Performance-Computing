@@ -19,12 +19,15 @@ In your writeup, also discuss who was Edgar Dijkstra, and what is so important a
 
 ## Part (a)
 
+If there are only 3 forks in the center of the table instead of being to the left and right of the philosophers, then no matter how many philosophers there are at the table, only one philosopher at most can be eating at a time. This is because each philosopher needs to acquire two forks to eat, and with only 3 forks available, there will always be a fork missing for at least one philosopher. On the other hand, if one fork is taken by a unique philosopher for every fork (assuming the solution allows for single-fork grabbing), then a deadlock situation occurs where the three philosophers that have one fork are waiting for a fork to become available, and none of them can eat, which leads to an infinite loop of waiting. My solution was implemented to avoid this deadlock scenario by only allowing double-fork grabbing.
 
 ## Part (b)
 
+Given that my solution forces philosophers to take a random amount of time to both think and eat, if one philosopher is given higher priority over the other philosophers, then it would get preferential treatment to eat in cases where it is waiting for a fork and it has a direct neighbor also waiting for a fork (since my solution only allows philosophers to take either both forks or none at a given moment). This means that it's possible for a prioritized philosopher to eat more frequently than the other philosophers. If my solution allowed for philosophers to take a single fork if it was available, then the philosopher with higher priority would be able to eat more frequently than the other philosophers if it could take a fork from a neighbor that was waiting for the other fork (assuming this was how the solution for priority was implemented). In a more egregious case, a priority philosopher might also be able to take a fork from a neighbor who is actively eating, forcing that neighbor to go into thinking. Considering my solution requires philosophers to take both forks at the same time, then a way to implement priority would be to allow the single philosopher to take individual forks if they are available and force all other philosophers to take double forks.
 
 ## Part (c)
 
+If the philosophers change which fork is acquired first on each pair of requests, it still wouldn't matter which fork was acquired first since the philosopher would still need to acquire both forks to eat according to my solution. This is because my solution tries to completely avoid deadlocks by not allowing a philosopher to take a fork if it can't take the other fork as well since the philosophers just try to grab forks regardless of what the other philosophers are doing. Take the case where all philosophers take the fork to their left at the same time. Then all philosophers would be waiting for the fork to their right, and none of them would be able to eat (a deadlock, which my solution is implemented to avoid)!
 
 ## Who is Edsger Dijkstra?
 
