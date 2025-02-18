@@ -15,7 +15,7 @@
 #define THINKING 0
 #define HUNGRY 1
 #define EATING 2
-#define USE_FANCY_DISPLAY false
+#define USE_FANCY_DISPLAY true
 
 // Global mutex for synchronizing cout since the start of the program creates janky output
 pthread_mutex_t cout_mutex = PTHREAD_MUTEX_INITIALIZER;
@@ -68,7 +68,9 @@ private:
     void pickup_forks(int id) {
         pthread_mutex_lock(&mutex);
         states[id] = HUNGRY;
-        print_safe("Philosopher " + std::to_string(id) + " is picking up the forks.");
+        if (!USE_FANCY_DISPLAY) {
+            print_safe("Philosopher " + std::to_string(id) + " is picking up the forks.");
+        }
         update_display();
         test(id);
         pthread_mutex_unlock(&mutex);
@@ -79,7 +81,9 @@ private:
     void putdown_forks(int id) {
         pthread_mutex_lock(&mutex);
         states[id] = THINKING;
-        print_safe("Philosopher " + std::to_string(id) + " is putting down the forks.");
+        if (!USE_FANCY_DISPLAY) {
+            print_safe("Philosopher " + std::to_string(id) + " is putting down the forks.");
+        }
         test((id + num_philosophers - 1) % num_philosophers); // Test left neighbor
         test((id + 1) % num_philosophers); // Test right neighbor
         pthread_mutex_unlock(&mutex);
@@ -136,6 +140,9 @@ private:
 
     // Thread-safe cout output function
     void print_safe(const std::string& message) {
+        if (!USE_FANCY_DISPLAY) {
+            return;
+        }
         pthread_mutex_lock(&cout_mutex);
         std::cout << message << std::endl;
         pthread_mutex_unlock(&cout_mutex);
