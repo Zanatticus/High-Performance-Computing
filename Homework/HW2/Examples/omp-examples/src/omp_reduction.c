@@ -24,7 +24,7 @@ int main(int argc, char *argv[]) {
 		a[i] = b[i] = i * 1.0;
 	sum = 0.0;
 
-#pragma omp parallel for reduction(+ : sum)
+	#pragma omp parallel for reduction(+ : sum)
 	for (i = 0; i < n; i++)
 		sum = sum + (a[i] * b[i]);
 

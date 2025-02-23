@@ -34,7 +34,7 @@ int main() {
 	}
 
 	gettimeofday(&scalc, NULL);
-#pragma omp parallel for private(sum, i, k, j)
+	#pragma omp parallel for private(sum, i, k, j)
 	for (i = 0; i < nra; i++) {
 		for (k = 0; k < ncb; k++) {
 			sum = 0.0;

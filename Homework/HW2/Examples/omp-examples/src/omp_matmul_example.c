@@ -24,7 +24,7 @@ int main(int argc, char *argv[]) {
 	chunk = 1; /* set loop iteration chunk size */
 
 	/*** Spawn a parallel region explicitly scoping all variables ***/
-#pragma omp parallel shared(a, b, c, nthreads, chunk) private(tid, i, j, k)
+	#pragma omp parallel shared(a, b, c, nthreads, chunk) private(tid, i, j, k)
 	{
 		tid = omp_get_thread_num();
 		if (tid == 0) {
@@ -33,17 +33,17 @@ int main(int argc, char *argv[]) {
 			printf("Initializing matrices...\n");
 		}
 
-/*** Initialize matrices ***/
-/*** static specifies means that the partitioning is done ahead of time ***/
-#pragma omp for schedule(static, chunk)
+		/*** Initialize matrices ***/
+		/*** static specifies means that the partitioning is done ahead of time ***/
+		#pragma omp for schedule(static, chunk)
 		for (i = 0; i < NRA; i++)
 			for (j = 0; j < NCA; j++)
 				a[i][j] = i + j;
-#pragma omp for schedule(static, chunk)
+		#pragma omp for schedule(static, chunk)
 		for (i = 0; i < NCA; i++)
 			for (j = 0; j < NCB; j++)
 				b[i][j] = i * j;
-#pragma omp for schedule(static, chunk)
+		#pragma omp for schedule(static, chunk)
 		for (i = 0; i < NRA; i++)
 			for (j = 0; j < NCB; j++)
 				c[i][j] = 0;
@@ -51,7 +51,7 @@ int main(int argc, char *argv[]) {
 		/*** Do matrix multiply sharing iterations on outer loop ***/
 		/*** Show who does which iterations ***/
 		printf("Thread %d starting matrix multiply...\n", tid);
-#pragma omp for schedule(static, chunk)
+		#pragma omp for schedule(static, chunk)
 		for (i = 0; i < NRA; i++) {
 			printf("Thread=%d did row=%d\n", tid, i);
 			for (j = 0; j < NCB; j++)

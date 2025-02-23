@@ -15,7 +15,7 @@ int main(int argc, char *argv[]) {
 		a[i] = b[i] = i * 1.0;
 	chunk = CHUNKSIZE;
 
-#pragma omp parallel shared(a, b, c, nthreads, chunk) private(i, tid)
+	#pragma omp parallel shared(a, b, c, nthreads, chunk) private(i, tid)
 	{
 		tid = omp_get_thread_num();
 		if (tid == 0) {
@@ -24,7 +24,7 @@ int main(int argc, char *argv[]) {
 		}
 		printf("Thread %d starting...\n", tid);
 
-#pragma omp for schedule(static, chunk)
+		#pragma omp for schedule(static, chunk)
 		for (i = 0; i < N; i++) {
 			c[i] = a[i] + b[i];
 			usleep(1);

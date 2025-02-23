@@ -2,7 +2,7 @@
 #include <unistd.h>
 
 int main(void) {
-#pragma omp parallel
+	#pragma omp parallel
 	{
 		printf("Hello\n");
 		sleep(1);

@@ -5,8 +5,8 @@
 int main(int argc, char *argv[]) {
 	int nthreads, tid, procs, maxt, inpar, dynamic, nested;
 
-/* Start parallel region */
-#pragma omp parallel private(nthreads, tid)
+	/* Start parallel region */
+	#pragma omp parallel private(nthreads, tid)
 	{
 		/* Obtain thread number */
 		tid = omp_get_thread_num();

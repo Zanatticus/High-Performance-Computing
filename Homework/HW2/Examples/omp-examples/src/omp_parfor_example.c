@@ -23,7 +23,7 @@ int main(int argc, char **argv) {
 	total1 = finish - start;
 
 	start = CLOCK();
-#pragma omp parallel for
+	#pragma omp parallel for
 	for (i = 0; i < 1000000; i++) {
 		a[i] = 2.0 * i;
 		a[i] += (i % 3);

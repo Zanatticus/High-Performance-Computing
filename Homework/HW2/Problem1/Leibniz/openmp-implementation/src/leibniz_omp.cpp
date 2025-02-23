@@ -22,7 +22,7 @@ int main() {
 
 	float sum = 0.0;
 
-#pragma omp parallel for reduction(+ : sum)
+	#pragma omp parallel for reduction(+ : sum)
 	for (int i = 0; i < DEPTH; i++) {
 		if (i % 2 == 0) {
 			sum += 1.0 / (2 * i + 1);
