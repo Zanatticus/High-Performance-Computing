@@ -2,20 +2,23 @@
 CC = gcc
 
 # Compiler flags
-CFLAGS = 
+CFLAGS =
+
+# Linker flags
+LDFLAGS = -lopenblas
 
 # Target executable
-TARGET = build/mat-mat-mul-openMP
+TARGET = build/blas_simple
 
 # Source files
-SRCS = src/mat-mat-mul-openMP.c
+SRCS = src/blas_simple.c
 
 # Default target
 all: clean $(TARGET)
 
 # Link the target executable
 $(TARGET):
-	$(CC) $(CFLAGS) -o $@ $(SRCS)
+	$(CC) $(CFLAGS) -o $@ $(SRCS) $(LDFLAGS)
 
 # Run the target executable
 run: $(TARGET)

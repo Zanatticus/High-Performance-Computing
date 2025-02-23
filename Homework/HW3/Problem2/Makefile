@@ -2,13 +2,13 @@
 CC = gcc
 
 # Compiler flags
-CFLAGS = 
+CFLAGS = -O3 -mavx512f
 
 # Target executable
-TARGET = build/mat-mat-mul-openMP
+TARGET = build/dot-product-AVX
 
 # Source files
-SRCS = src/mat-mat-mul-openMP.c
+SRCS = src/dot-product-AVX.c
 
 # Default target
 all: clean $(TARGET)

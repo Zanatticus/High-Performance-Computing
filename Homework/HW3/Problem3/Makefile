@@ -5,10 +5,10 @@ CC = gcc
 CFLAGS = 
 
 # Target executable
-TARGET = build/mat-mat-mul-openMP
+TARGET = build/matmul
 
 # Source files
-SRCS = src/mat-mat-mul-openMP.c
+SRCS = src/matmul.c
 
 # Default target
 all: clean $(TARGET)
