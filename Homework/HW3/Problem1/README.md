@@ -63,8 +63,8 @@ sin(2.0) using float:  0.909297347068786621093750000000
 sin(2.0) using double: 0.909297310288980642489775618742
 Actual value:          0.909297426825681695396019865911
 -------------------------------------------------------
-sin(3.0) using float:  -1.213540911674499511718750000000
-sin(3.0) using double: -1.213540920795420419153742841445
+sin(3.0) using float:  -1.21354091167449951171875000000
+sin(3.0) using double: -1.21354092079542041915374284144
 Actual value:          0.141120008059867222100744802808
 -------------------------------------------------------
 ```
@@ -83,12 +83,12 @@ sin(1.0) using float:  0.841470956802368164062500000000
 sin(1.0) using double: 0.841470984807896504875657228695
 Actual value:          0.841470984807896506652502321630
 -------------------------------------------------------
-sin(2.0) using float:  -2.628503799438476562500000000000
-sin(2.0) using double: -2.628503689575731439020955804153
+sin(2.0) using float:  -2.62850379943847656250000000000
+sin(2.0) using double: -2.62850368957573143902095580415
 Actual value:          0.909297426825681695396019865911
 -------------------------------------------------------
-sin(3.0) using float:  -86934339584.000000000000000000000000000000
-sin(3.0) using double: -86934340718.020004272460937500000000000000
+sin(3.0) using float:  -86934339584.0000000000000000000
+sin(3.0) using double: -86934340718.0200042724609375000
 Actual value:          0.141120008059867222100744802808
 -------------------------------------------------------
 ```
@@ -119,7 +119,9 @@ Actual value:          0.141120008059867222100744802808
 
 ### Discussion
 
-TODO
+Taking a look at the results for using 10 terms in the Taylor series expansion approximation, we can clearly see that the results for the floating point (single-precision) data format are not as precise as the double-precision data format. At around the 8th decimal place, the single-precision data format begins to lose precision. This pattern is prevalent for some of the other values of `x`, with a few rounding exceptions. On the other hand, for the double-precision format, it is precise up until the 18th decimal place until we begin to see it skew from the actual value. This is expected as the double-precision format has a higher precision than the single-precision format.
+
+An interesting observation is that at larger number of terms, the results begin to breakdown exponentially. I largely speculate that this is because at a larger number of terms, the computer begins to fail to calculate the factorials properly as the numbers are such large values. This is evident in the results for 30 and 40 terms, where the results are not even close to the actual value and quite nonsensical. For these input values, it seems the most number of terms that can be used before any form of breakdown occurs is ~17 terms.
 
 ## Part (b)
 
