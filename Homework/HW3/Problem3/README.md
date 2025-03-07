@@ -6,6 +6,44 @@ There will be prizes awarded for the **fastest dense** and the **fastest sparse*
 
 ## Answers
 
+### Optimization Observations
+Compiling with no optimization flags:
+```
+Starting dense matrix multiply... 
+Dense Matrix Multiplication Result: 4.44488e+07 
+Dense Matrix Multiplication Duration: 8395.593915 ms
+Starting sparse matrix multiply... 
+Sparse Matrix Multiplication Result: 0 
+Sparse Matrix Multiplication Duration: 8312.916006 ms
+Sparse Matrix Multiplication Sparsity: 0.750977 
+```
+
+Compiling with `-O3` optimization flag:
+```
+Starting dense matrix multiply... 
+Dense Matrix Multiplication Result: 4.44488e+07 
+Dense Matrix Multiplication Duration: 1598.310833 ms
+Starting sparse matrix multiply... 
+Sparse Matrix Multiplication Result: 0 
+Sparse Matrix Multiplication Duration: 1558.179026 ms
+Sparse Matrix Multiplication Sparsity: 0.750977 
+```
+
+Compiling with `-O3` and `-fopenmp` optimization flags with pragma directives:
+```
+Starting dense matrix multiply... 
+Dense Matrix Multiplication Result: 4.44488e+07 
+Dense Matrix Multiplication Duration: 422.341221 ms
+Starting sparse matrix multiply... 
+Sparse Matrix Multiplication Result: 0 
+Sparse Matrix Multiplication Duration: 1548.046255 ms
+Sparse Matrix Multiplication Sparsity: 0.750977 
+```
+
+### Fastest Dense Matrix Multiplication
+
+### Fastest Sparse Matrix Multiplication
+
 
 ## Miscellaneous
 - The program was compiled and run using the following command within the makefile directory:

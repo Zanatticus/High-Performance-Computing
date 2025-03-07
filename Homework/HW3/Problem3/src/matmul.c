@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
+#include <omp.h>
 
 #define N     512
 #define LOOPS 10
@@ -26,8 +27,10 @@ int main() {
 		}
 	}
 
-	printf("starting dense matrix multiply \n");
+	printf("Starting dense matrix multiply... \n");
 	start = CLOCK();
+
+	#pragma omp parallel for private(i, j, k)
 	for (l = 0; l < LOOPS; l++) {
 		for (i = 0; i < N; i++)
 			for (j = 0; j < N; j++) {
@@ -40,8 +43,8 @@ int main() {
 	finish = CLOCK();
 
 	total = finish - start;
-	printf("a result %g \n", c[7][8]); /* prevent dead code elimination */
-	printf("The total time for matrix multiplication with dense matrices = %f ms\n", total);
+	printf("Dense Matrix Multiplication Result: %g \n", c[7][8]); /* prevent dead code elimination */
+	printf("Dense Matrix Multiplication Duration: %f ms\n", total);
 
 	/* initialize a sparse matrix */
 	num_zeros = 0;
@@ -58,7 +61,7 @@ int main() {
 		}
 	}
 
-	printf("starting sparse matrix multiply \n");
+	printf("Starting sparse matrix multiply... \n");
 	start = CLOCK();
 	for (l = 0; l < LOOPS; l++) {
 		for (i = 0; i < N; i++)
@@ -70,9 +73,9 @@ int main() {
 	}
 	finish = CLOCK();
 	total  = finish - start;
-	printf("A result %g \n", c[7][8]); /* prevent dead code elimination */
-	printf("The total time for matrix multiplication with sparse matrices = %f ms\n", total);
-	printf("The sparsity of the a and b matrices = %f \n", (float) num_zeros / (float) (N * N));
+	printf("Sparse Matrix Multiplication Result: %g \n", c[7][8]); /* prevent dead code elimination */
+	printf("Sparse Matrix Multiplication Duration: %f ms\n", total);
+	printf("Sparse Matrix Multiplication Sparsity: %f \n", (float) num_zeros / (float) (N * N));
 
 	return 0;
 }

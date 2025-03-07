@@ -2,7 +2,7 @@
 CC = gcc
 
 # Compiler flags
-CFLAGS = 
+CFLAGS = -O3 -fopenmp
 
 # Target executable
 TARGET = build/matmul
@@ -11,7 +11,7 @@ TARGET = build/matmul
 SRCS = src/matmul.c
 
 # Default target
-all: clean $(TARGET)
+all: clean $(TARGET) run
 
 # Link the target executable
 $(TARGET):
