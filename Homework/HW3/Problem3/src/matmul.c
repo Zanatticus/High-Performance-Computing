@@ -1,7 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
-#include <omp.h>
 
 #define N     512
 #define LOOPS 10
@@ -43,7 +42,7 @@ int main() {
 	finish = CLOCK();
 
 	total = finish - start;
-	printf("Dense Matrix Multiplication Result: %g \n", c[7][8]); /* prevent dead code elimination */
+	printf("Dense Matrix Multiplication Result: %g \n", c[7][8]); // prevent dead code elimination
 	printf("Dense Matrix Multiplication Duration: %f ms\n", total);
 
 	/* initialize a sparse matrix */
@@ -73,7 +72,7 @@ int main() {
 	}
 	finish = CLOCK();
 	total  = finish - start;
-	printf("Sparse Matrix Multiplication Result: %g \n", c[7][8]); /* prevent dead code elimination */
+	printf("Sparse Matrix Multiplication Result: %g \n", c[7][8]); // prevent dead code elimination
 	printf("Sparse Matrix Multiplication Duration: %f ms\n", total);
 	printf("Sparse Matrix Multiplication Sparsity: %f \n", (float) num_zeros / (float) (N * N));
 
