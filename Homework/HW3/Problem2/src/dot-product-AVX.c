@@ -51,7 +51,6 @@ int main() {
 	int    i;
 	float  a[N], b[N];
 	size_t len = sizeof(a) / sizeof(a[0]);
-	//    size_t len = sizeof(a) / sizeof(a[0]);
 
 	for (i = 0; i < N; i++) {
 		a[i] = 1.0;

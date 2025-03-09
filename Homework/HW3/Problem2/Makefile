@@ -5,16 +5,20 @@ CC = gcc
 CFLAGS = -O3 -mavx512f
 
 # Target executable
-TARGET = build/dot-product-AVX
+TARGET = build/mat_vec_mul_avx
 
 # Source files
-SRCS = src/dot-product-AVX.c
+SRCS = src/mat_vec_mul_avx.c
 
 # Default target
-all: clean $(TARGET)
+all: clean $(TARGET) run
+
+# Compile the source files to assembly
+assembly: $(SRCS)
+	$(CC) $(CFLAGS) -S -o $(SRCS:.c=.s) $(SRCS)
 
 # Link the target executable
-$(TARGET):
+$(TARGET): $(SRCS)
 	$(CC) $(CFLAGS) -o $@ $(SRCS)
 
 # Run the target executable
@@ -23,6 +27,6 @@ run: $(TARGET)
 
 # Clean up build files
 clean:
-	rm -f $(TARGET)
+	rm -f $(TARGET) src/*.s
 
-.PHONY: all clean run
+.PHONY: all clean run assembly
