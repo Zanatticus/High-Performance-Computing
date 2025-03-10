@@ -24,55 +24,59 @@ void matrix_vector_multiplication(float mat[MATRIX_ROWS][MATRIX_COLS], float *ve
 	}
 }
 
-void matrix_vector_multiplication_avx512f(float mat[MATRIX_ROWS][MATRIX_COLS], float *vec, float *res) {
+void matrix_vector_multiplication_avx512f(float  mat[MATRIX_ROWS][MATRIX_COLS],
+                                          float *vec,
+                                          float *res) {
 	for (int i = 0; i < MATRIX_ROWS; i++) {
-        __m512 sum_vec = _mm512_setzero_ps();
-        int j = 0;
+		__m512 sum_vec = _mm512_setzero_ps();
+		int    j       = 0;
 
-        // Process 16 elements at a time
-        for (; j + 16 <= MATRIX_COLS; j += 16) {
-            __m512 mat_vec = _mm512_loadu_ps(&mat[i][j]); // Load 16 matrix elements into 512-bit AVX register
-            __m512 vec_vec = _mm512_loadu_ps(&vec[j]);    // Load 16 vector elements into 512-bit AVX register
-            sum_vec = _mm512_fmadd_ps(mat_vec, vec_vec, sum_vec); // Fused Multiply Add
-        }
+		// Process 16 elements at a time
+		for (; j + 16 <= MATRIX_COLS; j += 16) {
+			__m512 mat_vec =
+			    _mm512_loadu_ps(&mat[i][j]);   // Load 16 matrix elements into 512-bit AVX register
+			__m512 vec_vec =
+			    _mm512_loadu_ps(&vec[j]);   // Load 16 vector elements into 512-bit AVX register
+			sum_vec = _mm512_fmadd_ps(mat_vec, vec_vec, sum_vec);   // Fused Multiply Add
+		}
 
-        // Store result of the vectorized sum
-        float sum_arr[16];
-        _mm512_storeu_ps(sum_arr, sum_vec);
-        float sum = 0.0f;
+		// Store result of the vectorized sum
+		float sum_arr[16];
+		_mm512_storeu_ps(sum_arr, sum_vec);
+		float sum = 0.0f;
 
-        // Accumulate partial sums
-        for (int k = 0; k < 16; k++) {
-            sum += sum_arr[k];
-        }
+		// Accumulate partial sums
+		for (int k = 0; k < 16; k++) {
+			sum += sum_arr[k];
+		}
 
-        // Handle remaining elements (if MATRIX_COLS is not a multiple of 16)
-        for (; j < MATRIX_COLS; j++) {
-            sum += mat[i][j] * vec[j];
-        }
+		// Handle remaining elements (if MATRIX_COLS is not a multiple of 16)
+		for (; j < MATRIX_COLS; j++) {
+			sum += mat[i][j] * vec[j];
+		}
 
-        res[i] = sum; // Store the final sum for row i
-    }
+		res[i] = sum;   // Store the final sum for row i
+	}
 }
 
 int main() {
 	double start, finish, total, total_avx;
 	int    i;
-	float matrix[MATRIX_ROWS][MATRIX_COLS];
-	float vector[MATRIX_COLS];
-	float result[MATRIX_ROWS];
-	float result_avx[MATRIX_ROWS];
+	float  matrix[MATRIX_ROWS][MATRIX_COLS];
+	float  vector[MATRIX_COLS];
+	float  result[MATRIX_ROWS];
+	float  result_avx[MATRIX_ROWS];
 
 	for (i = 0; i < MATRIX_ROWS; i++) {
 		for (int j = 0; j < MATRIX_COLS; j++) {
-			// matrix[i][j] = (float)(i * MATRIX_ROWS + j);
-			matrix[i][j] = 1.0;
+			matrix[i][j] = (float) (i * MATRIX_ROWS + j);
+			// matrix[i][j] = 1.0;
 		}
 	}
 
 	for (i = 0; i < MATRIX_COLS; i++) {
-		// vector[i] = (float)(i);
-		vector[i] = 1.0;
+		vector[i] = (float) (i);
+		// vector[i] = 1.0;
 	}
 
 	start = CLOCK();
@@ -84,8 +88,8 @@ int main() {
 
 	start = CLOCK();
 	matrix_vector_multiplication_avx512f(matrix, vector, result_avx);
-	finish = CLOCK();
-	total_avx  = finish - start;
+	finish    = CLOCK();
+	total_avx = finish - start;
 
 	printf("Matrix-Vector Multiplication Duration With AVX: %f ms\n", total_avx);
 

@@ -6,13 +6,15 @@ There will be prizes awarded for the **fastest dense** and the **fastest sparse*
 
 ## Answers
 
-### Optimization Observations
+### Initial Observations
+
+The code to generate a sparse matrix shows that nonzero elements only appear in the upper right corner of the matrix (above a diagonal) with only odd-numbered rows containing the nonzero elements. All even numbered rows are entirely zero. This means that CSR might be a good format to store the sparse matrix in. At first assumption, the DIA format might have been used, but the diagonal concept is actually a red herring since the nonzero elements are not on the diagonal (they are just being contained by the diagonal). The sparse matrix multiplication duration does not include the time to convert to and form CSR format matrices.
+
+### Dense Matrix Optimization Results
 Compiling with no optimization flags:
 ```
-Starting dense matrix multiply... 
 Dense Matrix Multiplication Result: 4.44488e+07 
 Dense Matrix Multiplication Duration: 8395.593915 ms
-Starting sparse matrix multiply... 
 Sparse Matrix Multiplication Result: 0 
 Sparse Matrix Multiplication Duration: 8312.916006 ms
 Sparse Matrix Multiplication Sparsity: 0.750977 
@@ -20,10 +22,8 @@ Sparse Matrix Multiplication Sparsity: 0.750977
 
 Compiling with `-O3` optimization flag:
 ```
-Starting dense matrix multiply... 
 Dense Matrix Multiplication Result: 4.44488e+07 
 Dense Matrix Multiplication Duration: 1598.310833 ms
-Starting sparse matrix multiply... 
 Sparse Matrix Multiplication Result: 0 
 Sparse Matrix Multiplication Duration: 1558.179026 ms
 Sparse Matrix Multiplication Sparsity: 0.750977 
@@ -31,14 +31,14 @@ Sparse Matrix Multiplication Sparsity: 0.750977
 
 Compiling with `-O3` and `-fopenmp` optimization flags with pragma directives:
 ```
-Starting dense matrix multiply... 
 Dense Matrix Multiplication Result: 4.44488e+07 
 Dense Matrix Multiplication Duration: 422.341221 ms
-Starting sparse matrix multiply... 
 Sparse Matrix Multiplication Result: 0 
 Sparse Matrix Multiplication Duration: 1548.046255 ms
 Sparse Matrix Multiplication Sparsity: 0.750977 
 ```
+
+### Sparse Matrix Optimization Results
 
 ### Fastest Dense Matrix Multiplication
 
@@ -48,3 +48,4 @@ Sparse Matrix Multiplication Sparsity: 0.750977
 ## Miscellaneous
 - The program was compiled and run using the following command within the makefile directory:
 ```make```
+- This program was compiled and run on the Vector system
