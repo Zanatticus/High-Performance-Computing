@@ -13,32 +13,29 @@ The code to generate a sparse matrix shows that nonzero elements only appear in 
 ### Dense Matrix Optimization Results
 Compiling with no optimization flags:
 ```
-Dense Matrix Multiplication Result: 4.44488e+07 
-Dense Matrix Multiplication Duration: 8395.593915 ms
-Sparse Matrix Multiplication Result: 0 
-Sparse Matrix Multiplication Duration: 8312.916006 ms
+Dense Matrix Multiplication Duration: 8851.361876 ms
+Sparse Matrix Multiplication Duration: 8856.539037 ms
 Sparse Matrix Multiplication Sparsity: 0.750977 
 ```
 
 Compiling with `-O3` optimization flag:
 ```
-Dense Matrix Multiplication Result: 4.44488e+07 
-Dense Matrix Multiplication Duration: 1598.310833 ms
-Sparse Matrix Multiplication Result: 0 
-Sparse Matrix Multiplication Duration: 1558.179026 ms
+Dense Matrix Multiplication Duration: 3733.741100 ms
+Sparse Matrix Multiplication Duration: 3733.772827 ms
 Sparse Matrix Multiplication Sparsity: 0.750977 
 ```
 
-Compiling with `-O3` and `-fopenmp` optimization flags with pragma directives:
+Compiling with `-O3` optimization flag and CSR reformat for sparse matrices:
 ```
-Dense Matrix Multiplication Result: 4.44488e+07 
-Dense Matrix Multiplication Duration: 422.341221 ms
-Sparse Matrix Multiplication Result: 0 
-Sparse Matrix Multiplication Duration: 1548.046255 ms
+Dense Matrix Multiplication Duration: 3738.516834 ms
+Sparse Matrix Multiplication Duration: 5.157816 ms
 Sparse Matrix Multiplication Sparsity: 0.750977 
 ```
 
-### Sparse Matrix Optimization Results
+Compiling with `-O3` and `-fopenmp` optimization flags, CSR reformat for sparse matrices, and OpenMP:
+```
+
+```
 
 ### Fastest Dense Matrix Multiplication
 
@@ -48,4 +45,4 @@ Sparse Matrix Multiplication Sparsity: 0.750977
 ## Miscellaneous
 - The program was compiled and run using the following command within the makefile directory:
 ```make```
-- This program was compiled and run on the Vector system
+- This program was compiled and run on the Explorer system on node `c2192`

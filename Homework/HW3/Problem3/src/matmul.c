@@ -168,6 +168,7 @@ int main() {
 	double    a[N][N]; /* input matrix */
 	double    b[N][N]; /* input matrix */
 	double    c[N][N]; /* result matrix */
+	double 	  d[N][N]; /* result matrix */
 	int       num_zeros;
 	double    start, finish;
 	CSRMatrix a_csr, b_csr, c_csr;
@@ -191,10 +192,21 @@ int main() {
 
 	start = CLOCK();
 	matrix_multiply_csr(&a_csr, &b_csr, &c_csr);
-	// matrix_multiply(a, b, c);
 	finish = CLOCK();
 
 	convert_from_csr(&c_csr, c);
+
+	matrix_multiply(a, b, d);
+
+	// Check if the results are the same
+	for (int i = 0; i < N; i++) {
+		for (int j = 0; j < N; j++) {
+			if (c[i][j] != d[i][j]) {
+				printf("Error: Result mismatch at index (%d, %d)\n", i, j);
+				return 1;
+			}
+		}
+	}
 
 	printf("Sparse Matrix Multiplication Result: %g \n", c[7][8]);   // Avoids dead code elimination
 	printf("Sparse Matrix Multiplication Duration: %f ms\n", finish - start);
