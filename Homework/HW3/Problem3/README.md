@@ -28,13 +28,17 @@ Sparse Matrix Multiplication Sparsity: 0.750977
 Compiling with `-O3` optimization flag and CSR reformat for sparse matrices:
 ```
 Dense Matrix Multiplication Duration: 3738.516834 ms
-Sparse Matrix Multiplication Duration: 5.157816 ms
+Sparse Matrix Multiplication Duration: 5.109739 ms
 Sparse Matrix Multiplication Sparsity: 0.750977 
 ```
 
 Compiling with `-O3` and `-fopenmp` optimization flags, CSR reformat for sparse matrices, and OpenMP:
-```
 
+*** All attempts to use OpenMP resulted in either the same, or slower execution times. ***
+
+Operating on pointers instead of array indices resulted in a faster dense matrix multiplication duration:
+```
+Dense Matrix Multiplication Duration: 2994.199998 ms
 ```
 
 ### Fastest Dense Matrix Multiplication
