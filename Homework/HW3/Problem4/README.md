@@ -27,8 +27,8 @@ The above results were gathered on node `c2192` on the Explorer cluster.
 ## Part (b)
 
 ### Node c2192
-- **N=256:** 0.716843 ms, 65.062x speedup
-- **N=512:** 4.348857 ms, 87.522x speedup
+- **N=256:** <u>0.716843 ms</u>, <u>65.062x speedup</u>
+- **N=512:** <u>4.348857 ms</u>, <u>87.522x speedup</u>
 - **CPU:** Intel(R) Xeon(R) CPU E5-2680 v4 @ 2.40GHz
     - **Cores:** 28
     - **Max MHz:** 3300 MHz
@@ -40,8 +40,8 @@ The above results were gathered on node `c2192` on the Explorer cluster.
     - **L3:** 70 MiB (2 instances)
 
 ### Node d0011 (cascade lake) 
-- **N=256:** 0.705761 ms, 66.084x speedup
-- **N=512:** 4.204937 ms, 90.518x speedup
+- **N=256:** <u>0.705761 ms</u>, <u>66.084x speedup</u>
+- **N=512:** <u>4.204937 ms</u>, <u>90.518x speedup</u>
 - **CPU:** Intel(R) Xeon(R) Platinum 8276 CPU @ 2.20GHz
     - **Cores:** 56
     - **Max MHz:** 4000 MHz
@@ -52,7 +52,7 @@ The above results were gathered on node `c2192` on the Explorer cluster.
     - **L2:** 56 MiB (56 instances)
     - **L3:** 77 MiB (2 instances)
 
-The cascade lake node (d0011) slightly outperformed node c2192. This could be attributed to the fact that the cascade lake node has a higher clock speed and more cores to utilize during the matrix multiplication program. Also, the cascade lake node has larger cache sizes which could have helped in reducing cache misses (since more of the matrix data could be stored in the cache) as compared to node c2192.
+The cascade lake node (`d0011`) slightly outperformed node `c2192`. This could be attributed to the fact that the cascade lake node has a higher clock speed and more cores to utilize during the matrix multiplication program. Also, the cascade lake node has larger cache sizes which could have helped in reducing cache misses (since more of the matrix data could be stored in the cache) as compared to node `c2192`.
 
 ## Miscellaneous
 - The program was compiled and run using the following command within the makefile directory:
