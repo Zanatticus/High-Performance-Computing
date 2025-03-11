@@ -20,15 +20,15 @@ Sparse Matrix Multiplication Sparsity: 0.750977
 
 Compiling with `-O3` optimization flag:
 ```
-Dense Matrix Multiplication Duration: 3733.741100 ms
-Sparse Matrix Multiplication Duration: 3733.772827 ms
+Dense Matrix Multiplication Duration: 3501.741100 ms
+Sparse Matrix Multiplication Duration: 3501.772827 ms
 Sparse Matrix Multiplication Sparsity: 0.750977 
 ```
 
 Compiling with `-O3` optimization flag and CSR reformat for sparse matrices:
 ```
-Dense Matrix Multiplication Duration: 3738.516834 ms
-Sparse Matrix Multiplication Duration: 5.109739 ms
+Dense Matrix Multiplication Duration: 3502.476578 ms
+Sparse Matrix Multiplication Duration: 4.905243 ms
 Sparse Matrix Multiplication Sparsity: 0.750977 
 ```
 
