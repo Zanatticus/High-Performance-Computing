@@ -1,7 +1,7 @@
+#include <omp.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
-#include <omp.h>
 
 #define N     512
 #define LOOPS 10
@@ -47,37 +47,37 @@ int initialize_sparse_matrices(double a[N][N], double b[N][N]) {
 }
 
 void convert_to_csr(double a[N][N], CSRMatrix *csr) {
-    int nnz = 0;
+	int nnz = 0;
 
-    // Count the number of nonzero elements
-    for (int i = 0; i < N; i++) {
-        for (int j = 0; j < N; j++) {
-            if (a[i][j] != 0.0) {
-                nnz++;
-            }
-        }
-    }
+	// Count the number of nonzero elements
+	for (int i = 0; i < N; i++) {
+		for (int j = 0; j < N; j++) {
+			if (a[i][j] != 0.0) {
+				nnz++;
+			}
+		}
+	}
 
-    // Allocate memory for CSR arrays
-    csr->values = (double *)malloc(nnz * sizeof(double));
-    csr->column_indices = (int *)malloc(nnz * sizeof(int));
-    csr->row_pointers = (int *)malloc((N + 1) * sizeof(int));
-    csr->num_nonzeros = nnz;
-    csr->matrix_size = N;
+	// Allocate memory for CSR arrays
+	csr->values         = (double *) malloc(nnz * sizeof(double));
+	csr->column_indices = (int *) malloc(nnz * sizeof(int));
+	csr->row_pointers   = (int *) malloc((N + 1) * sizeof(int));
+	csr->num_nonzeros   = nnz;
+	csr->matrix_size    = N;
 
-    // Fill CSR arrays
-    int index = 0;
-    csr->row_pointers[0] = 0;  // First row starts at index 0
-    for (int i = 0; i < N; i++) {
-        for (int j = 0; j < N; j++) {
-            if (a[i][j] != 0.0) {
-                csr->values[index] = a[i][j];
-                csr->column_indices[index] = j;
-                index++;
-            }
-        }
-        csr->row_pointers[i + 1] = index;  // Mark start of next row
-    }
+	// Fill CSR arrays
+	int index            = 0;
+	csr->row_pointers[0] = 0;   // First row starts at index 0
+	for (int i = 0; i < N; i++) {
+		for (int j = 0; j < N; j++) {
+			if (a[i][j] != 0.0) {
+				csr->values[index]         = a[i][j];
+				csr->column_indices[index] = j;
+				index++;
+			}
+		}
+		csr->row_pointers[i + 1] = index;   // Mark start of next row
+	}
 }
 
 void convert_from_csr(CSRMatrix *csr, double a[N][N]) {
@@ -91,16 +91,16 @@ void convert_from_csr(CSRMatrix *csr, double a[N][N]) {
 	// Populate matrix from CSR format
 	for (int i = 0; i < csr->matrix_size; i++) {
 		for (int idx = csr->row_pointers[i]; idx < csr->row_pointers[i + 1]; idx++) {
-			int col = csr->column_indices[idx];
+			int col   = csr->column_indices[idx];
 			a[i][col] = csr->values[idx];
 		}
 	}
 }
 
 void free_csr(CSRMatrix *csr) {
-    free(csr->values);
-    free(csr->column_indices);
-    free(csr->row_pointers);
+	free(csr->values);
+	free(csr->column_indices);
+	free(csr->row_pointers);
 }
 
 // Matrix multiplication for dense matrices
@@ -118,13 +118,13 @@ void matrix_multiply(double a[N][N], double b[N][N], double c[N][N]) {
 
 void matrix_multiply_csr(CSRMatrix *a_csr, CSRMatrix *b_csr, CSRMatrix *c_csr) {
 	// Allocate maximum possible space
-	c_csr->values = (double *)malloc(a_csr->num_nonzeros * b_csr->matrix_size * sizeof(double));
-	c_csr->column_indices = (int *)malloc(a_csr->num_nonzeros * b_csr->matrix_size * sizeof(int));
-	c_csr->row_pointers = (int *)malloc((a_csr->matrix_size + 1) * sizeof(int));
-	c_csr->num_nonzeros = 0;
-	c_csr->matrix_size = a_csr->matrix_size;
+	c_csr->values = (double *) malloc(a_csr->num_nonzeros * b_csr->matrix_size * sizeof(double));
+	c_csr->column_indices = (int *) malloc(a_csr->num_nonzeros * b_csr->matrix_size * sizeof(int));
+	c_csr->row_pointers   = (int *) malloc((a_csr->matrix_size + 1) * sizeof(int));
+	c_csr->num_nonzeros   = 0;
+	c_csr->matrix_size    = a_csr->matrix_size;
 
-	int nnz = 0;
+	int nnz                = 0;
 	c_csr->row_pointers[0] = 0;
 
 	// Iterate over each row of A
@@ -133,13 +133,13 @@ void matrix_multiply_csr(CSRMatrix *a_csr, CSRMatrix *b_csr, CSRMatrix *c_csr) {
 
 		// Iterate over nonzero elements in row i of A
 		for (int a_idx = a_csr->row_pointers[i]; a_idx < a_csr->row_pointers[i + 1]; a_idx++) {
-			int k = a_csr->column_indices[a_idx]; // Column index (row index in B)
-			double Aik = a_csr->values[a_idx];    // Value of A[i, k]
+			int    k   = a_csr->column_indices[a_idx];   // Column index (row index in B)
+			double Aik = a_csr->values[a_idx];           // Value of A[i, k]
 
 			// Iterate over nonzero elements in row k of B
 			for (int b_idx = b_csr->row_pointers[k]; b_idx < b_csr->row_pointers[k + 1]; b_idx++) {
-				int j = b_csr->column_indices[b_idx]; // Column index in B (column in result)
-				double Bkj = b_csr->values[b_idx];    // Value of B[k, j]
+				int    j   = b_csr->column_indices[b_idx];   // Column index in B (column in result)
+				double Bkj = b_csr->values[b_idx];           // Value of B[k, j]
 
 				// Accumulate multiplication result into temporary storage
 				temp_result[j] += Aik * Bkj;
@@ -149,27 +149,26 @@ void matrix_multiply_csr(CSRMatrix *a_csr, CSRMatrix *b_csr, CSRMatrix *c_csr) {
 		// Store nonzero results into CSR structure for C
 		for (int j = 0; j < a_csr->matrix_size; j++) {
 			if (temp_result[j] != 0.0) {
-				c_csr->values[nnz] = temp_result[j];
+				c_csr->values[nnz]         = temp_result[j];
 				c_csr->column_indices[nnz] = j;
 				nnz++;
 			}
 		}
-		c_csr->row_pointers[i + 1] = nnz;  // Mark start of next row
+		c_csr->row_pointers[i + 1] = nnz;   // Mark start of next row
 	}
 
-	c_csr->num_nonzeros = nnz;  // Update nonzero count
+	c_csr->num_nonzeros = nnz;   // Update nonzero count
 
 	// Reallocate memory to fit exact size
-	c_csr->values = (double *)realloc(c_csr->values, nnz * sizeof(double));
-	c_csr->column_indices = (int *)realloc(c_csr->column_indices, nnz * sizeof(int));
+	c_csr->values         = (double *) realloc(c_csr->values, nnz * sizeof(double));
+	c_csr->column_indices = (int *) realloc(c_csr->column_indices, nnz * sizeof(int));
 }
-
 
 int main() {
 	double    a[N][N]; /* input matrix */
 	double    b[N][N]; /* input matrix */
 	double    c[N][N]; /* result matrix */
-	double 	  d[N][N]; /* result matrix */
+	double    d[N][N]; /* result matrix */
 	int       num_zeros;
 	double    start, finish;
 	CSRMatrix a_csr, b_csr, c_csr;
@@ -189,7 +188,7 @@ int main() {
 	num_zeros = initialize_sparse_matrices(a, b);
 
 	convert_to_csr(a, &a_csr);
-    convert_to_csr(b, &b_csr);
+	convert_to_csr(b, &b_csr);
 
 	start = CLOCK();
 	matrix_multiply_csr(&a_csr, &b_csr, &c_csr);
