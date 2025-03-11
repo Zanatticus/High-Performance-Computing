@@ -40,11 +40,17 @@ Sparse Matrix Multiplication Duration: 4.249631 ms
 Sparse Matrix Multiplication Sparsity: 0.750977 
 ```
 
-### Fastest Dense Matrix Multiplication
+### Fastest Dense Matrix Multiplication for N=512
 ***380.621120 ms***
 
-### Fastest Sparse Matrix Multiplication
+### Fastest Sparse Matrix Multiplication for N=512
 ***4.249631 ms***
+
+### Fastest Dense Matrix Multiplication for N=256
+***46.639208 ms***
+
+### Fastest Sparse Matrix Multiplication for N=256
+***0.756236 ms***
 
 ## Miscellaneous
 - The program was compiled and run using the following command within the makefile directory:
