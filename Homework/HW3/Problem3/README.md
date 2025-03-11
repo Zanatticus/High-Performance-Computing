@@ -34,7 +34,7 @@ Sparse Matrix Multiplication Sparsity: 0.750977
 
 Compiling with `-O3` and `-fopenmp` optimization flags, CSR reformat for sparse matrices, and OpenMP:
 
-*** All attempts to use OpenMP resulted in either the same, or slower execution times. ***
+*** All attempts to use OpenMP resulted in either the same, or slower execution times. Systems then began segfaulting when no changes were made to the code or compiler. Erratic system behavior***
 
 Operating on pointers instead of array indices resulted in a faster dense matrix multiplication duration:
 ```
@@ -42,9 +42,10 @@ Dense Matrix Multiplication Duration: 2994.199998 ms
 ```
 
 ### Fastest Dense Matrix Multiplication
+***2994.199998 ms***
 
 ### Fastest Sparse Matrix Multiplication
-
+***4.905243 ms***
 
 ## Miscellaneous
 - The program was compiled and run using the following command within the makefile directory:
