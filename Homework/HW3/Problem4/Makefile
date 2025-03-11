@@ -14,7 +14,7 @@ TARGET = build/blas_simple
 SRCS = src/blas_simple.c
 
 # Default target
-all: clean $(TARGET)
+all: clean $(TARGET) run
 
 # Link the target executable
 $(TARGET):
