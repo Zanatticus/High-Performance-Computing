@@ -13,41 +13,40 @@ The code to generate a sparse matrix shows that nonzero elements only appear in 
 ### Dense Matrix Optimization Results
 Compiling with no optimization flags:
 ```
-Dense Matrix Multiplication Duration: 8851.361876 ms
-Sparse Matrix Multiplication Duration: 8856.539037 ms
+Dense Matrix Multiplication Duration: 8395.593915 ms
+Sparse Matrix Multiplication Duration: 8312.916006 ms
 Sparse Matrix Multiplication Sparsity: 0.750977 
 ```
 
 Compiling with `-O3` optimization flag:
 ```
-Dense Matrix Multiplication Duration: 3501.741100 ms
-Sparse Matrix Multiplication Duration: 3501.772827 ms
+Dense Matrix Multiplication Duration: 1598.310833 ms
+Sparse Matrix Multiplication Duration: 1558.179026 ms
 Sparse Matrix Multiplication Sparsity: 0.750977 
 ```
 
-Compiling with `-O3` optimization flag and CSR reformat for sparse matrices:
+Compiling with `-O3` and `-fopenmp` optimization flags with pragma directives for dense multiplication:
+
 ```
-Dense Matrix Multiplication Duration: 3502.476578 ms
-Sparse Matrix Multiplication Duration: 4.905243 ms
+Dense Matrix Multiplication Duration: 422.341221 ms
+Sparse Matrix Multiplication Duration: 1548.046255 ms
 Sparse Matrix Multiplication Sparsity: 0.750977 
 ```
 
-Compiling with `-O3` and `-fopenmp` optimization flags, CSR reformat for sparse matrices, and OpenMP:
-
-*** All attempts to use OpenMP resulted in either the same, or slower execution times. Systems then began segfaulting when no changes were made to the code or compiler. Erratic system behavior***
-
-Operating on pointers instead of array indices resulted in a faster dense matrix multiplication duration:
+Compiling with `-O3` and `-fopenmp` optimization flags with pragma directives for dense multiplication and CSR reformat for sparse matrices:
 ```
-Dense Matrix Multiplication Duration: 2994.199998 ms
+Dense Matrix Multiplication Duration: 380.621120 ms
+Sparse Matrix Multiplication Duration: 4.249631 ms
+Sparse Matrix Multiplication Sparsity: 0.750977 
 ```
 
 ### Fastest Dense Matrix Multiplication
-***2994.199998 ms***
+***380.621120 ms***
 
 ### Fastest Sparse Matrix Multiplication
-***4.905243 ms***
+***4.249631 ms***
 
 ## Miscellaneous
 - The program was compiled and run using the following command within the makefile directory:
 ```make```
-- This program was compiled and run on the Explorer system on node `c2192`
+- This program was compiled and run on Rho on the Vector system.

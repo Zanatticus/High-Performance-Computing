@@ -105,6 +105,7 @@ void free_csr(CSRMatrix *csr) {
 
 // Matrix multiplication for dense matrices
 void matrix_multiply(double a[N][N], double b[N][N], double c[N][N]) {
+	#pragma omp parallel for
 	for (int l = 0; l < LOOPS; l++) {
 		for (int i = 0; i < N; i++) {
 			for (int j = 0; j < N; j++) {
