@@ -50,3 +50,6 @@ Sparse Matrix Multiplication Sparsity: 0.750977
 - The program was compiled and run using the following command within the makefile directory:
 ```make```
 - This program was compiled and run on Rho on the Vector system.
+    - Intel(R) Xeon(R) CPU E5-2698 v4 @ 2.20GHz
+    - 80 Cores
+    - CPU MHz: 3600.00
