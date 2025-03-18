@@ -11,3 +11,12 @@ srun -p courses-gpu -N 1 -n 1 --gres=gpu:1 --pty --time=03:00:00 /bin/bash
 
 # Obtain a CPU-based node with AVX512 support
 srun -p courses -N 1 --constraint=cascadelake --pty --time=03:00:00 /bin/bash
+
+# Obtain a node with 8 NVIDIA A100 GPUs
+srun --partition=ai-jumpstart --nodes=1 --pty --gres=gpu:8 --ntasks=1 --mem=4GB --time=01:00:00 /bin/bash
+
+# Obtain a node with 4 NVIDIA Tesla P100 GPUs
+srun --partition=courses-gpu --nodes=1 --pty --gres=gpu:4 --time=01:00:00 /bin/bash
+
+# Obtain a node with 4 NVIDIA V100 GPUs
+srun --partition=courses-gpu --nodelist=d1004 --nodes=1 --pty --gres=gpu:4 --time=01:00:00 /bin/bash
