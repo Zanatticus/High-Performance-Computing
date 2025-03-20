@@ -1,5 +1,5 @@
 # Compiler
-CXX = g++
+CXX = mpic++
 
 # Compiler flags
 CXXFLAGS = -O3
@@ -11,18 +11,14 @@ TARGET = build/MPI_counter
 SRCS = src/MPI_counter.cpp
 
 # Default target
-all: clean $(TARGET) run
+all: clean $(TARGET)
 
 # Link the target executable
 $(TARGET):
 	$(CXX) $(CXXFLAGS) -o $@ $(SRCS)
 
-# Run the target executable
-run: $(TARGET)
-	./$(TARGET)
-
 # Clean up build files
 clean:
 	rm -f $(TARGET)
 
-.PHONY: all clean run
+.PHONY: all clean
