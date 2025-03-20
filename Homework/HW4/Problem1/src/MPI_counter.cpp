@@ -25,6 +25,7 @@ int main(int argc, char** argv) {
         return 1;
     }
 
+    // Part (a)
     if (rank == 0) {
         counter = 1;
         std::cout << "Process " << rank << " on node " << processor_name << " started with counter: " << counter << "\n";
@@ -40,6 +41,23 @@ int main(int argc, char** argv) {
         }
     }
 
+    // Wait for all processes to reach this point
+    MPI_Barrier(MPI_COMM_WORLD);
+
+    // Part (b)
+    if (rank == COUNT_LIMIT - 1) {
+        counter -= 2;
+        MPI_Send(&counter, 1, MPI_INT, rank - 1, 0, MPI_COMM_WORLD);
+    } else if (rank > 0) {
+        MPI_Recv(&counter, 1, MPI_INT, rank + 1, 0, MPI_COMM_WORLD, &status);
+        std::cout << "Process " << rank << " on node " << processor_name << " received counter: " << counter << "\n";
+
+        if (rank > 0 && counter > 0) {
+            counter -= 2;
+            MPI_Send(&counter, 1, MPI_INT, rank - 1, 0, MPI_COMM_WORLD);
+        }
+    }
+    
     MPI_Finalize();
     return 0;
 }
