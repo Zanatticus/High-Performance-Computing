@@ -6,7 +6,7 @@
 
 int main(int argc, char** argv) {
     int rank, size;
-    const int COUNT_LIMIT = 48;
+    const int COUNT_LIMIT = 64;
     int counter = 0;
     char processor_name[MPI_MAX_PROCESSOR_NAME];
     int processor_name_len;
@@ -27,12 +27,12 @@ int main(int argc, char** argv) {
 
     if (rank == 0) {
         counter = 1;
-        std::cout << "Process " << rank << " on node " << processor_name << " received value: " << counter << "\n";
+        std::cout << "Process " << rank << " on node " << processor_name << " started with counter: " << counter << "\n";
         counter++;
         MPI_Send(&counter, 1, MPI_INT, rank + 1, 0, MPI_COMM_WORLD);
     } else {
         MPI_Recv(&counter, 1, MPI_INT, rank - 1, 0, MPI_COMM_WORLD, &status);
-        std::cout << "Process " << rank << " on node " << processor_name << " received value: " << counter << "\n";
+        std::cout << "Process " << rank << " on node " << processor_name << " received counter: " << counter << "\n";
 
         if (rank < COUNT_LIMIT - 1) {
             counter++;
