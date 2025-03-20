@@ -9,4 +9,4 @@
 #SBATCH --ntasks-per-node=16
 #SBATCH --mem=100G
 
-mpirun -np 64 --map-by ppr:16:node -mca btl_base_warn_component_unused 0 ./build/MPI_counter
+mpirun -mca btl_base_warn_component_unused 0 ./build/MPI_counter
