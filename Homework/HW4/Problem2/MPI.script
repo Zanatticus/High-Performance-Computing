@@ -5,8 +5,9 @@
 #SBATCH --partition=courses
 #SBATCH --mem=100G
 #SBATCH --cpus-per-task=1
-#SBATCH --ntasks=128
+#SBATCH --ntasks=56
 #SBATCH --nodes=2
-#SBATCH --ntasks-per-node=64
+#SBATCH --ntasks-per-node=28
+#SBATCH --output=output/slurm-%j.out
 
 mpirun -mca btl_base_warn_component_unused 0 ./build/parallel_histogram
