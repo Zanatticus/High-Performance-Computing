@@ -1,5 +1,5 @@
 # Compiler
-CXX = g++
+CXX = mpic++
 
 # Compiler flags
 CXXFLAGS = -O3
@@ -17,9 +17,9 @@ all: clean $(TARGET) run
 $(TARGET):
 	$(CXX) $(CXXFLAGS) -o $@ $(SRCS)
 
-# Run the target executable
+# Run the job using Slurm
 run: $(TARGET)
-	./$(TARGET)
+	sbatch MPI.script
 
 # Clean up build files
 clean:

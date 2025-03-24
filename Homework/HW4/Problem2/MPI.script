@@ -1,0 +1,12 @@
+#!/bin/bash
+#SBATCH --job-name=ZanderHistogramOpenMPI
+#SBATCH --time=00:30:00
+#SBATCH --verbose
+#SBATCH --partition=courses
+#SBATCH --mem=100G
+#SBATCH --cpus-per-task=1
+#SBATCH --ntasks=128
+#SBATCH --nodes=2
+#SBATCH --ntasks-per-node=64
+
+mpirun -mca btl_base_warn_component_unused 0 ./build/parallel_histogram

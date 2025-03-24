@@ -3,10 +3,10 @@
 #SBATCH --time=00:30:00
 #SBATCH --verbose
 #SBATCH --partition=courses
+#SBATCH --mem=100G
 #SBATCH --cpus-per-task=1
 #SBATCH --ntasks=64
 #SBATCH --nodes=4
 #SBATCH --ntasks-per-node=16
-#SBATCH --mem=100G
 
 mpirun -mca btl_base_warn_component_unused 0 ./build/MPI_counter
