@@ -852,9 +852,298 @@ Min Time: 0.0001148730 seconds
 Max Time: 0.0004827560 seconds
 Avg Time: 0.0001562496 seconds
 
+### Observations
+When comparing performance across different node configurations for 128 bins:
+
+- Processing time decreases substantially as we add more nodes (following a rough inverse linear relationship)
+    - 2 nodes → 4 nodes: Average time reduced by ~45% (0.00047s → 0.00026s)
+    - 4 nodes → 8 nodes: Average time reduced by ~40% (0.00026s → 0.00016s)
+- Minimum processing time follows a similar improving pattern
+- Maximum processing time shows some variability unrelated to the number of nodes
+- Benefits of adding more nodes show some slight diminishing returns
+
 ## Part (b)
 
+### Results for 32 Bins, 2 Nodes
+<details>
+<summary>Click to view full histogram results</summary>
 
+```
+Parallel Histogram Results
+============================
+
+Total elements: 8000000 | Range: 1-100000 | Number of Bins: 32
+MPI Processes: 56
+Unique Nodes: 2
+
+Performance Metrics:
+  └── Min Time: 0.0004311430 seconds
+  └── Max Time: 0.0006072270 seconds
+  └── Avg Time: 0.0004623902 seconds
+
+Bin 0: [1 - 3125]
+  └── Count: 250357
+Bin 1: [3126 - 6250]
+  └── Count: 249954
+Bin 2: [6251 - 9375]
+  └── Count: 250362
+Bin 3: [9376 - 12500]
+  └── Count: 250798
+Bin 4: [12501 - 15625]
+  └── Count: 250441
+Bin 5: [15626 - 18750]
+  └── Count: 249727
+Bin 6: [18751 - 21875]
+  └── Count: 249692
+Bin 7: [21876 - 25000]
+  └── Count: 250053
+Bin 8: [25001 - 28125]
+  └── Count: 250731
+Bin 9: [28126 - 31250]
+  └── Count: 249642
+Bin 10: [31251 - 34375]
+  └── Count: 249656
+Bin 11: [34376 - 37500]
+  └── Count: 249960
+Bin 12: [37501 - 40625]
+  └── Count: 249652
+Bin 13: [40626 - 43750]
+  └── Count: 249697
+Bin 14: [43751 - 46875]
+  └── Count: 249201
+Bin 15: [46876 - 50000]
+  └── Count: 250465
+Bin 16: [50001 - 53125]
+  └── Count: 249738
+Bin 17: [53126 - 56250]
+  └── Count: 249845
+Bin 18: [56251 - 59375]
+  └── Count: 249754
+Bin 19: [59376 - 62500]
+  └── Count: 250556
+Bin 20: [62501 - 65625]
+  └── Count: 249228
+Bin 21: [65626 - 68750]
+  └── Count: 250012
+Bin 22: [68751 - 71875]
+  └── Count: 249368
+Bin 23: [71876 - 75000]
+  └── Count: 250853
+Bin 24: [75001 - 78125]
+  └── Count: 249952
+Bin 25: [78126 - 81250]
+  └── Count: 249994
+Bin 26: [81251 - 84375]
+  └── Count: 249407
+Bin 27: [84376 - 87500]
+  └── Count: 250601
+Bin 28: [87501 - 90625]
+  └── Count: 250434
+Bin 29: [90626 - 93750]
+  └── Count: 249863
+Bin 30: [93751 - 96875]
+  └── Count: 250105
+Bin 31: [96876 - 100000]
+  └── Count: 249902
+```
+</details>
+
+##### MPI Process Performance:
+Min Time: 0.0004311430 seconds
+Max Time: 0.0006072270 seconds
+Avg Time: 0.0004623902 seconds
+
+### Results for 32 Bins, 4 Nodes
+<details>
+<summary>Click to view full histogram results</summary>
+
+```
+Parallel Histogram Results
+============================
+
+Total elements: 8000000 | Range: 1-100000 | Number of Bins: 32
+MPI Processes: 112
+Unique Nodes: 4
+
+Performance Metrics:
+  └── Min Time: 0.0002168030 seconds
+  └── Max Time: 0.0004386830 seconds
+  └── Avg Time: 0.0002558552 seconds
+
+Bin 0: [1 - 3125]
+  └── Count: 250357
+Bin 1: [3126 - 6250]
+  └── Count: 249954
+Bin 2: [6251 - 9375]
+  └── Count: 250362
+Bin 3: [9376 - 12500]
+  └── Count: 250798
+Bin 4: [12501 - 15625]
+  └── Count: 250441
+Bin 5: [15626 - 18750]
+  └── Count: 249727
+Bin 6: [18751 - 21875]
+  └── Count: 249692
+Bin 7: [21876 - 25000]
+  └── Count: 250053
+Bin 8: [25001 - 28125]
+  └── Count: 250731
+Bin 9: [28126 - 31250]
+  └── Count: 249642
+Bin 10: [31251 - 34375]
+  └── Count: 249656
+Bin 11: [34376 - 37500]
+  └── Count: 249960
+Bin 12: [37501 - 40625]
+  └── Count: 249652
+Bin 13: [40626 - 43750]
+  └── Count: 249697
+Bin 14: [43751 - 46875]
+  └── Count: 249201
+Bin 15: [46876 - 50000]
+  └── Count: 250465
+Bin 16: [50001 - 53125]
+  └── Count: 249738
+Bin 17: [53126 - 56250]
+  └── Count: 249845
+Bin 18: [56251 - 59375]
+  └── Count: 249754
+Bin 19: [59376 - 62500]
+  └── Count: 250556
+Bin 20: [62501 - 65625]
+  └── Count: 249228
+Bin 21: [65626 - 68750]
+  └── Count: 250012
+Bin 22: [68751 - 71875]
+  └── Count: 249368
+Bin 23: [71876 - 75000]
+  └── Count: 250853
+Bin 24: [75001 - 78125]
+  └── Count: 249952
+Bin 25: [78126 - 81250]
+  └── Count: 249994
+Bin 26: [81251 - 84375]
+  └── Count: 249407
+Bin 27: [84376 - 87500]
+  └── Count: 250601
+Bin 28: [87501 - 90625]
+  └── Count: 250434
+Bin 29: [90626 - 93750]
+  └── Count: 249863
+Bin 30: [93751 - 96875]
+  └── Count: 250105
+Bin 31: [96876 - 100000]
+  └── Count: 249902
+```
+</details>
+
+##### MPI Process Performance:
+Min Time: 0.0002168030 seconds
+Max Time: 0.0004386830 seconds
+Avg Time: 0.0002558552 seconds
+
+### Results for 32 Bins, 8 Nodes
+<details>
+<summary>Click to view full histogram results</summary>
+
+```
+Parallel Histogram Results
+============================
+
+Total elements: 8000000 | Range: 1-100000 | Number of Bins: 32
+MPI Processes: 224
+Unique Nodes: 8
+
+Performance Metrics:
+  └── Min Time: 0.0001092660 seconds
+  └── Max Time: 0.0004458940 seconds
+  └── Avg Time: 0.0001480433 seconds
+
+Bin 0: [1 - 3125]
+  └── Count: 250357
+Bin 1: [3126 - 6250]
+  └── Count: 249954
+Bin 2: [6251 - 9375]
+  └── Count: 250362
+Bin 3: [9376 - 12500]
+  └── Count: 250798
+Bin 4: [12501 - 15625]
+  └── Count: 250441
+Bin 5: [15626 - 18750]
+  └── Count: 249727
+Bin 6: [18751 - 21875]
+  └── Count: 249692
+Bin 7: [21876 - 25000]
+  └── Count: 250053
+Bin 8: [25001 - 28125]
+  └── Count: 250731
+Bin 9: [28126 - 31250]
+  └── Count: 249642
+Bin 10: [31251 - 34375]
+  └── Count: 249656
+Bin 11: [34376 - 37500]
+  └── Count: 249960
+Bin 12: [37501 - 40625]
+  └── Count: 249652
+Bin 13: [40626 - 43750]
+  └── Count: 249697
+Bin 14: [43751 - 46875]
+  └── Count: 249201
+Bin 15: [46876 - 50000]
+  └── Count: 250465
+Bin 16: [50001 - 53125]
+  └── Count: 249738
+Bin 17: [53126 - 56250]
+  └── Count: 249845
+Bin 18: [56251 - 59375]
+  └── Count: 249754
+Bin 19: [59376 - 62500]
+  └── Count: 250556
+Bin 20: [62501 - 65625]
+  └── Count: 249228
+Bin 21: [65626 - 68750]
+  └── Count: 250012
+Bin 22: [68751 - 71875]
+  └── Count: 249368
+Bin 23: [71876 - 75000]
+  └── Count: 250853
+Bin 24: [75001 - 78125]
+  └── Count: 249952
+Bin 25: [78126 - 81250]
+  └── Count: 249994
+Bin 26: [81251 - 84375]
+  └── Count: 249407
+Bin 27: [84376 - 87500]
+  └── Count: 250601
+Bin 28: [87501 - 90625]
+  └── Count: 250434
+Bin 29: [90626 - 93750]
+  └── Count: 249863
+Bin 30: [93751 - 96875]
+  └── Count: 250105
+Bin 31: [96876 - 100000]
+  └── Count: 249902
+```
+</details>
+
+##### MPI Process Performance:
+Min Time: 0.0001092660 seconds
+Max Time: 0.0004458940 seconds
+Avg Time: 0.0001480433 seconds
+
+### Observations
+When comparing performance across different node configurations for 32 bins:
+
+- Processing time decreases substantially as we add more nodes (following a rough inverse linear relationship)
+    - 2 nodes → 4 nodes: Average time reduced by ~45% (0.00046s → 0.00026s)
+    - 4 nodes → 8 nodes: Average time reduced by ~40% (0.00026s → 0.00015s)
+- Minimum processing time follows a similar improving pattern
+- Maximum processing time shows some variability unrelated to the number of nodes
+- Benefits of adding more nodes show some slight diminishing returns
+
+## Part (c)
+
+When comparing the performance of 128-bin (part a) and 32-bin (part b) configurations it becomes clear that there really isn't any statistically significant differences in changing the number of bins. This is because my implementation of the histogram program allows all MPI processes to add values to the bins rather than assigning MPI processes to the a bin. The only difference that might be discernable would be if OpenMPI takes noticably longer to reduce processes for programs that are using more MPI processes. This could potentially be the reason why the 32 bin average latency results are all roughly 0.00001 seconds faster than the 128 bin latency results.
 
 ## Miscellaneous
 - The program was compiled and run using the following command within the makefile directory:
