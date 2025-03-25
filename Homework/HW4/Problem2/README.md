@@ -286,9 +286,9 @@ Bin 127: [99219 - 100000]
 </details>
 
 ##### MPI Process Performance:
-Min Time: 0.0004344630 seconds
-Max Time: 0.0005813460 seconds
-Avg Time: 0.0004737656 seconds
+- Min Time: 0.0004344630 seconds
+- Max Time: 0.0005813460 seconds
+- Avg Time: 0.0004737656 seconds
 
 ### Results for 128 Bins, 4 Nodes
 <details>
@@ -567,9 +567,9 @@ Bin 127: [99219 - 100000]
 </details>
 
 ##### MPI Process Performance:
-Min Time: 0.0002222280 seconds
-Max Time: 0.0003851060 seconds
-Avg Time: 0.0002617112 seconds
+- Min Time: 0.0002222280 seconds
+- Max Time: 0.0003851060 seconds
+- Avg Time: 0.0002617112 seconds
 
 ### Results for 128 Bins, 8 Nodes
 <details>
@@ -848,9 +848,9 @@ Bin 127: [99219 - 100000]
 </details>
 
 ##### MPI Process Performance:
-Min Time: 0.0001148730 seconds
-Max Time: 0.0004827560 seconds
-Avg Time: 0.0001562496 seconds
+- Min Time: 0.0001148730 seconds
+- Max Time: 0.0004827560 seconds
+- Avg Time: 0.0001562496 seconds
 
 ### Observations
 When comparing performance across different node configurations for 128 bins:
@@ -949,9 +949,9 @@ Bin 31: [96876 - 100000]
 </details>
 
 ##### MPI Process Performance:
-Min Time: 0.0004311430 seconds
-Max Time: 0.0006072270 seconds
-Avg Time: 0.0004623902 seconds
+- Min Time: 0.0004311430 seconds
+- Max Time: 0.0006072270 seconds
+- Avg Time: 0.0004623902 seconds
 
 ### Results for 32 Bins, 4 Nodes
 <details>
@@ -1038,9 +1038,9 @@ Bin 31: [96876 - 100000]
 </details>
 
 ##### MPI Process Performance:
-Min Time: 0.0002168030 seconds
-Max Time: 0.0004386830 seconds
-Avg Time: 0.0002558552 seconds
+- Min Time: 0.0002168030 seconds
+- Max Time: 0.0004386830 seconds
+- Avg Time: 0.0002558552 seconds
 
 ### Results for 32 Bins, 8 Nodes
 <details>
@@ -1127,9 +1127,9 @@ Bin 31: [96876 - 100000]
 </details>
 
 ##### MPI Process Performance:
-Min Time: 0.0001092660 seconds
-Max Time: 0.0004458940 seconds
-Avg Time: 0.0001480433 seconds
+- Min Time: 0.0001092660 seconds
+- Max Time: 0.0004458940 seconds
+- Avg Time: 0.0001480433 seconds
 
 ### Observations
 When comparing performance across different node configurations for 32 bins:
