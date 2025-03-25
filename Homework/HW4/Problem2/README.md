@@ -1148,3 +1148,4 @@ When comparing the performance of 128-bin (part a) and 32-bin (part b) configura
 ## Miscellaneous
 - The program was compiled and run using the following command within the makefile directory:
 ```make```
+- sbatch output of the program appears in `slurm.out` files within the `output` directory
