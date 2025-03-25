@@ -31,8 +31,8 @@ The Intel VTune Profiler can optimize the entire application performance for CPU
 | **Licensing**                    | Open-source (BSD-style license) [1]                                                                                           | Primarily optimized for Intel hardware and Intel software ecosystems (Linux and Windows) [3][5]                             |
 
 ### Sources Cited
-[1] https://www.cs.uoregon.edu/research/tau/docs/newguide/bk01pr01.html
-[2] https://journals.sagepub.com/doi/10.1177/1094342006064482
-[3] https://www.intel.com/content/www/us/en/developer/tools/oneapi/vtune-profiler.html
-[4] https://www.intel.com/content/www/us/en/developer/videos/configure-vtune-profiler-for-analysis.html
-[5] https://en.wikipedia.org/wiki/VTune 
+- [1] https://www.cs.uoregon.edu/research/tau/docs/newguide/bk01pr01.html
+- [2] https://journals.sagepub.com/doi/10.1177/1094342006064482
+- [3] https://www.intel.com/content/www/us/en/developer/tools/oneapi/vtune-profiler.html
+- [4] https://www.intel.com/content/www/us/en/developer/videos/configure-vtune-profiler-for-analysis.html
+- [5] https://en.wikipedia.org/wiki/VTune 
