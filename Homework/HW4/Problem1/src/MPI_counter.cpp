@@ -50,11 +50,14 @@ int main(int argc, char** argv) {
         MPI_Send(&counter, 1, MPI_INT, rank - 1, 0, MPI_COMM_WORLD);
     } else if (rank > 0) {
         MPI_Recv(&counter, 1, MPI_INT, rank + 1, 0, MPI_COMM_WORLD, &status);
-        std::cout << "Process " << rank << " on node " << processor_name << " received counter: " << counter << "\n";
 
-        if (rank > 0 && counter > 0) {
+        if (counter >= 0) {
+            std::cout << "Process " << rank << " on node " << processor_name << " received counter: " << counter << "\n";
             counter -= 2;
             MPI_Send(&counter, 1, MPI_INT, rank - 1, 0, MPI_COMM_WORLD);
+        }
+        else {
+            MPI_Send(&counter, 1, MPI_INT, rank - 1, 0, MPI_COMM_WORLD); // This needs to continue to finish the program since the lower ranks will hang
         }
     }
     
