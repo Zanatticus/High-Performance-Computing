@@ -87,7 +87,6 @@ int main(int argc, char** argv) {
 
     // Print the histogram in the head node
     if (rank == 0) {
-
         std::cout << "Parallel Histogram Results\n";
         std::cout << "============================\n\n";
         std::cout << "Total elements: " << N << " | Range: 1-" << RANGE << " | Number of Bins: " << NUM_BINS << "\n";
