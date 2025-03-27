@@ -1,5 +1,7 @@
 #!/bin/bash
 
+.DEFAULT_GOAL := all
+
 ROOT_DIR=$(PWD)
 SRC_DIR=$(ROOT_DIR)/src
 INCLUDE_DIR=$(ROOT_DIR)/include
