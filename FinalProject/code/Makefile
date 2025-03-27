@@ -26,7 +26,7 @@ all: clean $(TARGET)
 
 # Run the target executable
 run: $(TARGET)
-	./$(TARGET)
+	$(TARGET)
 
 # Clean up build files
 clean:
