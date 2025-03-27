@@ -12,17 +12,17 @@ CC = nvcc
 CFLAGS = -O3
 
 # Source files
-SRCS = $(SRC_DIR)/KNN.cu
+SRCS = $(SRC_DIR)/test_dataset.cpp $(SRC_DIR)/knn.cu
 
 # Target executable
-TARGET = $(BUILD_DIR)/KNN
+TARGET = $(BUILD_DIR)/knn_test
 
 # Link the target executable
 $(TARGET):
 	$(CC) $(CFLAGS) -I$(INCLUDE_DIR) -o $@ $(SRCS)
 
 # Default target
-all: clean $(TARGET) run
+all: clean $(TARGET)
 
 # Run the target executable
 run: $(TARGET)
