@@ -21,7 +21,7 @@ TARGET = $(BUILD_DIR)/knn_test
 
 # Link the target executable
 $(TARGET):
-	$(CC) $(CFLAGS) -I$(INCLUDE_DIR) -o $@ $(SRCS)
+	module load nvidia-hpc-sdk && $(CC) $(CFLAGS) -I$(INCLUDE_DIR) -o $@ $(SRCS)
 
 # Default target
 all: clean $(TARGET)
