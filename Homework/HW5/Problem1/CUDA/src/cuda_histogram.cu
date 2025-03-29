@@ -13,6 +13,17 @@
 #define NUM_BINS 128
 #define BLOCK_SIZE 256
 #define GRID_SIZE (N + BLOCK_SIZE - 1) / BLOCK_SIZE
+#define USE_EXAMPLE_VALUES 1
+
+__global__ void histogram_kernel(const int* data, int* histogram, int n, float bin_width) {
+    int idx = blockIdx.x * blockDim.x + threadIdx.x;
+    if (idx >= n) return;
+
+    int bin = floorf((data[idx] - 1) / bin_width);
+    if (bin >= NUM_BINS) bin = NUM_BINS - 1;
+
+    atomicAdd(&histogram[bin], 1);
+}
 
 __global__ void histogram_kernel(const int* data, int* histogram, int* example_values, int n, float bin_width) {
     int idx = blockIdx.x * blockDim.x + threadIdx.x;
@@ -26,6 +37,21 @@ __global__ void histogram_kernel(const int* data, int* histogram, int* example_v
     if (atomicCAS(&example_values[bin], 0, data[idx]) == 0) {
         example_values[bin] = data[idx];
     }
+}
+
+void write_histogram_to_csv(const int* histogram, const char* filename) {
+    FILE* file = fopen(filename, "w");
+    if (file == nullptr) {
+        std::cerr << "Error opening file for writing: " << filename << std::endl;
+        return;
+    }
+
+    fprintf(file, "Bin,Count\n");
+    for (int i = 0; i < NUM_BINS; ++i) {
+        fprintf(file, "%d,%d\n", i, histogram[i]);
+    }
+
+    fclose(file);
 }
 
 int main() {
@@ -42,8 +68,11 @@ int main() {
     cudaMalloc(&d_data, N * sizeof(int));
     cudaMalloc(&d_histogram, NUM_BINS * sizeof(int));
     cudaMemset(d_histogram, 0, NUM_BINS * sizeof(int));
-    cudaMalloc(&d_example_values, NUM_BINS * sizeof(int));
-    cudaMemset(d_example_values, 0, NUM_BINS * sizeof(int));
+
+    if (USE_EXAMPLE_VALUES) {
+        cudaMalloc(&d_example_values, NUM_BINS * sizeof(int));
+        cudaMemset(d_example_values, 0, NUM_BINS * sizeof(int));
+    }
 
     cudaMemcpy(d_data, h_data, N * sizeof(int), cudaMemcpyHostToDevice);
 
@@ -51,10 +80,16 @@ int main() {
     int* h_example_values = new int[NUM_BINS];
 
     auto start = std::chrono::high_resolution_clock::now();
-    histogram_kernel<<<GRID_SIZE, BLOCK_SIZE>>>(d_data, d_histogram, d_example_values, N, bin_width);
+
+    if (USE_EXAMPLE_VALUES) {
+        histogram_kernel<<<GRID_SIZE, BLOCK_SIZE>>>(d_data, d_histogram, d_example_values, N, bin_width);
+    } else {
+        histogram_kernel<<<GRID_SIZE, BLOCK_SIZE>>>(d_data, d_histogram, N, bin_width);
+    }
     cudaDeviceSynchronize();
     cudaMemcpy(h_histogram, d_histogram, NUM_BINS * sizeof(int), cudaMemcpyDeviceToHost);
     cudaMemcpy(h_example_values, d_example_values, NUM_BINS * sizeof(int), cudaMemcpyDeviceToHost);
+
     auto end = std::chrono::high_resolution_clock::now();
 
     std::chrono::duration<double> elapsed = end - start;
@@ -63,7 +98,7 @@ int main() {
     std::cout << "============================\n\n";
     std::cout << "Total elements: " << N << " | Range: 1-" << RANGE
               << " | Number of Bins: " << NUM_BINS << "\n";
-    std::cout << "Block Size (Threads Per Block): " << BLOCK_SIZE << " | Grid Size (Threads Per Block): " << GRID_SIZE << "\n";
+    std::cout << "Block Size (Threads Per Block): " << BLOCK_SIZE << " | Grid Size (Number of Blocks): " << GRID_SIZE << "\n";
     std::cout << "Execution Time (including device sync & copy): " 
               << std::fixed << std::setprecision(10) << elapsed.count() << " seconds\n\n";
 
@@ -74,8 +109,11 @@ int main() {
 
         std::cout << "Bin " << i << ": [" << bin_start << " - " << bin_end << "]\n";
         std::cout << "  └── Count: " << h_histogram[i] << "\n";
-        std::cout << "  └── Example Value: " << h_example_values[i] << "\n";
+        if (USE_EXAMPLE_VALUES)
+            std::cout << "  └── Example Value: " << h_example_values[i] << "\n";
     }
+
+    write_histogram_to_csv(h_histogram, "output/histogram.csv");
 
     delete[] h_data;
     delete[] h_histogram;
