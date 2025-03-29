@@ -360,8 +360,9 @@ bool knn_cuda_global(const float * ref,
     if (query_nb % BLOCK_DIM != 0) grid0.x += 1;
     if (ref_nb   % BLOCK_DIM != 0) grid0.y += 1;
     compute_distances<<<grid0, block0>>>(ref_dev, ref_nb, ref_pitch, query_dev, query_nb, query_pitch, dim, dist_dev);
-    if (cudaGetLastError() != cudaSuccess) {
-        printf("ERROR: Unable to execute kernel\n");
+    cudaError_t err = cudaGetLastError();
+    if (err != cudaSuccess) {
+        printf("ERROR1: Unable to execute kernel compute_distances: %s\n", cudaGetErrorString(err));
         cudaFree(ref_dev);
         cudaFree(query_dev);
         cudaFree(dist_dev);
@@ -375,7 +376,7 @@ bool knn_cuda_global(const float * ref,
     if (query_nb % 256 != 0) grid1.x += 1;
     modified_insertion_sort<<<grid1, block1>>>(dist_dev, dist_pitch, index_dev, index_pitch, query_nb, ref_nb, k);
     if (cudaGetLastError() != cudaSuccess) {
-        printf("ERROR: Unable to execute kernel\n");
+        printf("ERROR2: Unable to execute kernel\n");
         cudaFree(ref_dev);
         cudaFree(query_dev);
         cudaFree(dist_dev);
@@ -390,7 +391,7 @@ bool knn_cuda_global(const float * ref,
     if (k % 16 != 0)        grid2.y += 1;
     compute_sqrt<<<grid2, block2>>>(dist_dev, query_nb, query_pitch, k);	
     if (cudaGetLastError() != cudaSuccess) {
-        printf("ERROR: Unable to execute kernel\n");
+        printf("ERROR3: Unable to execute kernel\n");
         cudaFree(ref_dev);
         cudaFree(query_dev);
         cudaFree(dist_dev);

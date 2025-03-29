@@ -334,18 +334,18 @@ int main(void) {
     initialize_data(ref, ref_nb, query, query_nb, dim);
 
     // Compute the ground truth k-NN distances and indexes for each query point
-    printf("Ground truth computation in progress...\n\n");
-    if (!knn_c(ref, ref_nb, query, query_nb, dim, k, knn_dist, knn_index)) {
-        free(ref);
-	    free(query);
-	    free(knn_dist);
-	    free(knn_index);
-        return EXIT_FAILURE;
-    }
+    // printf("Ground truth computation in progress...\n\n");
+    // if (!knn_c(ref, ref_nb, query, query_nb, dim, k, knn_dist, knn_index)) {
+    //     free(ref);
+	//     free(query);
+	//     free(knn_dist);
+	//     free(knn_index);
+    //     return EXIT_FAILURE;
+    // }
 
     // Test all k-NN functions
     printf("TESTS\n");
-    test(ref, ref_nb, query, query_nb, dim, k, knn_dist, knn_index, &knn_c,            "knn_c",              2);
+    // test(ref, ref_nb, query, query_nb, dim, k, knn_dist, knn_index, &knn_c,            "knn_c",              2);
     test(ref, ref_nb, query, query_nb, dim, k, knn_dist, knn_index, &knn_cuda_global,  "knn_cuda_global",  100); 
     // test(ref, ref_nb, query, query_nb, dim, k, knn_dist, knn_index, &knn_cuda_texture, "knn_cuda_texture", 100); 
     // test(ref, ref_nb, query, query_nb, dim, k, knn_dist, knn_index, &knn_cublas,       "knn_cublas",       100); 
