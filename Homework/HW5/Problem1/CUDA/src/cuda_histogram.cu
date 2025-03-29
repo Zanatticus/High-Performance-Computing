@@ -108,9 +108,13 @@ int main() {
         if (i == NUM_BINS - 1) bin_end = RANGE;
 
         std::cout << "Bin " << i << ": [" << bin_start << " - " << bin_end << "]\n";
-        std::cout << "  └── Count: " << h_histogram[i] << "\n";
-        if (USE_EXAMPLE_VALUES)
+        if (USE_EXAMPLE_VALUES) {
+            std::cout << "  ├── Count: " << h_histogram[i] << "\n";
             std::cout << "  └── Example Value: " << h_example_values[i] << "\n";
+        }
+        else {
+            std::cout << "  └── Count: " << h_histogram[i] << "\n";
+        }
     }
 
     write_histogram_to_csv(h_histogram, "output/histogram.csv");
