@@ -2463,7 +2463,7 @@ Defaulted execution with 128 bins and a fixed block size of 128
 ##### N = \( 2^{23} \)
 - Kernel Execution Time: 0.0135498230 seconds
 
-![Kernel Execution Time vs N](CUDA/output/Kernel%20Execution%20Time%20(s)%20vs.%20N%20(Number%20of%20Elements).png)
+![Kernel Execution Time vs N](plots/Kernel%20Execution%20Time%20(s)%20vs.%20N%20(Number%20of%20Elements).png)
 
 
 ## Part (b)
@@ -2584,9 +2584,13 @@ Defaulted execution with 128 bins and a fixed thread count of 28 (the max allowe
 ##### N = \( 2^{23} \)
 - OpenMP Execution Time: 0.0034046910 seconds
 
-![OpenMP Execution Time vs N](OpenMP/output/OpenMP%20Execution%20Time%20(s)%20vs.%20N%20(Number%20of%20Elements).png)
+![OpenMP Execution Time vs N](plots/OpenMP%20Execution%20Time%20(s)%20vs.%20N%20(Number%20of%20Elements).png)
 
+#### Comparisons Between CUDA and OpenMP
 
+![CUDA vs OpenMP Execution Time](plots/Kernel%20Execution%20Time%20(s)%20and%20OpenMP%20Execution%20Time%20(s).png)
+
+Initially, for smaller values of N, OpenMP is faster than CUDA for histogramming. However, at around \(N = 2^{19} \), CUDA begins to outperform OpenMP dramatically, as seen in the above plot.
 
 ## Miscellaneous
 - The program was compiled and run using the following command within the makefile directory:
