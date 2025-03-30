@@ -28,20 +28,23 @@ int main() {
 	auto start = std::chrono::high_resolution_clock::now();
 
 	#pragma omp parallel
-	{
-		int tid = omp_get_thread_num();
+    {
+        int tid   = omp_get_thread_num();
+        int total = omp_get_num_threads();
 
-		#pragma omp for
-		for (int i = 0; i < N; i++) {
-			int bin = floorf((data[i] - 1) / bin_width);
-			if (bin >= NUM_BINS) bin = NUM_BINS - 1;
-			local_histograms[tid][bin]++;
-		}
-	}
+        int chunk = (N + total - 1) / total;
+        int start = tid * chunk;
+        int end   = std::min(start + chunk, N);
+
+        for (int i = start; i < end; i++) {
+            int bin = floorf((data[i] - 1) / bin_width);
+            if (bin >= NUM_BINS) bin = NUM_BINS - 1;
+            local_histograms[tid][bin]++;
+        }
+    }
 
 	// Combine local histograms into global histogram
 	for (int t = 0; t < NUM_THREADS; ++t) {
-		// #pragma omp parallel for
 		for (int b = 0; b < NUM_BINS; ++b) {
 			global_histogram[b] += local_histograms[t][b];
 		}
@@ -59,14 +62,14 @@ int main() {
     std::cout << "  └── Total Time: " << std::fixed << std::setprecision(10)
               << elapsed.count() << " seconds\n\n";
 
-    // for (int i = 0; i < NUM_BINS; i++) {
-    //     int bin_start = (i == 0) ? 1 : floorf(i * bin_width) + 1;
-    //     int bin_end = floor((i + 1) * bin_width);
-    //     if (i == NUM_BINS - 1) bin_end = RANGE;
+    for (int i = 0; i < NUM_BINS; i++) {
+        int bin_start = (i == 0) ? 1 : floorf(i * bin_width) + 1;
+        int bin_end = floor((i + 1) * bin_width);
+        if (i == NUM_BINS - 1) bin_end = RANGE;
 
-    //     std::cout << "Bin " << i << ": [" << bin_start << " - " << bin_end << "]\n";
-    //     std::cout << "  └── Count: " << global_histogram[i] << "\n";
-    // }
+        std::cout << "Bin " << i << ": [" << bin_start << " - " << bin_end << "]\n";
+        std::cout << "  └── Count: " << global_histogram[i] << "\n";
+    }
 
     delete[] data;
     return 0;
