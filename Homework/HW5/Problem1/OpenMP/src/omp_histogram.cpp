@@ -1,5 +1,5 @@
 // A program that performs parallel histogramming of a data set using C++ and OpenMP.
-// Converted from OpenMPI version by Zander Ingare
+// Author: Zander Ingare
 
 #include <cmath>
 #include <iomanip>
