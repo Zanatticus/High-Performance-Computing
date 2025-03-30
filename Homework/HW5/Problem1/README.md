@@ -8,7 +8,7 @@ b. Compare your GPU performance with running this same code on a CPU using OpenM
 
 ## Part (a)
 
-This program was run on the `NVIDIA Tesla P100 GPU` on `Node c2187` of the Explorer System.
+This program was run on the `NVIDIA Tesla P100 GPU` on `Node c2187` of the Explorer system.
 
 #### Results for 128 bins, N = \( 2^{12} \), block size = 64, grid size = 64
 <details>
@@ -2463,10 +2463,13 @@ Defaulted execution with 128 bins and a fixed block size of 128
 ##### N = \( 2^{23} \)
 - Kernel Execution Time: 0.0135498230 seconds
 
-
+![Kernel Execution Time vs N](CUDA/output/Kernel%20Execution%20Time%20(s)%20vs.%20N%20(Number%20of%20Elements).png)
 
 
 ## Part (b)
+
+The OpenMP implementation was executed on an `Intel(R) Xeon(R) CPU E5-2680 v4 @ 2.40GHz` on `Node c2194` of the Explorer system.
+
 
 
 
