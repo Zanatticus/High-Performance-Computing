@@ -8,10 +8,10 @@
 #include <cstdlib>
 #include <chrono>
 
-#define N        (1 << 23)  // Can be varied from 2^12 to 2^23
+#define N        (1 << 23)
 #define RANGE    100000
 #define NUM_BINS 128
-#define BLOCK_SIZE 256
+#define BLOCK_SIZE 128
 #define GRID_SIZE (N + BLOCK_SIZE - 1) / BLOCK_SIZE
 #define USE_EXAMPLE_VALUES 1
 
@@ -37,21 +37,6 @@ __global__ void histogram_kernel(const int* data, int* histogram, int* example_v
     if (atomicCAS(&example_values[bin], 0, data[idx]) == 0) {
         example_values[bin] = data[idx];
     }
-}
-
-void write_histogram_to_csv(const int* histogram, const char* filename) {
-    FILE* file = fopen(filename, "w");
-    if (file == nullptr) {
-        std::cerr << "Error opening file for writing: " << filename << std::endl;
-        return;
-    }
-
-    fprintf(file, "Bin,Count\n");
-    for (int i = 0; i < NUM_BINS; ++i) {
-        fprintf(file, "%d,%d\n", i, histogram[i]);
-    }
-
-    fclose(file);
 }
 
 int main() {
@@ -116,8 +101,6 @@ int main() {
             std::cout << "  └── Count: " << h_histogram[i] << "\n";
         }
     }
-
-    write_histogram_to_csv(h_histogram, "output/histogram.csv");
 
     delete[] h_data;
     delete[] h_histogram;
