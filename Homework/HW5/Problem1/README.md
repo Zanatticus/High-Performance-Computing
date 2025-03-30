@@ -2468,9 +2468,9 @@ Defaulted execution with 128 bins and a fixed block size of 128
 
 ## Part (b)
 
-The OpenMP implementation was executed on an `Intel(R) Xeon(R) CPU E5-2680 v4 @ 2.40GHz` on `Node c2194` of the Explorer system.
+The OpenMP implementation was executed on an `Intel(R) Xeon(R) CPU E5-2680 v4 @ 2.40GHz` on `Node c2195` of the Explorer system.
 
-No matter the number of threads used, the OpenMP implementation consistently took roughly the same time to execute, except for small N values, where higher thread counts resulted in slower execution times. See below for full results.
+For small values of N, the OpenMP thread creation overhead is significant, and the performance is worse than the single-threaded version. However, as N increases, the performance improves significantly. When N is sufficiently large enough, the speedup attained by using threads exhibits a linear relationship with the number of threads used.
 
 ##### N = \( 2^{12} \), 128 Bins, 1 Thread
 
@@ -2482,7 +2482,7 @@ Total elements: 4096 | Range: 1-100000 | Number of Bins: 128
 OpenMP Threads: 1
 
 Performance Metrics:
-  └── Total Time: 0.0000158180 seconds
+  └── Total Time: 0.0000181750 seconds
 ```
 
 ##### N = \( 2^{12} \), 128 Bins, 16 Threads
@@ -2494,19 +2494,19 @@ Total elements: 4096 | Range: 1-100000 | Number of Bins: 128
 OpenMP Threads: 16
 
 Performance Metrics:
-  └── Total Time: 0.0006020550 seconds
+  └── Total Time: 0.0009427630 seconds
 ```
 
-##### N = \( 2^{12} \), 128 Bins, 64 Threads
+##### N = \( 2^{12} \), 128 Bins, 28 Threads
 ```
 OpenMP Histogram Results
 ============================
 
 Total elements: 4096 | Range: 1-100000 | Number of Bins: 128
-OpenMP Threads: 64
+OpenMP Threads: 28
 
 Performance Metrics:
-  └── Total Time: 0.0020622490 seconds
+  └── Total Time: 0.0012507120 seconds
 ```
 
 ##### N = \( 2^{23} \), 128 Bins, 1 Threads
@@ -2518,7 +2518,7 @@ Total elements: 8388608 | Range: 1-100000 | Number of Bins: 128
 OpenMP Threads: 1
 
 Performance Metrics:
-  └── Total Time: 0.0243780760 seconds
+  └── Total Time: 0.0244004940 seconds
 ```
 
 ##### N = \( 2^{23} \), 128 Bins, 16 Threads
@@ -2530,21 +2530,66 @@ Total elements: 8388608 | Range: 1-100000 | Number of Bins: 128
 OpenMP Threads: 16
 
 Performance Metrics:
-  └── Total Time: 0.0249491790 seconds
+  └── Total Time: 0.0073352910 seconds
 ```
 
-##### N = \( 2^{23} \), 128 Bins, 64 Threads
+##### N = \( 2^{23} \), 128 Bins, 28 Threads
 ```
 OpenMP Histogram Results
 ============================
 
 Total elements: 8388608 | Range: 1-100000 | Number of Bins: 128
-OpenMP Threads: 64
+OpenMP Threads: 28
 
 Performance Metrics:
-  └── Total Time: 0.0266375940 seconds
+  └── Total Time: 0.0049772080 seconds
 ```
+
+#### Program Performance
+Defaulted execution with 128 bins and a fixed thread count of 28 (the max allowed on a node)
+
+##### N = \( 2^{12} \)
+- OpenMP Execution Time: 0.0009360450 seconds
+
+##### N = \( 2^{13} \)
+- OpenMP Execution Time: 0.0012637340 seconds
+
+##### N = \( 2^{14} \)
+- OpenMP Execution Time: 0.0012340780 seconds
+
+##### N = \( 2^{15} \)
+- OpenMP Execution Time: 0.0012857420 seconds
+
+##### N = \( 2^{16} \)
+- OpenMP Execution Time: 0.0009262790 seconds
+
+##### N = \( 2^{17} \)
+- OpenMP Execution Time: 0.0013144960 seconds
+
+##### N = \( 2^{18} \)
+- OpenMP Execution Time: 0.0009914500 seconds
+
+##### N = \( 2^{19} \)
+- OpenMP Execution Time: 0.0011830800 seconds
+
+##### N = \( 2^{20} \)
+- OpenMP Execution Time: 0.0014089920 seconds
+
+##### N = \( 2^{21} \)
+- OpenMP Execution Time: 0.0020692780 seconds
+
+##### N = \( 2^{22} \)
+- OpenMP Execution Time: 0.0016347920 seconds
+
+##### N = \( 2^{23} \)
+- OpenMP Execution Time: 0.0034046910 seconds
+
+![OpenMP Execution Time vs N](OpenMP/output/OpenMP%20Execution%20Time%20(s)%20vs.%20N%20(Number%20of%20Elements).png)
+
+
 
 ## Miscellaneous
 - The program was compiled and run using the following command within the makefile directory:
 ```make```
+- The OpenMP program needed a node that specifically bound the number of CPU cores to the number of threads used:
+```srun --cpus-per-task=28 --cpu-bind=cores --partition=courses-gpu --pty --time=01:00:00 --nodes=1 /bin/bash```
