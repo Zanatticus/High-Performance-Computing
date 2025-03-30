@@ -1,12 +1,12 @@
 #!/bin/bash
 
 # Define the file extensions to look for
-extensions=("*.c" "*.cpp" "*.h" "*.hpp")
+extensions=("*.c" "*.cpp" "*.h" "*.hpp" "*.cu")
 
 # Function to display help message
 show_help() {
     echo "Usage: $0 [OPTIONS]"
-    echo "Format C/C++ files in specified directories"
+    echo "Format C/C++/CUDA files in specified directories"
     echo ""
     echo "Options:"
     echo "  -h, --help     Show this help message"
