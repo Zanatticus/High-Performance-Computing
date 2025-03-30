@@ -2596,4 +2596,4 @@ Initially, for smaller values of N, OpenMP is faster than CUDA for histogramming
 - The program was compiled and run using the following command within the makefile directory:
 ```make```
 - The OpenMP program needed a node that specifically bound the number of CPU cores to the number of threads used:
-```srun --cpus-per-task=28 --cpu-bind=cores --partition=courses-gpu --pty --time=01:00:00 --nodes=1 /bin/bash```
+```srun --cpus-per-task=28 --cpu-bind=cores --partition=courses --pty --time=01:00:00 --nodes=1 /bin/bash```
