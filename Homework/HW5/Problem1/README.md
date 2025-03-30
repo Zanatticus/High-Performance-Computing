@@ -2470,8 +2470,80 @@ Defaulted execution with 128 bins and a fixed block size of 128
 
 The OpenMP implementation was executed on an `Intel(R) Xeon(R) CPU E5-2680 v4 @ 2.40GHz` on `Node c2194` of the Explorer system.
 
+No matter the number of threads used, the OpenMP implementation consistently took roughly the same time to execute, except for small N values, where higher thread counts resulted in slower execution times. See below for full results.
 
+##### N = \( 2^{12} \), 128 Bins, 1 Thread
 
+```
+OpenMP Histogram Results
+============================
+
+Total elements: 4096 | Range: 1-100000 | Number of Bins: 128
+OpenMP Threads: 1
+
+Performance Metrics:
+  └── Total Time: 0.0000158180 seconds
+```
+
+##### N = \( 2^{12} \), 128 Bins, 16 Threads
+```
+OpenMP Histogram Results
+============================
+
+Total elements: 4096 | Range: 1-100000 | Number of Bins: 128
+OpenMP Threads: 16
+
+Performance Metrics:
+  └── Total Time: 0.0006020550 seconds
+```
+
+##### N = \( 2^{12} \), 128 Bins, 64 Threads
+```
+OpenMP Histogram Results
+============================
+
+Total elements: 4096 | Range: 1-100000 | Number of Bins: 128
+OpenMP Threads: 64
+
+Performance Metrics:
+  └── Total Time: 0.0020622490 seconds
+```
+
+##### N = \( 2^{23} \), 128 Bins, 1 Threads
+```
+OpenMP Histogram Results
+============================
+
+Total elements: 8388608 | Range: 1-100000 | Number of Bins: 128
+OpenMP Threads: 1
+
+Performance Metrics:
+  └── Total Time: 0.0243780760 seconds
+```
+
+##### N = \( 2^{23} \), 128 Bins, 16 Threads
+```
+OpenMP Histogram Results
+============================
+
+Total elements: 8388608 | Range: 1-100000 | Number of Bins: 128
+OpenMP Threads: 16
+
+Performance Metrics:
+  └── Total Time: 0.0249491790 seconds
+```
+
+##### N = \( 2^{23} \), 128 Bins, 64 Threads
+```
+OpenMP Histogram Results
+============================
+
+Total elements: 8388608 | Range: 1-100000 | Number of Bins: 128
+OpenMP Threads: 64
+
+Performance Metrics:
+  └── Total Time: 0.0266375940 seconds
+```
 
 ## Miscellaneous
 - The program was compiled and run using the following command within the makefile directory:
