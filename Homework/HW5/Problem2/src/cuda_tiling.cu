@@ -96,7 +96,7 @@ int main() {
 	cudaMalloc(&d_b, size * sizeof(float));
 	cudaMemcpy(d_b, h_b, size * sizeof(float), cudaMemcpyHostToDevice);
 
-	// Kernel launch
+	// Launch non-tiled kernel
 	auto start = std::chrono::high_resolution_clock::now();
 	stencil_kernel<<<GRID_SIZE, BLOCK_SIZE>>>(d_a, d_b);
 
@@ -107,30 +107,33 @@ int main() {
 	std::chrono::duration<double> elapsed = end - start;
 
 	// Print performance results
+	std::cout << "==========================================\n";
 	std::cout << "CUDA Non-Tiled Stencil Computation Results\n";
-	std::cout << "============================\n\n";
-	std::cout << "Total elements: " << N << "\n";
-	std::cout << "Block Size (Threads Per Block): " << BLOCK_SIZE
-	          << " | Grid Size (Number of Blocks): " << GRID_SIZE << "\n";
+	std::cout << "==========================================\n\n";
+	std::cout << "Total elements: " << N*N*N << "\n";
+	std::cout << "Block Size (Threads Per Block): (" << BLOCK_SIZE.x << ", " << BLOCK_SIZE.y << ", " << BLOCK_SIZE.z << ") = " << BLOCK_SIZE.x * BLOCK_SIZE.y * BLOCK_SIZE.z
+          << " | Grid Size (Number of Blocks): (" << GRID_SIZE.x << ", " << GRID_SIZE.y << ", " << GRID_SIZE.z << ") = " << GRID_SIZE.x * GRID_SIZE.y * GRID_SIZE.z << "\n";
 	std::cout << "Execution Time (including device sync & copy): " << std::fixed
 	          << std::setprecision(10) << elapsed.count() << " seconds\n\n";
 
-	// Kernel launch
-	auto start = std::chrono::high_resolution_clock::now();
+	// Launch Tiled Kernel
+	start = std::chrono::high_resolution_clock::now();
 	stencil_kernel_tiled<<<GRID_SIZE, BLOCK_SIZE>>>(d_a, d_b, N);
 
 	// Synchronize kernel with the host
 	cudaDeviceSynchronize();
 	cudaMemcpy(h_a, d_a, size * sizeof(float), cudaMemcpyDeviceToHost);
-	auto                          end     = std::chrono::high_resolution_clock::now();
-	std::chrono::duration<double> elapsed = end - start;
+	end     = std::chrono::high_resolution_clock::now();
+	elapsed = end - start;
 
 	// Print performance results
+	std::cout << "======================================\n";
 	std::cout << "CUDA Tiled Stencil Computation Results\n";
-	std::cout << "============================\n\n";
-	std::cout << "Total elements: " << N << "\n";
-	std::cout << "Tile Size :" << TILE_SIZE << " | Block Size (Threads Per Block): " << BLOCK_SIZE
-	          << " | Grid Size (Number of Blocks): " << GRID_SIZE << "\n";
+	std::cout << "======================================\n\n";
+	std::cout << "Total elements: " << N*N*N << "\n";
+	std::cout << "Tile Size: " << TILE_SIZE
+          << " | Block Size (Threads Per Block): (" << BLOCK_SIZE.x << ", " << BLOCK_SIZE.y << ", " << BLOCK_SIZE.z << ") = " << BLOCK_SIZE.x * BLOCK_SIZE.y * BLOCK_SIZE.z
+          << " | Grid Size (Number of Blocks): (" << GRID_SIZE.x << ", " << GRID_SIZE.y << ", " << GRID_SIZE.z << ") = " << GRID_SIZE.x * GRID_SIZE.y * GRID_SIZE.z << "\n";
 	std::cout << "Execution Time (including device sync & copy): " << std::fixed
 	          << std::setprecision(10) << elapsed.count() << " seconds\n\n";
 
