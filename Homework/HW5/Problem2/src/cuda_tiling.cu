@@ -22,10 +22,9 @@ Author: Zander Ingare
 #define N          32
 #define TILE_SIZE  4
 #define BLOCK_SIZE dim3(TILE_SIZE, TILE_SIZE, TILE_SIZE)
-#define GRID_SIZE                         \
-	dim3((N + TILE_SIZE - 1) / TILE_SIZE, \
-	     (N + TILE_SIZE - 1) / TILE_SIZE, \
-	     (N + TILE_SIZE - 1) / TILE_SIZE)
+#define GRID_SIZE  dim3((N + TILE_SIZE - 1) / TILE_SIZE, \
+						(N + TILE_SIZE - 1) / TILE_SIZE, \
+	     			    (N + TILE_SIZE - 1) / TILE_SIZE)
 
 __global__ void stencil_kernel(float* a, const float* b) {
 	int i = blockIdx.x * blockDim.x + threadIdx.x;
@@ -42,42 +41,42 @@ __global__ void stencil_kernel(float* a, const float* b) {
 	             b[i * N * N + j * N + (k - 1)] + b[i * N * N + j * N + (k + 1)]);
 }
 
-__global__ void stencil_kernel_tiled(float* a, const float* b, int n) {
+__global__ void stencil_kernel_tiled(float* a, const float* b) {
 	__shared__ float tile[TILE_SIZE + 2][TILE_SIZE + 2][TILE_SIZE + 2];
 
 	int i = blockIdx.x * blockDim.x + threadIdx.x;
 	int j = blockIdx.y * blockDim.y + threadIdx.y;
 	int k = blockIdx.z * blockDim.z + threadIdx.z;
 
-	if (i >= n || j >= n || k >= n) {
+	if (i >= N || j >= N || k >= N) {
 		return;
 	}
 
-	tile[threadIdx.x + 1][threadIdx.y + 1][threadIdx.z + 1] = b[i * n * n + j * n + k];
+	tile[threadIdx.x + 1][threadIdx.y + 1][threadIdx.z + 1] = b[i * N * N + j * N + k];
 
 	if (threadIdx.x == 0 && i > 0) {
-		tile[0][threadIdx.y + 1][threadIdx.z + 1] = b[(i - 1) * n * n + j * n + k];
+		tile[0][threadIdx.y + 1][threadIdx.z + 1] = b[(i - 1) * N * N + j * N + k];
 	}
-	if (threadIdx.x == TILE_SIZE - 1 && i < n - 1) {
-		tile[TILE_SIZE + 1][threadIdx.y + 1][threadIdx.z + 1] = b[(i + 1) * n * n + j * n + k];
+	if (threadIdx.x == TILE_SIZE - 1 && i < N - 1) {
+		tile[TILE_SIZE + 1][threadIdx.y + 1][threadIdx.z + 1] = b[(i + 1) * N * N + j * N + k];
 	}
 	if (threadIdx.y == 0 && j > 0) {
-		tile[threadIdx.x + 1][0][threadIdx.z + 1] = b[i * n * n + (j - 1) * n + k];
+		tile[threadIdx.x + 1][0][threadIdx.z + 1] = b[i * N * N + (j - 1) * N + k];
 	}
-	if (threadIdx.y == TILE_SIZE - 1 && j < n - 1) {
-		tile[threadIdx.x + 1][TILE_SIZE + 1][threadIdx.z + 1] = b[i * n * n + (j + 1) * n + k];
+	if (threadIdx.y == TILE_SIZE - 1 && j < N - 1) {
+		tile[threadIdx.x + 1][TILE_SIZE + 1][threadIdx.z + 1] = b[i * N * N + (j + 1) * N + k];
 	}
 	if (threadIdx.z == 0 && k > 0) {
-		tile[threadIdx.x + 1][threadIdx.y + 1][0] = b[i * n * n + j * n + (k - 1)];
+		tile[threadIdx.x + 1][threadIdx.y + 1][0] = b[i * N * N + j * N + (k - 1)];
 	}
-	if (threadIdx.z == TILE_SIZE - 1 && k < n - 1) {
-		tile[threadIdx.x + 1][threadIdx.y + 1][TILE_SIZE + 1] = b[i * n * n + j * n + (k + 1)];
+	if (threadIdx.z == TILE_SIZE - 1 && k < N - 1) {
+		tile[threadIdx.x + 1][threadIdx.y + 1][TILE_SIZE + 1] = b[i * N * N + j * N + (k + 1)];
 	}
 
 	// Perform the stencil computation using shared memory
 	if (threadIdx.x > 0 && threadIdx.x < TILE_SIZE + 1 && threadIdx.y > 0 &&
 	    threadIdx.y < TILE_SIZE + 1 && threadIdx.z > 0 && threadIdx.z < TILE_SIZE + 1) {
-		a[i * n * n + j * n + k] = 0.75f * (tile[threadIdx.x - 1][threadIdx.y][threadIdx.z] +
+		a[i * N * N + j * N + k] = 0.75f * (tile[threadIdx.x - 1][threadIdx.y][threadIdx.z] +
 		                                    tile[threadIdx.x + 1][threadIdx.y][threadIdx.z] +
 		                                    tile[threadIdx.x][threadIdx.y - 1][threadIdx.z] +
 		                                    tile[threadIdx.x][threadIdx.y + 1][threadIdx.z] +
@@ -129,7 +128,7 @@ int main() {
 
 	// Launch Tiled Kernel
 	start = std::chrono::high_resolution_clock::now();
-	stencil_kernel_tiled<<<GRID_SIZE, BLOCK_SIZE>>>(d_a, d_b, N);
+	stencil_kernel_tiled<<<GRID_SIZE, BLOCK_SIZE>>>(d_a, d_b);
 
 	// Synchronize kernel with the host
 	cudaDeviceSynchronize();
