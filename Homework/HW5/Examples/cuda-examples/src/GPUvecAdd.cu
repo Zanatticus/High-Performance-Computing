@@ -72,7 +72,7 @@ int main(int argc, char *argv[]) {
 	start = CLOCK();
 
 	// Execute the kernel
-	vecAdd< < < gridSize, blockSize > > >(d_a, d_b, d_c, n);
+	vecAdd<<<gridSize, blockSize>>>(d_a, d_b, d_c, n);
 
 	// Copy array back to host
 	cudaMemcpy(h_c, d_c, bytes, cudaMemcpyDeviceToHost);

@@ -20,7 +20,7 @@ int main() {
 		data[i] = rand() % RANGE + 1;
 	}
 
-	float bin_width = static_cast< float >(RANGE) / NUM_BINS;
+	float bin_width = static_cast<float>(RANGE) / NUM_BINS;
 
 	int global_histogram[NUM_BINS]              = {0};
 	int local_histograms[NUM_THREADS][NUM_BINS] = {0};
@@ -51,8 +51,8 @@ int main() {
 		}
 	}
 
-	auto                            end     = std::chrono::high_resolution_clock::now();
-	std::chrono::duration< double > elapsed = end - start;
+	auto                          end     = std::chrono::high_resolution_clock::now();
+	std::chrono::duration<double> elapsed = end - start;
 
 	std::cout << "OpenMP Histogram Results\n";
 	std::cout << "============================\n\n";

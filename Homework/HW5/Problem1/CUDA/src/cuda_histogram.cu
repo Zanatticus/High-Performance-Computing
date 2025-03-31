@@ -50,7 +50,7 @@ int main() {
 		h_data[i] = rand() % RANGE + 1;
 	}
 
-	float bin_width = static_cast< float >(RANGE) / NUM_BINS;
+	float bin_width = static_cast<float>(RANGE) / NUM_BINS;
 
 	int* d_data           = nullptr;
 	int* d_histogram      = nullptr;
@@ -72,10 +72,10 @@ int main() {
 	auto start = std::chrono::high_resolution_clock::now();
 
 	if (USE_EXAMPLE_VALUES) {
-		histogram_kernel< < < GRID_SIZE, BLOCK_SIZE > > >(
+		histogram_kernel<<<GRID_SIZE, BLOCK_SIZE>>>(
 		    d_data, d_histogram, d_example_values, N, bin_width);
 	} else {
-		histogram_kernel< < < GRID_SIZE, BLOCK_SIZE > > >(d_data, d_histogram, N, bin_width);
+		histogram_kernel<<<GRID_SIZE, BLOCK_SIZE>>>(d_data, d_histogram, N, bin_width);
 	}
 	cudaDeviceSynchronize();
 	cudaMemcpy(h_histogram, d_histogram, NUM_BINS * sizeof(int), cudaMemcpyDeviceToHost);
@@ -83,7 +83,7 @@ int main() {
 
 	auto end = std::chrono::high_resolution_clock::now();
 
-	std::chrono::duration< double > elapsed = end - start;
+	std::chrono::duration<double> elapsed = end - start;
 
 	std::cout << "CUDA Histogram Results\n";
 	std::cout << "============================\n\n";
@@ -95,8 +95,8 @@ int main() {
 	          << std::setprecision(10) << elapsed.count() << " seconds\n\n";
 
 	for (int i = 0; i < NUM_BINS; ++i) {
-		int bin_start = (i == 0) ? 1 : static_cast< int >(i * bin_width) + 1;
-		int bin_end   = static_cast< int >((i + 1) * bin_width);
+		int bin_start = (i == 0) ? 1 : static_cast<int>(i * bin_width) + 1;
+		int bin_end   = static_cast<int>((i + 1) * bin_width);
 		if (i == NUM_BINS - 1)
 			bin_end = RANGE;
 
