@@ -15,8 +15,6 @@ Author: Zander Ingare
 */
 
 #include <chrono>
-#include <cmath>
-#include <cstdlib>
 #include <cuda.h>
 #include <iomanip>
 #include <iostream>
@@ -76,6 +74,17 @@ __global__ void stencil_kernel_tiled(float* a, const float* b, int n) {
 		tile[threadIdx.x + 1][threadIdx.y + 1][TILE_SIZE + 1] = b[i * n * n + j * n + (k + 1)];
 	}
 
+	// Perform the stencil computation using shared memory
+	if (threadIdx.x > 0 && threadIdx.x < TILE_SIZE + 1 && threadIdx.y > 0 &&
+	    threadIdx.y < TILE_SIZE + 1 && threadIdx.z > 0 && threadIdx.z < TILE_SIZE + 1) {
+		a[i * n * n + j * n + k] = 0.75f * (tile[threadIdx.x - 1][threadIdx.y][threadIdx.z] +
+		                                    tile[threadIdx.x + 1][threadIdx.y][threadIdx.z] +
+		                                    tile[threadIdx.x][threadIdx.y - 1][threadIdx.z] +
+		                                    tile[threadIdx.x][threadIdx.y + 1][threadIdx.z] +
+		                                    tile[threadIdx.x][threadIdx.y][threadIdx.z - 1] +
+		                                    tile[threadIdx.x][threadIdx.y][threadIdx.z + 1]);
+	}
+
 	__syncthreads();
 }
 
@@ -110,9 +119,11 @@ int main() {
 	std::cout << "==========================================\n";
 	std::cout << "CUDA Non-Tiled Stencil Computation Results\n";
 	std::cout << "==========================================\n\n";
-	std::cout << "Total elements: " << N*N*N << "\n";
-	std::cout << "Block Size (Threads Per Block): (" << BLOCK_SIZE.x << ", " << BLOCK_SIZE.y << ", " << BLOCK_SIZE.z << ") = " << BLOCK_SIZE.x * BLOCK_SIZE.y * BLOCK_SIZE.z
-          << " | Grid Size (Number of Blocks): (" << GRID_SIZE.x << ", " << GRID_SIZE.y << ", " << GRID_SIZE.z << ") = " << GRID_SIZE.x * GRID_SIZE.y * GRID_SIZE.z << "\n";
+	std::cout << "Total elements: " << N * N * N << "\n";
+	std::cout << "Block Size (Threads Per Block): (" << BLOCK_SIZE.x << ", " << BLOCK_SIZE.y << ", "
+	          << BLOCK_SIZE.z << ") = " << BLOCK_SIZE.x * BLOCK_SIZE.y * BLOCK_SIZE.z
+	          << " | Grid Size (Number of Blocks): (" << GRID_SIZE.x << ", " << GRID_SIZE.y << ", "
+	          << GRID_SIZE.z << ") = " << GRID_SIZE.x * GRID_SIZE.y * GRID_SIZE.z << "\n";
 	std::cout << "Execution Time (including device sync & copy): " << std::fixed
 	          << std::setprecision(10) << elapsed.count() << " seconds\n\n";
 
@@ -130,10 +141,12 @@ int main() {
 	std::cout << "======================================\n";
 	std::cout << "CUDA Tiled Stencil Computation Results\n";
 	std::cout << "======================================\n\n";
-	std::cout << "Total elements: " << N*N*N << "\n";
-	std::cout << "Tile Size: " << TILE_SIZE
-          << " | Block Size (Threads Per Block): (" << BLOCK_SIZE.x << ", " << BLOCK_SIZE.y << ", " << BLOCK_SIZE.z << ") = " << BLOCK_SIZE.x * BLOCK_SIZE.y * BLOCK_SIZE.z
-          << " | Grid Size (Number of Blocks): (" << GRID_SIZE.x << ", " << GRID_SIZE.y << ", " << GRID_SIZE.z << ") = " << GRID_SIZE.x * GRID_SIZE.y * GRID_SIZE.z << "\n";
+	std::cout << "Total elements: " << N * N * N << "\n";
+	std::cout << "Tile Size: " << TILE_SIZE << " | Block Size (Threads Per Block): ("
+	          << BLOCK_SIZE.x << ", " << BLOCK_SIZE.y << ", " << BLOCK_SIZE.z
+	          << ") = " << BLOCK_SIZE.x * BLOCK_SIZE.y * BLOCK_SIZE.z
+	          << " | Grid Size (Number of Blocks): (" << GRID_SIZE.x << ", " << GRID_SIZE.y << ", "
+	          << GRID_SIZE.z << ") = " << GRID_SIZE.x * GRID_SIZE.y * GRID_SIZE.z << "\n";
 	std::cout << "Execution Time (including device sync & copy): " << std::fixed
 	          << std::setprecision(10) << elapsed.count() << " seconds\n\n";
 
