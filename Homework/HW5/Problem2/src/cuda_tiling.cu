@@ -26,6 +26,22 @@ Author: Zander Ingare
 						(N + TILE_SIZE - 1) / TILE_SIZE, \
 	     			    (N + TILE_SIZE - 1) / TILE_SIZE)
 
+void stencil_default(float* a, const float* b) {
+	for (int i = 1; i < N - 1; i++) {
+		for (int j = 1; j < N - 1; j++) {
+			for (int k = 1; k < N - 1; k++) {
+				a[i * N * N + j * N + k] =
+					0.75f * (b[(i - 1) * N * N + j * N + k] +
+							 b[(i + 1) * N * N + j * N + k] +
+							 b[i * N * N + (j - 1) * N + k] +
+							 b[i * N * N + (j + 1) * N + k] +
+							 b[i * N * N + j * N + (k - 1)] +
+							 b[i * N * N + j * N + (k + 1)]);
+			}
+		}
+	}
+}
+						
 __global__ void stencil_kernel(float* a, const float* b) {
 	int i = blockIdx.x * blockDim.x + threadIdx.x;
 	int j = blockIdx.y * blockDim.y + threadIdx.y;
@@ -91,10 +107,25 @@ int main() {
 	// Host allocation
 	float* h_a = new float[size];
 	float* h_b = new float[size];
+	float* h_a_ground_truth = new float[size];
 
 	for (int i = 0; i < size; ++i) {
-		h_b[i] = static_cast<float>(rand()) / RAND_MAX;
+		h_b[i] = static_cast<float>(i);
 	}
+
+	// Compute the ground truth using the default CPU implementation
+	auto start = std::chrono::high_resolution_clock::now();
+	stencil_default(h_a_ground_truth, h_b);
+	auto                          end     = std::chrono::high_resolution_clock::now();
+	std::chrono::duration<double> elapsed = end - start;
+
+	// Print performance results
+	std::cout << "==========================================\n";
+	std::cout << "C/C++ Default Computation Results\n";
+	std::cout << "==========================================\n\n";
+	std::cout << "Total elements: " << N * N * N << "\n";
+	std::cout << "Execution Time: " << std::fixed
+	          << std::setprecision(10) << elapsed.count() << " seconds\n\n";
 
 	// Device allocation
 	float *d_a, *d_b;
@@ -103,14 +134,14 @@ int main() {
 	cudaMemcpy(d_b, h_b, size * sizeof(float), cudaMemcpyHostToDevice);
 
 	// Launch non-tiled kernel
-	auto start = std::chrono::high_resolution_clock::now();
+	start = std::chrono::high_resolution_clock::now();
 	stencil_kernel<<<GRID_SIZE, BLOCK_SIZE>>>(d_a, d_b);
 
 	// Synchronize kernel with the host
 	cudaDeviceSynchronize();
 	cudaMemcpy(h_a, d_a, size * sizeof(float), cudaMemcpyDeviceToHost);
-	auto                          end     = std::chrono::high_resolution_clock::now();
-	std::chrono::duration<double> elapsed = end - start;
+	end     = std::chrono::high_resolution_clock::now();
+	elapsed = end - start;
 
 	// Print performance results
 	std::cout << "==========================================\n";
@@ -135,9 +166,9 @@ int main() {
 	elapsed = end - start;
 
 	// Print performance results
-	std::cout << "======================================\n";
+	std::cout << "==========================================\n";
 	std::cout << "CUDA Tiled Stencil Computation Results\n";
-	std::cout << "======================================\n\n";
+	std::cout << "==========================================\n\n";
 	std::cout << "Total elements: " << N * N * N << "\n";
 	std::cout << "Tile Size: " << TILE_SIZE << " | Block Size (Threads Per Block): ("
 	          << BLOCK_SIZE.x << ", " << BLOCK_SIZE.y << ", " << BLOCK_SIZE.z
@@ -152,6 +183,7 @@ int main() {
 	cudaFree(d_b);
 	delete[] h_a;
 	delete[] h_b;
+	delete[] h_a_ground_truth;
 
 	return 0;
 }
