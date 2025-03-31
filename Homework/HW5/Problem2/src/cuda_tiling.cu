@@ -21,22 +21,28 @@ Author: Zander Ingare
 
 #define N          32
 #define TILE_SIZE  4
+#define TILE_DIM   (TILE_SIZE + 2) // Dimension of shared memory tile including halo (tile edges)
 #define BLOCK_SIZE dim3(TILE_SIZE, TILE_SIZE, TILE_SIZE)
 #define GRID_SIZE  dim3((N + TILE_SIZE - 1) / TILE_SIZE, \
 						(N + TILE_SIZE - 1) / TILE_SIZE, \
 	     			    (N + TILE_SIZE - 1) / TILE_SIZE)
 
+// Helper function for linear index in a 3D array
+__host__ __device__ inline int idx3d(int i, int j, int k, int dimN) {
+    return i * dimN * dimN + j * dimN + k;
+}
+
 void stencil_default(float* a, const float* b) {
 	for (int i = 1; i < N - 1; i++) {
 		for (int j = 1; j < N - 1; j++) {
 			for (int k = 1; k < N - 1; k++) {
-				a[i * N * N + j * N + k] =
-					0.75f * (b[(i - 1) * N * N + j * N + k] +
-							 b[(i + 1) * N * N + j * N + k] +
-							 b[i * N * N + (j - 1) * N + k] +
-							 b[i * N * N + (j + 1) * N + k] +
-							 b[i * N * N + j * N + (k - 1)] +
-							 b[i * N * N + j * N + (k + 1)]);
+				a[idx3d(i, j, k, N)] =
+                    0.75f * (b[idx3d(i - 1, j, k, N)] +
+                             b[idx3d(i + 1, j, k, N)] +
+                             b[idx3d(i, j - 1, k, N)] +
+                             b[idx3d(i, j + 1, k, N)] +
+                             b[idx3d(i, j, k - 1, N)] +
+                             b[idx3d(i, j, k + 1, N)]);
 			}
 		}
 	}
@@ -47,14 +53,15 @@ __global__ void stencil_kernel(float* a, const float* b) {
 	int j = blockIdx.y * blockDim.y + threadIdx.y;
 	int k = blockIdx.z * blockDim.z + threadIdx.z;
 
-	if (i >= N || j >= N || k >= N) {
-		return;
+    if (i > 0 && i < N - 1 && j > 0 && j < N - 1 && k > 0 && k < N - 1) {
+		a[idx3d(i, j, k, N)] =
+			0.75f * (b[idx3d(i - 1, j, k, N)] +
+					 b[idx3d(i + 1, j, k, N)] +
+					 b[idx3d(i, j - 1, k, N)] +
+					 b[idx3d(i, j + 1, k, N)] +
+					 b[idx3d(i, j, k - 1, N)] +
+					 b[idx3d(i, j, k + 1, N)]);
 	}
-
-	a[i * N * N + j * N + k] =
-	    0.75f * (b[(i - 1) * N * N + j * N + k] + b[(i + 1) * N * N + j * N + k] +
-	             b[i * N * N + (j - 1) * N + k] + b[i * N * N + (j + 1) * N + k] +
-	             b[i * N * N + j * N + (k - 1)] + b[i * N * N + j * N + (k + 1)]);
 }
 
 __global__ void stencil_kernel_tiled(float* a, const float* b) {
@@ -161,27 +168,30 @@ int main() {
 	float max_error = 0.0f;
 
 	for (int i = 1; i < N - 1; ++i) {
-		for (int j = 1; j < N - 1; ++j) {
-			for (int k = 1; k < N - 1; ++k) {
-				int idx = i * N * N + j * N + k;
-				float error = fabs(h_a[idx] - h_a_ground_truth[idx]);
-				if (error > 1e-5f) {
-					std::cout << "Mismatch at (" << i << "," << j << "," << k << "): "
-					          << "CPU = " << h_a_ground_truth[idx]
-					          << ", GPU = " << h_a[idx]
-					          << ", error = " << error << "\n";
-					success = false;
-				}
-				if (error > max_error) max_error = error;
-			}
-		}
-	}
+        for (int j = 1; j < N - 1; ++j) {
+            for (int k = 1; k < N - 1; ++k) {
+                int idx = idx3d(i, j, k, N);
+                float error = fabs(h_a[idx] - h_a_ground_truth[idx]);
+                if (error > 1e-5f) {
+                    std::cout << "Mismatch at (" << i << "," << j << "," << k << "): "
+                              << "CPU = " << h_a_ground_truth[idx]
+                              << ", GPU = " << h_a[idx]
+                              << ", error = " << error << "\n";
+                    success = false;
+                    break;
+                }
+                if (error > max_error) max_error = error;
+            }
+            if (!success) break;
+        }
+        if (!success) break;
+    }
 
-	if (success) {
-		std::cout << "Results Match Ground-Truth\n\n";
-	} else {
-		std::cout << "Results DO NOT Match Ground-Truth\n\n";
-	}
+    if (success) {
+        std::cout << "Results Match Ground-Truth (Max Error: " << max_error << ")\n\n";
+    } else {
+        std::cout << "Results DO NOT Match Ground-Truth (Max Error: " << max_error << ")\n\n";
+    }
 
 	// Launch Tiled Kernel
 	start = std::chrono::high_resolution_clock::now();
@@ -212,27 +222,30 @@ int main() {
 	max_error = 0.0f;
 
 	for (int i = 1; i < N - 1; ++i) {
-		for (int j = 1; j < N - 1; ++j) {
-			for (int k = 1; k < N - 1; ++k) {
-				int idx = i * N * N + j * N + k;
-				float error = fabs(h_a[idx] - h_a_ground_truth[idx]);
-				if (error > 1e-5f) {
-					std::cout << "Mismatch at (" << i << "," << j << "," << k << "): "
-					          << "CPU = " << h_a_ground_truth[idx]
-					          << ", GPU = " << h_a[idx]
-					          << ", error = " << error << "\n";
-					success = false;
-				}
-				if (error > max_error) max_error = error;
-			}
-		}
-	}
+        for (int j = 1; j < N - 1; ++j) {
+            for (int k = 1; k < N - 1; ++k) {
+                int idx = idx3d(i, j, k, N);
+                float error = fabs(h_a[idx] - h_a_ground_truth[idx]);
+                if (error > 1e-5f) {
+                    std::cout << "Mismatch at (" << i << "," << j << "," << k << "): "
+                              << "CPU = " << h_a_ground_truth[idx]
+                              << ", GPU = " << h_a[idx]
+                              << ", error = " << error << "\n";
+                    success = false;
+                    break;
+                }
+                if (error > max_error) max_error = error;
+            }
+            if (!success) break;
+        }
+        if (!success) break;
+    }
 
 	if (success) {
-		std::cout << "Results Match Ground-Truth\n\n";
-	} else {
-		std::cout << "Results DO NOT Match Ground-Truth\n\n";
-	}
+        std::cout << "Results Match Ground-Truth (Max Error: " << max_error << ")\n\n";
+    } else {
+        std::cout << "Results DO NOT Match Ground-Truth (Max Error: " << max_error << ")\n\n";
+    }
 
 	// Cleanup memory
 	cudaFree(d_a);
