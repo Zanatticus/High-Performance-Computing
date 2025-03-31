@@ -73,23 +73,23 @@ __global__ void stencil_kernel_tiled(float* a, const float* b) {
 	tile[threadIdx.x + 1][threadIdx.y + 1][threadIdx.z + 1] = b[i * N * N + j * N + k];
 
 	// Load the halo (edge) values from global memory into shared memory
-	if (threadIdx.x == 0 && i > 0)
-		tile[0][threadIdx.y + 1][threadIdx.z + 1] = b[(i - 1) * N * N + j * N + k];
-	if (threadIdx.x == TILE_SIZE - 1 && i < N - 1)
-		tile[TILE_SIZE + 1][threadIdx.y + 1][threadIdx.z + 1] = b[(i + 1) * N * N + j * N + k];
-	if (threadIdx.y == 0 && j > 0)
-		tile[threadIdx.x + 1][0][threadIdx.z + 1] = b[i * N * N + (j - 1) * N + k];
-	if (threadIdx.y == TILE_SIZE - 1 && j < N - 1) 
-		tile[threadIdx.x + 1][TILE_SIZE + 1][threadIdx.z + 1] = b[i * N * N + (j + 1) * N + k];
-	if (threadIdx.z == 0 && k > 0)
-		tile[threadIdx.x + 1][threadIdx.y + 1][0] = b[i * N * N + j * N + (k - 1)];
-	if (threadIdx.z == TILE_SIZE - 1 && k < N - 1)
-		tile[threadIdx.x + 1][threadIdx.y + 1][TILE_SIZE + 1] = b[i * N * N + j * N + (k + 1)];
+	if (i > 0)
+		tile[threadIdx.x][threadIdx.y + 1][threadIdx.z + 1] = b[(i - 1) * N * N + j * N + k];
+	if (i < N - 1)
+		tile[threadIdx.x + 2][threadIdx.y + 1][threadIdx.z + 1] = b[(i + 1) * N * N + j * N + k];
+	if (j > 0)
+		tile[threadIdx.x + 1][threadIdx.y][threadIdx.z + 1] = b[i * N * N + (j - 1) * N + k];
+	if (j < N - 1)
+		tile[threadIdx.x + 1][threadIdx.y + 2][threadIdx.z + 1] = b[i * N * N + (j + 1) * N + k];
+	if (k > 0)
+		tile[threadIdx.x + 1][threadIdx.y + 1][threadIdx.z] = b[i * N * N + j * N + (k - 1)];
+	if (k < N - 1)
+		tile[threadIdx.x + 1][threadIdx.y + 1][threadIdx.z + 2] = b[i * N * N + j * N + (k + 1)];
 
 	// Perform the stencil computation using shared memory
-	if (threadIdx.x > 0 && threadIdx.x < TILE_SIZE + 1 && 
-		threadIdx.y > 0 && threadIdx.y < TILE_SIZE + 1 && 
-		threadIdx.z > 0 && threadIdx.z < TILE_SIZE + 1) {
+	if (i > 0 && i < N - 1 &&
+		j > 0 && j < N - 1 &&
+		k > 0 && k < N - 1) {
 		a[i * N * N + j * N + k] = 0.75f * (tile[threadIdx.x - 1][threadIdx.y][threadIdx.z] +
 		                                    tile[threadIdx.x + 1][threadIdx.y][threadIdx.z] +
 		                                    tile[threadIdx.x][threadIdx.y - 1][threadIdx.z] +
@@ -155,6 +155,34 @@ int main() {
 	std::cout << "Execution Time (including device sync & copy): " << std::fixed
 	          << std::setprecision(10) << elapsed.count() << " seconds\n\n";
 
+	// Verify results (non-tiled)
+	std::cout << "Verifying Non-Tiled Kernel Results...\n";
+	bool success = true;
+	float max_error = 0.0f;
+
+	for (int i = 1; i < N - 1; ++i) {
+		for (int j = 1; j < N - 1; ++j) {
+			for (int k = 1; k < N - 1; ++k) {
+				int idx = i * N * N + j * N + k;
+				float error = fabs(h_a[idx] - h_a_ground_truth[idx]);
+				if (error > 1e-5f) {
+					std::cout << "Mismatch at (" << i << "," << j << "," << k << "): "
+					          << "CPU = " << h_a_ground_truth[idx]
+					          << ", GPU = " << h_a[idx]
+					          << ", error = " << error << "\n";
+					success = false;
+				}
+				if (error > max_error) max_error = error;
+			}
+		}
+	}
+
+	if (success) {
+		std::cout << "Results Match Ground-Truth\n\n";
+	} else {
+		std::cout << "Results DO NOT Match Ground-Truth\n\n";
+	}
+
 	// Launch Tiled Kernel
 	start = std::chrono::high_resolution_clock::now();
 	stencil_kernel_tiled<<<GRID_SIZE, BLOCK_SIZE>>>(d_a, d_b);
@@ -177,6 +205,34 @@ int main() {
 	          << GRID_SIZE.z << ") = " << GRID_SIZE.x * GRID_SIZE.y * GRID_SIZE.z << "\n";
 	std::cout << "Execution Time (including device sync & copy): " << std::fixed
 	          << std::setprecision(10) << elapsed.count() << " seconds\n\n";
+
+	// Verify results (tiled)
+	std::cout << "Verifying Tiled Kernel Results...\n";
+	success = true;
+	max_error = 0.0f;
+
+	for (int i = 1; i < N - 1; ++i) {
+		for (int j = 1; j < N - 1; ++j) {
+			for (int k = 1; k < N - 1; ++k) {
+				int idx = i * N * N + j * N + k;
+				float error = fabs(h_a[idx] - h_a_ground_truth[idx]);
+				if (error > 1e-5f) {
+					std::cout << "Mismatch at (" << i << "," << j << "," << k << "): "
+					          << "CPU = " << h_a_ground_truth[idx]
+					          << ", GPU = " << h_a[idx]
+					          << ", error = " << error << "\n";
+					success = false;
+				}
+				if (error > max_error) max_error = error;
+			}
+		}
+	}
+
+	if (success) {
+		std::cout << "Results Match Ground-Truth\n\n";
+	} else {
+		std::cout << "Results DO NOT Match Ground-Truth\n\n";
+	}
 
 	// Cleanup memory
 	cudaFree(d_a);
