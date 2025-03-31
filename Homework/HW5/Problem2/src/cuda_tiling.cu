@@ -50,32 +50,30 @@ __global__ void stencil_kernel_tiled(float* a, const float* b) {
 		return;
 	}
 
+	// Create a tile halo for data access to +1 and -1 neighbors
 	__shared__ float tile[TILE_SIZE + 2][TILE_SIZE + 2][TILE_SIZE + 2];
 
+	// Load data for each tile's corresponding central value from global memory into shared memory
 	tile[threadIdx.x + 1][threadIdx.y + 1][threadIdx.z + 1] = b[i * N * N + j * N + k];
 
-	if (threadIdx.x == 0 && i > 0) {
+	// Load the halo (edge) values from global memory into shared memory
+	if (threadIdx.x == 0 && i > 0)
 		tile[0][threadIdx.y + 1][threadIdx.z + 1] = b[(i - 1) * N * N + j * N + k];
-	}
-	if (threadIdx.x == TILE_SIZE - 1 && i < N - 1) {
+	if (threadIdx.x == TILE_SIZE - 1 && i < N - 1)
 		tile[TILE_SIZE + 1][threadIdx.y + 1][threadIdx.z + 1] = b[(i + 1) * N * N + j * N + k];
-	}
-	if (threadIdx.y == 0 && j > 0) {
+	if (threadIdx.y == 0 && j > 0)
 		tile[threadIdx.x + 1][0][threadIdx.z + 1] = b[i * N * N + (j - 1) * N + k];
-	}
-	if (threadIdx.y == TILE_SIZE - 1 && j < N - 1) {
+	if (threadIdx.y == TILE_SIZE - 1 && j < N - 1) 
 		tile[threadIdx.x + 1][TILE_SIZE + 1][threadIdx.z + 1] = b[i * N * N + (j + 1) * N + k];
-	}
-	if (threadIdx.z == 0 && k > 0) {
+	if (threadIdx.z == 0 && k > 0)
 		tile[threadIdx.x + 1][threadIdx.y + 1][0] = b[i * N * N + j * N + (k - 1)];
-	}
-	if (threadIdx.z == TILE_SIZE - 1 && k < N - 1) {
+	if (threadIdx.z == TILE_SIZE - 1 && k < N - 1)
 		tile[threadIdx.x + 1][threadIdx.y + 1][TILE_SIZE + 1] = b[i * N * N + j * N + (k + 1)];
-	}
 
 	// Perform the stencil computation using shared memory
-	if (threadIdx.x > 0 && threadIdx.x < TILE_SIZE + 1 && threadIdx.y > 0 &&
-	    threadIdx.y < TILE_SIZE + 1 && threadIdx.z > 0 && threadIdx.z < TILE_SIZE + 1) {
+	if (threadIdx.x > 0 && threadIdx.x < TILE_SIZE + 1 && 
+		threadIdx.y > 0 && threadIdx.y < TILE_SIZE + 1 && 
+		threadIdx.z > 0 && threadIdx.z < TILE_SIZE + 1) {
 		a[i * N * N + j * N + k] = 0.75f * (tile[threadIdx.x - 1][threadIdx.y][threadIdx.z] +
 		                                    tile[threadIdx.x + 1][threadIdx.y][threadIdx.z] +
 		                                    tile[threadIdx.x][threadIdx.y - 1][threadIdx.z] +
