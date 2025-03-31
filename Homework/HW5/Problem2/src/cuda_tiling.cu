@@ -42,8 +42,6 @@ __global__ void stencil_kernel(float* a, const float* b) {
 }
 
 __global__ void stencil_kernel_tiled(float* a, const float* b) {
-	__shared__ float tile[TILE_SIZE + 2][TILE_SIZE + 2][TILE_SIZE + 2];
-
 	int i = blockIdx.x * blockDim.x + threadIdx.x;
 	int j = blockIdx.y * blockDim.y + threadIdx.y;
 	int k = blockIdx.z * blockDim.z + threadIdx.z;
@@ -51,6 +49,8 @@ __global__ void stencil_kernel_tiled(float* a, const float* b) {
 	if (i >= N || j >= N || k >= N) {
 		return;
 	}
+
+	__shared__ float tile[TILE_SIZE + 2][TILE_SIZE + 2][TILE_SIZE + 2];
 
 	tile[threadIdx.x + 1][threadIdx.y + 1][threadIdx.z + 1] = b[i * N * N + j * N + k];
 
