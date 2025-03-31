@@ -2595,5 +2595,7 @@ Initially, for smaller values of N, OpenMP is faster than CUDA for histogramming
 ## Miscellaneous
 - The program was compiled and run using the following command within the makefile directory:
 ```make```
+- The CUDA program needed a node with access to an NVIDIA GPU:
+```srun --partition=courses-gpu --nodes=1 --pty --gres=gpu:1 --time=01:00:00 /bin/bash```
 - The OpenMP program needed a node that specifically bound the number of CPU cores to the number of threads used:
 ```srun --cpus-per-task=28 --cpu-bind=cores --partition=courses --pty --time=01:00:00 --nodes=1 /bin/bash```
