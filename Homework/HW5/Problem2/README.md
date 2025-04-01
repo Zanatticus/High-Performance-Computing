@@ -257,9 +257,13 @@ Verifying Tiled Kernel Results...
 Results Match Ground-Truth!
 ```
 
-### Performance Plot
+### Performance Plots
 
+![C_C++ Execution Time (s), Non-Tiled CUDA Execution Time (s) and Tiled CUDA Execution Time (s)](plots/C_C++%20Execution%20Time%20(s),%20Non-Tiled%20CUDA%20Execution%20Time%20(s)%20and%20Tiled%20CUDA%20Execution%20Time%20(s).png)
 
+![C_C++ Execution Time (s), Non-Tiled CUDA Execution Time (s) and Tiled CUDA Execution Time (s)(1)](plots/C_C++%20Execution%20Time%20(s),%20Non-Tiled%20CUDA%20Execution%20Time%20(s)%20and%20Tiled%20CUDA%20Execution%20Time%20(s)(1).png)
+
+![Non-Tiled CUDA Execution Time (s) and Tiled CUDA Execution Time (s)](plots/Non-Tiled%20CUDA%20Execution%20Time%20(s)%20and%20Tiled%20CUDA%20Execution%20Time%20(s).png)
 
 ## Part (b)
 
