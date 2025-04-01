@@ -19,14 +19,20 @@ Author: Zander Ingare
 #include <iomanip>
 #include <iostream>
 
-#define N          8
-#define TILE_SIZE  10
-#define TILE_DIM   (TILE_SIZE + 2)   // Dimension of shared memory tile including halo (tile edges)
+#define N          512
+#define TILE_SIZE  8
 #define BLOCK_SIZE dim3(TILE_SIZE, TILE_SIZE, TILE_SIZE)
 #define GRID_SIZE                         \
 	dim3((N + TILE_SIZE - 1) / TILE_SIZE, \
 	     (N + TILE_SIZE - 1) / TILE_SIZE, \
 	     (N + TILE_SIZE - 1) / TILE_SIZE)
+
+// Exploring asymmetrical block and grid sizes, uncomment the below and comment the above
+// #define BLOCK_SIZE dim3(TILE_SIZE, TILE_SIZE, 2*TILE_SIZE)
+// #define GRID_SIZE                         \
+// 	dim3((N + TILE_SIZE - 1) / TILE_SIZE, \
+// 	     (N + TILE_SIZE - 1) / TILE_SIZE, \
+// 	     (N + (2*TILE_SIZE) - 1) / (2*TILE_SIZE))
 
 // Helper function for linear index in a 3D array
 __host__ __device__ inline int idx3d(int i, int j, int k, int dimN) {
@@ -59,8 +65,12 @@ __global__ void stencil_kernel(float* a, const float* b) {
 }
 
 __global__ void stencil_kernel_tiled(float* a, const float* b) {
-	// Shared memory tile including halo region
-	__shared__ float tile[TILE_DIM][TILE_DIM][TILE_DIM];
+	// Shared memory tile including halo region (+/- 1 = 2 extra)
+	__shared__ float tile[TILE_SIZE + 2][TILE_SIZE + 2][TILE_SIZE + 2];
+
+	// Uncomment the below line when exploring asymmetrical block and grid sizes, comment the above
+	// __shared__ float tile[TILE_SIZE + 2][TILE_SIZE + 2][(2 * TILE_SIZE) + 2];
+
 
 	// Thread indices within the block
 	int tx = threadIdx.x;
