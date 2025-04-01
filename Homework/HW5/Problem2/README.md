@@ -267,7 +267,7 @@ Results Match Ground-Truth!
 
 ## Part (b)
 
-
+// EXPLORE DIFFERENT TILE SIZES INSTEAD OF PRESET 10
 
 ## Miscellaneous
 - The program was compiled and run using the following command within the makefile directory:
