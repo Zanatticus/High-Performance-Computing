@@ -19,7 +19,7 @@ Author: Zander Ingare
 #include <iomanip>
 #include <iostream>
 
-#define N          16
+#define N          8
 #define TILE_SIZE  10
 #define TILE_DIM   (TILE_SIZE + 2)   // Dimension of shared memory tile including halo (tile edges)
 #define BLOCK_SIZE dim3(TILE_SIZE, TILE_SIZE, TILE_SIZE)
