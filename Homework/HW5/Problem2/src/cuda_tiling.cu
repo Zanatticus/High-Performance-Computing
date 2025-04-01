@@ -20,7 +20,7 @@ Author: Zander Ingare
 #include <iostream>
 
 #define N          32
-#define TILE_SIZE  4
+#define TILE_SIZE  10
 #define TILE_DIM   (TILE_SIZE + 2) // Dimension of shared memory tile including halo (tile edges)
 #define BLOCK_SIZE dim3(TILE_SIZE, TILE_SIZE, TILE_SIZE)
 #define GRID_SIZE  dim3((N + TILE_SIZE - 1) / TILE_SIZE, \
@@ -65,47 +65,58 @@ __global__ void stencil_kernel(float* a, const float* b) {
 }
 
 __global__ void stencil_kernel_tiled(float* a, const float* b) {
-	int i = blockIdx.x * blockDim.x + threadIdx.x;
-	int j = blockIdx.y * blockDim.y + threadIdx.y;
-	int k = blockIdx.z * blockDim.z + threadIdx.z;
+	// Shared memory tile including halo region
+    __shared__ float tile[TILE_DIM][TILE_DIM][TILE_DIM];
 
-	if (i >= N || j >= N || k >= N) {
-		return;
-	}
+    // Thread indices within the block
+    int tx = threadIdx.x;
+    int ty = threadIdx.y;
+    int tz = threadIdx.z;
 
-	// Create a tile halo for data access to +1 and -1 neighbors
-	__shared__ float tile[TILE_SIZE + 2][TILE_SIZE + 2][TILE_SIZE + 2];
+    // Global indices corresponding to the start of the block
+    int block_base_i = blockIdx.x * TILE_SIZE;
+    int block_base_j = blockIdx.y * TILE_SIZE;
+    int block_base_k = blockIdx.z * TILE_SIZE;
 
-	// Load data for each tile's corresponding central value from global memory into shared memory
-	tile[threadIdx.x + 1][threadIdx.y + 1][threadIdx.z + 1] = b[i * N * N + j * N + k];
+    // Global indices corresponding to this thread's primary element
+    // This thread will be responsible for loading element (i,j,k) into tile(tx+1, ty+1, tz+1)
+    int i = block_base_i + tx;
+    int j = block_base_j + ty;
+    int k = block_base_k + tz;
 
-	// Load the halo (edge) values from global memory into shared memory
-	if (i > 0)
-		tile[threadIdx.x][threadIdx.y + 1][threadIdx.z + 1] = b[(i - 1) * N * N + j * N + k];
-	if (i < N - 1)
-		tile[threadIdx.x + 2][threadIdx.y + 1][threadIdx.z + 1] = b[(i + 1) * N * N + j * N + k];
-	if (j > 0)
-		tile[threadIdx.x + 1][threadIdx.y][threadIdx.z + 1] = b[i * N * N + (j - 1) * N + k];
-	if (j < N - 1)
-		tile[threadIdx.x + 1][threadIdx.y + 2][threadIdx.z + 1] = b[i * N * N + (j + 1) * N + k];
-	if (k > 0)
-		tile[threadIdx.x + 1][threadIdx.y + 1][threadIdx.z] = b[i * N * N + j * N + (k - 1)];
-	if (k < N - 1)
-		tile[threadIdx.x + 1][threadIdx.y + 1][threadIdx.z + 2] = b[i * N * N + j * N + (k + 1)];
+    // Load the central element this thread is responsible for from global memory into shared memory
+    if (i < N && j < N && k < N) {
+         tile[tx + 1][ty + 1][tz + 1] = b[idx3d(i, j, k, N)];
+    }
 
-	// Perform the stencil computation using shared memory
-	if (i > 0 && i < N - 1 &&
-		j > 0 && j < N - 1 &&
-		k > 0 && k < N - 1) {
-		a[i * N * N + j * N + k] = 0.75f * (tile[threadIdx.x - 1][threadIdx.y][threadIdx.z] +
-		                                    tile[threadIdx.x + 1][threadIdx.y][threadIdx.z] +
-		                                    tile[threadIdx.x][threadIdx.y - 1][threadIdx.z] +
-		                                    tile[threadIdx.x][threadIdx.y + 1][threadIdx.z] +
-		                                    tile[threadIdx.x][threadIdx.y][threadIdx.z - 1] +
-		                                    tile[threadIdx.x][threadIdx.y][threadIdx.z + 1]);
-	}
+    // Load -1 face halo elements from global memory to shared memory
+    if (tx == 0 && i > 0) tile[0][ty + 1][tz + 1] = b[idx3d(i - 1, j, k, N)];
+    if (ty == 0 && j > 0) tile[tx + 1][0][tz + 1] = b[idx3d(i, j - 1, k, N)];
+    if (tz == 0 && k > 0) tile[tx + 1][ty + 1][0] = b[idx3d(i, j, k - 1, N)];
 
-	__syncthreads();
+    // Load +1 face halo elements from global memory to shared memory
+    if (tx == TILE_SIZE - 1 && i < N - 1) tile[TILE_SIZE + 1][ty + 1][tz + 1] = b[idx3d(i + 1, j, k, N)];
+    if (ty == TILE_SIZE - 1 && j < N - 1) tile[tx + 1][TILE_SIZE + 1][tz + 1] = b[idx3d(i, j + 1, k, N)];
+    if (tz == TILE_SIZE - 1 && k < N - 1) tile[tx + 1][ty + 1][TILE_SIZE + 1] = b[idx3d(i, j, k + 1, N)];
+
+    __syncthreads();
+
+    // Perform stencil computation using shared memory
+    if (i > 0 && i < N - 1 && j > 0 && j < N - 1 && k > 0 && k < N - 1) {
+        if (tx < TILE_SIZE && ty < TILE_SIZE && tz < TILE_SIZE) {
+            // Access neighbors relative to the element at [tx+1][ty+1][tz+1]
+            float neighbor_im1 = tile[tx    ][ty + 1][tz + 1]; // i-1 neighbor stored at tx
+            float neighbor_ip1 = tile[tx + 2][ty + 1][tz + 1]; // i+1 neighbor stored at tx+2
+            float neighbor_jm1 = tile[tx + 1][ty    ][tz + 1]; // j-1 neighbor stored at ty
+            float neighbor_jp1 = tile[tx + 1][ty + 2][tz + 1]; // j+1 neighbor stored at ty+2
+            float neighbor_km1 = tile[tx + 1][ty + 1][tz    ]; // k-1 neighbor stored at tz
+            float neighbor_kp1 = tile[tx + 1][ty + 1][tz + 2]; // k+1 neighbor stored at tz+2
+
+            a[idx3d(i, j, k, N)] = 0.75f * (neighbor_im1 + neighbor_ip1 +
+                                            neighbor_jm1 + neighbor_jp1 +
+                                            neighbor_km1 + neighbor_kp1);
+        }
+    }
 }
 
 int main() {
@@ -188,7 +199,7 @@ int main() {
     }
 
     if (success) {
-        std::cout << "Results Match Ground-Truth (Max Error: " << max_error << ")\n\n";
+        std::cout << "Results Match Ground-Truth!\n\n";
     } else {
         std::cout << "Results DO NOT Match Ground-Truth (Max Error: " << max_error << ")\n\n";
     }
@@ -242,7 +253,7 @@ int main() {
     }
 
 	if (success) {
-        std::cout << "Results Match Ground-Truth (Max Error: " << max_error << ")\n\n";
+        std::cout << "Results Match Ground-Truth!\n\n";
     } else {
         std::cout << "Results DO NOT Match Ground-Truth (Max Error: " << max_error << ")\n\n";
     }
