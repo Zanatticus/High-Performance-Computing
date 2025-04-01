@@ -19,7 +19,7 @@ Author: Zander Ingare
 #include <iomanip>
 #include <iostream>
 
-#define N          32
+#define N          16
 #define TILE_SIZE  10
 #define TILE_DIM   (TILE_SIZE + 2)   // Dimension of shared memory tile including halo (tile edges)
 #define BLOCK_SIZE dim3(TILE_SIZE, TILE_SIZE, TILE_SIZE)
@@ -153,12 +153,14 @@ int main() {
 	// Launch non-tiled kernel
 	start = std::chrono::high_resolution_clock::now();
 	stencil_kernel<<<GRID_SIZE, BLOCK_SIZE>>>(d_a, d_b);
+    auto end_execution = std::chrono::high_resolution_clock::now();
 
 	// Synchronize kernel with the host
 	cudaDeviceSynchronize();
 	cudaMemcpy(h_a, d_a, size * sizeof(float), cudaMemcpyDeviceToHost);
 	end     = std::chrono::high_resolution_clock::now();
 	elapsed = end - start;
+    std::chrono::duration<double> elapsed_execution = end_execution - start;
 
 	// Print performance results
 	std::cout << "==========================================\n";
@@ -170,7 +172,9 @@ int main() {
 	          << " | Grid Size (Number of Blocks): (" << GRID_SIZE.x << ", " << GRID_SIZE.y << ", "
 	          << GRID_SIZE.z << ") = " << GRID_SIZE.x * GRID_SIZE.y * GRID_SIZE.z << "\n";
 	std::cout << "Execution Time (including device sync & copy): " << std::fixed
-	          << std::setprecision(10) << elapsed.count() << " seconds\n\n";
+	          << std::setprecision(10) << elapsed.count() << " seconds\n";
+    std::cout << "Execution Time (excluding device sync & copy): " << std::fixed
+              << std::setprecision(10) << elapsed_execution.count() << " seconds\n\n";
 
 	// Verify results (non-tiled)
 	std::cout << "Verifying Non-Tiled Kernel Results...\n";
@@ -208,12 +212,14 @@ int main() {
 	// Launch Tiled Kernel
 	start = std::chrono::high_resolution_clock::now();
 	stencil_kernel_tiled<<<GRID_SIZE, BLOCK_SIZE>>>(d_a, d_b);
+    end_execution = std::chrono::high_resolution_clock::now();
 
 	// Synchronize kernel with the host
 	cudaDeviceSynchronize();
 	cudaMemcpy(h_a, d_a, size * sizeof(float), cudaMemcpyDeviceToHost);
 	end     = std::chrono::high_resolution_clock::now();
 	elapsed = end - start;
+    elapsed_execution = end_execution - start;
 
 	// Print performance results
 	std::cout << "==========================================\n";
@@ -226,7 +232,9 @@ int main() {
 	          << " | Grid Size (Number of Blocks): (" << GRID_SIZE.x << ", " << GRID_SIZE.y << ", "
 	          << GRID_SIZE.z << ") = " << GRID_SIZE.x * GRID_SIZE.y * GRID_SIZE.z << "\n";
 	std::cout << "Execution Time (including device sync & copy): " << std::fixed
-	          << std::setprecision(10) << elapsed.count() << " seconds\n\n";
+	          << std::setprecision(10) << elapsed.count() << " seconds\n";
+    std::cout << "Execution Time (excluding device sync & copy): " << std::fixed
+              << std::setprecision(10) << elapsed_execution.count() << " seconds\n\n";
 
 	// Verify results (tiled)
 	std::cout << "Verifying Tiled Kernel Results...\n";
