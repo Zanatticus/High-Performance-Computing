@@ -71,7 +71,6 @@ __global__ void stencil_kernel_tiled(float* a, const float* b) {
 	// Uncomment the below line when exploring asymmetrical block and grid sizes, comment the above
 	// __shared__ float tile[TILE_SIZE + 2][TILE_SIZE + 2][(2 * TILE_SIZE) + 2];
 
-
 	// Thread indices within the block
 	int tx = threadIdx.x;
 	int ty = threadIdx.y;
@@ -163,14 +162,14 @@ int main() {
 	// Launch non-tiled kernel
 	start = std::chrono::high_resolution_clock::now();
 	stencil_kernel<<<GRID_SIZE, BLOCK_SIZE>>>(d_a, d_b);
-    auto end_execution = std::chrono::high_resolution_clock::now();
+	auto end_execution = std::chrono::high_resolution_clock::now();
 
 	// Synchronize kernel with the host
 	cudaDeviceSynchronize();
 	cudaMemcpy(h_a, d_a, size * sizeof(float), cudaMemcpyDeviceToHost);
-	end     = std::chrono::high_resolution_clock::now();
-	elapsed = end - start;
-    std::chrono::duration<double> elapsed_execution = end_execution - start;
+	end                                             = std::chrono::high_resolution_clock::now();
+	elapsed                                         = end - start;
+	std::chrono::duration<double> elapsed_execution = end_execution - start;
 
 	// Print performance results
 	std::cout << "==========================================\n";
@@ -183,8 +182,8 @@ int main() {
 	          << GRID_SIZE.z << ") = " << GRID_SIZE.x * GRID_SIZE.y * GRID_SIZE.z << "\n";
 	std::cout << "Execution Time (including device sync & copy): " << std::fixed
 	          << std::setprecision(10) << elapsed.count() << " seconds\n";
-    std::cout << "Execution Time (excluding device sync & copy): " << std::fixed
-              << std::setprecision(10) << elapsed_execution.count() << " seconds\n\n";
+	std::cout << "Execution Time (excluding device sync & copy): " << std::fixed
+	          << std::setprecision(10) << elapsed_execution.count() << " seconds\n\n";
 
 	// Verify results (non-tiled)
 	std::cout << "Verifying Non-Tiled Kernel Results...\n";
@@ -222,14 +221,14 @@ int main() {
 	// Launch Tiled Kernel
 	start = std::chrono::high_resolution_clock::now();
 	stencil_kernel_tiled<<<GRID_SIZE, BLOCK_SIZE>>>(d_a, d_b);
-    end_execution = std::chrono::high_resolution_clock::now();
+	end_execution = std::chrono::high_resolution_clock::now();
 
 	// Synchronize kernel with the host
 	cudaDeviceSynchronize();
 	cudaMemcpy(h_a, d_a, size * sizeof(float), cudaMemcpyDeviceToHost);
-	end     = std::chrono::high_resolution_clock::now();
-	elapsed = end - start;
-    elapsed_execution = end_execution - start;
+	end               = std::chrono::high_resolution_clock::now();
+	elapsed           = end - start;
+	elapsed_execution = end_execution - start;
 
 	// Print performance results
 	std::cout << "==========================================\n";
@@ -243,8 +242,8 @@ int main() {
 	          << GRID_SIZE.z << ") = " << GRID_SIZE.x * GRID_SIZE.y * GRID_SIZE.z << "\n";
 	std::cout << "Execution Time (including device sync & copy): " << std::fixed
 	          << std::setprecision(10) << elapsed.count() << " seconds\n";
-    std::cout << "Execution Time (excluding device sync & copy): " << std::fixed
-              << std::setprecision(10) << elapsed_execution.count() << " seconds\n\n";
+	std::cout << "Execution Time (excluding device sync & copy): " << std::fixed
+	          << std::setprecision(10) << elapsed_execution.count() << " seconds\n\n";
 
 	// Verify results (tiled)
 	std::cout << "Verifying Tiled Kernel Results...\n";
