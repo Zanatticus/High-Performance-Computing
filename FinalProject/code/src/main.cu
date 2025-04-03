@@ -2,10 +2,10 @@
 #include <iostream>
 
 #define MNIST_DATA_DIR "datasets/MNIST/"
-#define TRAIN_IMAGES MNIST_DATA_DIR "train-images-idx3-ubyte"
-#define TRAIN_LABELS MNIST_DATA_DIR "train-labels-idx1-ubyte"
-#define TEST_IMAGES MNIST_DATA_DIR "t10k-images-idx3-ubyte"
-#define TEST_LABELS MNIST_DATA_DIR "t10k-labels-idx1-ubyte"
+#define TRAIN_IMAGES MNIST_DATA_DIR "train-images.idx3-ubyte"
+#define TRAIN_LABELS MNIST_DATA_DIR "train-labels.idx1-ubyte"
+#define TEST_IMAGES MNIST_DATA_DIR "t10k-images.idx3-ubyte"
+#define TEST_LABELS MNIST_DATA_DIR "t10k-labels.idx1-ubyte"
 
 int main() {
     MNISTLoader loader(TRAIN_IMAGES, TRAIN_LABELS);
