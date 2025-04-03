@@ -1,27 +1,42 @@
 #!/bin/bash
 
+###########################
+# ------ CONSTANTS ------ #
+###########################
+
 .DEFAULT_GOAL := all
 
-ROOT_DIR=$(PWD)
-SRC_DIR=$(ROOT_DIR)/src
-INCLUDE_DIR=$(ROOT_DIR)/include
-BUILD_DIR=$(ROOT_DIR)/build
+ROOT_DIR := $(PWD)
+SRC_DIR := $(ROOT_DIR)/src
+INCLUDE_DIR := $(ROOT_DIR)/include
+BUILD_DIR := $(ROOT_DIR)/build
 
-# Compiler
-CC = nvcc
+###########################
+# ----- COMPILATION ----- #
+###########################
+
+# Compilers
+CXX := g++
+NVCC := nvcc
 
 # Compiler flags
-CFLAGS = -O3
+CXXFLAGS := -O3 -I$(INCLUDE_DIR)
+NVCCFLAGS := -O3 -I$(INCLUDE_DIR)
 
 # Source files
-SRCS = $(SRC_DIR)/test_dataset.cpp $(SRC_DIR)/knn.cu
+CPP_SRCS := $(SRC_DIR)/MNIST-Loader.cpp
+CU_SRCS := $(SRC_DIR)/main.cu
 
 # Target executable
-TARGET = $(BUILD_DIR)/knn_test
+TARGET := $(BUILD_DIR)/main
 
-# Link the target executable
+# Compile C++ sources, CUDA sources, and link the target executable
 $(TARGET):
-	module load nvidia-hpc-sdk && $(CC) $(CFLAGS) -I$(INCLUDE_DIR) -o $@ $(SRCS)
+	module load nvidia-hpc-sdk && $(NVCC) $(NVCCFLAGS) -o $(TARGET) $(CU_SRCS) $(CPP_SRCS)
+
+###########################
+# -------- RULES -------- #
+###########################
 
 # Default target
 all: clean $(TARGET)
@@ -34,4 +49,4 @@ run: $(TARGET)
 clean:
 	rm -f $(TARGET)
 
-.PHONY: all clean run
+.PHONY: all run clean
