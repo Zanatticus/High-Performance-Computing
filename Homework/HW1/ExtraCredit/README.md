@@ -116,7 +116,7 @@ These results were gathered on the Explorer Cluster, Node c2195. The hardware co
 - L3 cache: 35 MB per socket × 2 = 70 MB total (shared per socket)
 - Total cores: 28 physical (14 per socket)
 
-Optimize Tiling:
+Optimized Tiling:
 - Integer matrix multiplication, 4 bytes per int
     - Tile Size = 32: 
         - 32 x 32 x 4 = 8 KB per matrix tile
@@ -127,4 +127,4 @@ Optimize Tiling:
         - 3 Matrices (A, B, C)
             - 3 x 16 KB = 48 KB per tile computation
 
-    - Since this is parallelized, the size of 32 KB per core matches the Tile Size of 32 best, which matches the performance results gathered above.
+    - Since this is parallelized, the size of 32 KB per core (which has 24 KB per tile computation being the largest value less than 32 KB for binary divisible sizes) matches the Tile Size = 32 best. This choice agrees with the performance results gathered above!
