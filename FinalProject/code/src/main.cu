@@ -1,6 +1,5 @@
 #include "MNIST-Loader.h"
 #include <iostream>
-#include <unistd.h> // for getcwd
 
 #define MNIST_DATA_DIR "datasets/MNIST/"
 #define TRAIN_IMAGES MNIST_DATA_DIR "train-images-idx3-ubyte"
