@@ -4,7 +4,7 @@
 #include <time.h>
 
 #define M 512
-#define B 64
+#define B 32
 
 double CLOCK() {
 	struct timespec t;
