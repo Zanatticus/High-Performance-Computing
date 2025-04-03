@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
+
 #define M 512
 #define B 64
 
@@ -36,7 +37,7 @@ int main(int argc, char **argv) {
 
 	finish = CLOCK();
 	total1 = finish - start;
-	printf("Check c[511][511] = %li\n", c[255][255]);
+	printf("Check c[%i][%i] = %li\n", M - 1, M - 1, c[M - 1][M - 1]);
 
 	for (i = 0; i < M; i++)
 		for (j = 0; j < M; j++)
@@ -52,22 +53,22 @@ int main(int argc, char **argv) {
 
 	finish = CLOCK();
 	total2 = finish - start;
-	printf("Check c[511][511] = %li\n", c[511][511]);
+	printf("Check c[%i][%i] = %li\n", M - 1, M - 1, c[M - 1][M - 1]);
 
 	for (i = 0; i < M; i++)
 		for (j = 0; j < M; j++)
 			c[i][j] = 0.0;
 
-	en    = B * 8;
+	en    = M;
 	start = CLOCK();
 
 	#pragma omp parallel for private(i, j, jj, k, kk, sum)
 	for (kk = 0; kk < en; kk += B)
 		for (jj = 0; jj < en; jj += B)
 			for (i = 0; i < M; i++)
-				for (j = jj; j < jj + B; j++) {
+				for (j = jj; j < jj + B && j < M; j++) {
 					sum = c[i][j];
-					for (k = kk; k < kk + B; k++) {
+					for (k = kk; k < kk + B && k < M; k++) {
 						sum += a[i][k] * b[k][j];
 					}
 					c[i][j] = sum;
@@ -76,7 +77,7 @@ int main(int argc, char **argv) {
 	finish = CLOCK();
 	total3 = finish - start;
 
-	printf("Check c[511][511] = %li\n", c[511][511]);
+	printf("Check c[%i][%i] = %li\n", M - 1, M - 1, c[M - 1][M - 1]);
 
 	printf("Time for first loop (not parallelized) = %f\n", total1);
 	printf("Time for second loop (parallelized) = %f\n", total2);
