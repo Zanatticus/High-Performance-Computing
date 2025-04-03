@@ -20,6 +20,12 @@ show_help() {
     exit 0
 }
 
+# Check if no arguments are provided
+if [[ $# -eq 0 ]]; then
+    echo "Error: No arguments provided."
+    show_help
+fi
+
 # Default to all directories
 target_dir="."
 
