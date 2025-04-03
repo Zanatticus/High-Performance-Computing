@@ -20,3 +20,6 @@ srun --partition=courses-gpu --nodes=1 --pty --gres=gpu:4 --time=01:00:00 /bin/b
 
 # Obtain a node with 4 NVIDIA V100 GPUs
 srun --partition=courses-gpu --nodelist=d1004 --nodes=1 --pty --gres=gpu:4 --time=01:00:00 /bin/bash
+
+# Obtain a node with 1 GPU and binded CPU cores (for OpenMP)
+srun --cpus-per-task=28 --cpu-bind=cores --partition=courses-gpu --gres=gpu:1 --pty --time=01:00:00 --nodes=1 /bin/bash
