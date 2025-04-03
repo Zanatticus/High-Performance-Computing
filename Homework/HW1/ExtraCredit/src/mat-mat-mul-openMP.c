@@ -68,7 +68,7 @@ int main(int argc, char **argv) {
 				for (j = jj; j < jj + B; j++) {
 					sum = c[i][j];
 					for (k = kk; k < kk + B; k++) {
-						sum += a[i][j] * b[k][j];
+						sum += a[i][k] * b[k][j];
 					}
 					c[i][j] = sum;
 				}
