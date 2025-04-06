@@ -60,7 +60,7 @@ int main() {
     std::cout << "MNIST Train Size: " << mnist.getNumTrainImages() << "\n";
     std::cout << "MNIST Test Size: " << mnist.getNumTestImages() << "\n";
 
-    int mnist_idx = 1;
+    int mnist_idx = 0;
     std::cout << "MNIST Test Image Label: " << (int)mnist_test_labels[mnist_idx] << "\n";
     write_mnist_ppm(&mnist_test_images[mnist_idx * mnist.getImageSize()], 28, 28, "output/mnist_image.ppm");
 
@@ -75,7 +75,7 @@ int main() {
     std::cout << "CIFAR Train Size: " << cifar.getNumTrainImages() << "\n";
     std::cout << "CIFAR Test Size: " << cifar.getNumTestImages() << "\n";
 
-    int cifar_idx = 5;   
+    int cifar_idx = 0;   
     std::cout << "Label: " << (int)cifar_test_labels[cifar_idx] << " (" << cifar.getLabelName(cifar_test_labels[cifar_idx]) << ")\n";
     write_cifar_ppm(&cifar_test_images[cifar_idx * cifar.getImageSize()], cifar.getWidth(), cifar.getHeight(), "output/cifar_img.ppm");
     
