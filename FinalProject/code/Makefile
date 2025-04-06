@@ -24,7 +24,8 @@ CXXFLAGS := -O3 -I$(INCLUDE_DIR)
 NVCCFLAGS := -O3 -I$(INCLUDE_DIR)
 
 # Source files
-CPP_SRCS := $(SRC_DIR)/MNIST-Loader.cpp
+CPP_SRCS := $(SRC_DIR)/MNIST-Loader.cpp \
+			$(SRC_DIR)/CIFAR-Loader.cpp
 CU_SRCS := $(SRC_DIR)/main.cu
 
 # Target executable

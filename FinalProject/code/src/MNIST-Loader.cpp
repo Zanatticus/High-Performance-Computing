@@ -1,74 +1,66 @@
 #include "MNIST-Loader.h"
-#include <cstdio>
-#include <cstdlib>
+#include <fstream>
 #include <stdexcept>
+#include <iostream>
 
-MNISTLoader::MNISTLoader(const std::string &imageFilePath, const std::string &labelFilePath)
-    : numImages(0), numRows(0), numCols(0)
-{
-    loadImages(imageFilePath);
-    loadLabels(labelFilePath);
-}
+MNISTLoader::MNISTLoader() {
+    loadImagesAndLabels(std::string(BASE_DIR) + TRAIN_IMAGE_FILE,
+                        std::string(BASE_DIR) + TRAIN_LABEL_FILE,
+                        trainImages, trainLabels);
 
-int MNISTLoader::getNumImages() const {
-    return numImages;
-}
-
-int MNISTLoader::getImageSize() const {
-    return numRows * numCols;
-}
-
-const std::vector<float>& MNISTLoader::getImages() const {
-    return images;
-}
-
-const std::vector<unsigned char>& MNISTLoader::getLabels() const {
-    return labels;
+    loadImagesAndLabels(std::string(BASE_DIR) + TEST_IMAGE_FILE,
+                        std::string(BASE_DIR) + TEST_LABEL_FILE,
+                        testImages, testLabels);
 }
 
 int MNISTLoader::readBigEndianInt(FILE *fp) {
     unsigned char bytes[4];
-    if (fread(bytes, sizeof(unsigned char), 4, fp) != 4) {
-        throw std::runtime_error("Failed to read 4 bytes from file");
-    }
+    fread(bytes, sizeof(unsigned char), 4, fp);
     return (bytes[0] << 24) | (bytes[1] << 16) | (bytes[2] << 8) | bytes[3];
 }
 
-void MNISTLoader::loadImages(const std::string &filePath) {
-    FILE *fp = fopen(filePath.c_str(), "rb");
-    if (!fp) throw std::runtime_error("Cannot open image file: " + filePath);
+void MNISTLoader::loadImagesAndLabels(const std::string &imagePath, const std::string &labelPath,
+                                      std::vector<float> &imageVec, std::vector<unsigned char> &labelVec) {
+    FILE *fp = fopen(imagePath.c_str(), "rb");
+    if (!fp) throw std::runtime_error("Cannot open image file: " + imagePath);
 
     int magic = readBigEndianInt(fp);
-    if (magic != 2051) throw std::runtime_error("Invalid image file format: " + filePath);
+    if (magic != 2051) throw std::runtime_error("Invalid image file format: " + imagePath);
 
-    numImages = readBigEndianInt(fp);
+    int numImages = readBigEndianInt(fp);
     numRows = readBigEndianInt(fp);
     numCols = readBigEndianInt(fp);
     int imageSize = numRows * numCols;
 
-    images.resize(numImages * imageSize);
+    imageVec.resize(numImages * imageSize);
     unsigned char *temp = new unsigned char[numImages * imageSize];
     fread(temp, sizeof(unsigned char), numImages * imageSize, fp);
     fclose(fp);
 
     for (int i = 0; i < numImages * imageSize; ++i) {
-        images[i] = temp[i] / 255.0f; // normalize
+        imageVec[i] = temp[i] / 255.0f;
     }
-
     delete[] temp;
-}
 
-void MNISTLoader::loadLabels(const std::string &filePath) {
-    FILE *fp = fopen(filePath.c_str(), "rb");
-    if (!fp) throw std::runtime_error("Cannot open label file: " + filePath);
+    // Labels
+    fp = fopen(labelPath.c_str(), "rb");
+    if (!fp) throw std::runtime_error("Cannot open label file: " + labelPath);
+    magic = readBigEndianInt(fp);
+    if (magic != 2049) throw std::runtime_error("Invalid label file format: " + labelPath);
 
-    int magic = readBigEndianInt(fp);
-    if (magic != 2049) throw std::runtime_error("Invalid label file format: " + filePath);
+    int numLabels = readBigEndianInt(fp);
+    if (numLabels != numImages) throw std::runtime_error("Image/label count mismatch");
 
-    int count = readBigEndianInt(fp);
-    if (count != numImages) throw std::runtime_error("Label count does not match image count");
-
-    labels.resize(count);
-    fread(labels.data(), sizeof(unsigned char), count, fp);
+    labelVec.resize(numLabels);
+    fread(labelVec.data(), sizeof(unsigned char), numLabels, fp);
     fclose(fp);
 }
+
+int MNISTLoader::getNumTrainImages() const { return trainLabels.size(); }
+int MNISTLoader::getNumTestImages() const { return testLabels.size(); }
+int MNISTLoader::getImageSize() const { return numRows * numCols; }
+
+const std::vector<float>& MNISTLoader::getTrainImages() const { return trainImages; }
+const std::vector<unsigned char>& MNISTLoader::getTrainLabels() const { return trainLabels; }
+const std::vector<float>& MNISTLoader::getTestImages() const { return testImages; }
+const std::vector<unsigned char>& MNISTLoader::getTestLabels() const { return testLabels; }
