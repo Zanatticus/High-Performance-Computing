@@ -2,7 +2,6 @@
 #include "KNN-Classifier.h"
 #include "MNIST-Loader.h"
 
-#include <chrono>
 #include <fstream>
 #include <iomanip>
 #include <iostream>
@@ -12,8 +11,7 @@
 #define K_MNIST 5
 #define K_CIFAR 5
 
-void saveMetrics(
-    const std::string &dataset, int k, double executionTime, float accuracy, float memoryUsage) {
+void saveMetrics(const std::string &dataset, int k, double executionTime, float accuracy, float memoryUsage) {
 	std::ofstream outFile("output/knn_metrics.csv", std::ios::app);
 
 	// Write header if file is empty
@@ -40,14 +38,11 @@ int main() {
 	const auto &mnist_test_images  = mnist.getTestImages();
 	const auto &mnist_test_labels  = mnist.getTestLabels();
 
-	std::cout << "MNIST Train Size: " << mnist.getNumTrainImages() << "\n";
-	std::cout << "MNIST Test Size: " << mnist.getNumTestImages() << "\n";
-
 	// Create and train KNN classifier for MNIST
 	KNNClassifier mnist_knn(K_MNIST);
 	mnist_knn.trainMNIST(mnist_train_images, mnist_train_labels);
 
-	// Test a single image first
+	// Test on a single image first
 	int           mnist_idx       = 0;
 	unsigned char predicted_label = mnist_knn.predict(mnist_test_images, mnist_idx);
 	std::cout << "MNIST Test Image Actual Label: " << (int) mnist_test_labels[mnist_idx] << "\n";
@@ -78,14 +73,11 @@ int main() {
 	const auto &cifar_test_images  = cifar.getTestImages();
 	const auto &cifar_test_labels  = cifar.getTestLabels();
 
-	std::cout << "CIFAR Train Size: " << cifar.getNumTrainImages() << "\n";
-	std::cout << "CIFAR Test Size: " << cifar.getNumTestImages() << "\n";
-
 	// Create and train KNN classifier for CIFAR
 	KNNClassifier cifar_knn(K_CIFAR);
 	cifar_knn.trainCIFAR(cifar_train_images, cifar_train_labels);
 
-	// Test a single image first
+	// Test on a single image first
 	int cifar_idx   = 0;
 	predicted_label = cifar_knn.predict(cifar_test_images, cifar_idx);
 	std::cout << "CIFAR Test Image Actual Label: " << (int) cifar_test_labels[cifar_idx] << " ("
@@ -96,8 +88,9 @@ int main() {
 
 	// Evaluate on full test set
 	float cifar_accuracy = cifar_knn.evaluateAccuracy(cifar_test_images, cifar_test_labels);
+	
+	/* ------------------------------------------------------------------------------------------ */
 
-	// Save metrics
 	saveMetrics("CIFAR",
 	            K_CIFAR,
 	            cifar_knn.getLastExecutionTime(),

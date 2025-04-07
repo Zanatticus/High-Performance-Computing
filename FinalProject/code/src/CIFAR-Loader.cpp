@@ -1,7 +1,6 @@
 #include "CIFAR-Loader.h"
 
 #include <fstream>
-#include <iostream>
 #include <stdexcept>
 
 const char* CIFARLoader::LABEL_NAMES[10] = {

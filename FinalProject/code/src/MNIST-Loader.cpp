@@ -1,7 +1,6 @@
 #include "MNIST-Loader.h"
 
 #include <fstream>
-#include <iostream>
 #include <stdexcept>
 
 MNISTLoader::MNISTLoader() {
