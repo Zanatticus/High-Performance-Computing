@@ -17,6 +17,8 @@ public:
     const std::vector<float>& getTestImages() const;
     const std::vector<unsigned char>& getTestLabels() const;
 
+    void writeImageToPPM(const std::vector<float>& image, int index, const std::string& filename) const;
+
 private:
     int numRows;
     int numCols;

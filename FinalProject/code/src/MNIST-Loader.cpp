@@ -64,3 +64,17 @@ const std::vector<float>& MNISTLoader::getTrainImages() const { return trainImag
 const std::vector<unsigned char>& MNISTLoader::getTrainLabels() const { return trainLabels; }
 const std::vector<float>& MNISTLoader::getTestImages() const { return testImages; }
 const std::vector<unsigned char>& MNISTLoader::getTestLabels() const { return testLabels; }
+
+void MNISTLoader::writeImageToPPM(const std::vector<float>& image, int index, const std::string& filename) const {
+    std::ofstream out(filename);
+    if (!out.is_open()) throw std::runtime_error("Cannot open PPM file for writing: " + filename);
+
+    out << "P3\n" << numCols << " " << numRows << "\n255\n";
+    int offset = index * numCols * numRows;
+    for (int i = 0; i < numCols * numRows; ++i) {
+        int gray = static_cast<int>(image[offset + i] * 255.0f);
+        out << gray << " " << gray << " " << gray << "\n";
+    }
+
+    out.close();
+}

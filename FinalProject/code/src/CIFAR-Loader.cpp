@@ -62,3 +62,20 @@ const char* CIFARLoader::getLabelName(int labelIndex) const {
     if (labelIndex < 0 || labelIndex >= NUM_CLASSES) return "unknown";
     return LABEL_NAMES[labelIndex];
 }
+
+void CIFARLoader::writeImageToPPM(const std::vector<float>& image, int index, const std::string& filename) const {
+    std::ofstream out(filename);
+    if (!out.is_open()) throw std::runtime_error("Cannot open PPM file for writing: " + filename);
+
+    out << "P3\n" << width << " " << height << "\n255\n";
+    int offset = index * imageSize;
+
+    for (int i = 0; i < width * height; ++i) {
+        int r = static_cast<int>(image[offset + i] * 255.0f);
+        int g = static_cast<int>(image[offset + width * height + i] * 255.0f);
+        int b = static_cast<int>(image[offset + 2 * width * height + i] * 255.0f);
+        out << r << " " << g << " " << b << "\n";
+    }
+
+    out.close();
+}

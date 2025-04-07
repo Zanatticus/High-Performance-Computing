@@ -24,6 +24,8 @@ public:
 
     const char* getLabelName(int labelIndex) const;
 
+    void writeImageToPPM(const std::vector<float>& image, int index, const std::string& filename) const;
+
 private:
     int imageSize;
     int width;
