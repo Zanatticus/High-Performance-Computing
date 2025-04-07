@@ -27,9 +27,10 @@ void saveMetrics(const std::string& dataset, int k, double executionTime, float 
 
 int main() {
     // Test with MNIST
-    std::cout << "\n==============================" << std::endl;
-    std::cout << "\n Testing KNN on MNIST dataset" << std::endl;
-    std::cout << "\n==============================" << std::endl;
+    std::cout << std::endl;
+    std::cout << "==============================" << std::endl;
+    std::cout << " Testing KNN on MNIST dataset" << std::endl;
+    std::cout << "==============================" << std::endl;
 
     MNISTLoader mnist;
     const auto &mnist_train_images = mnist.getTrainImages();
@@ -60,9 +61,10 @@ int main() {
     // ------------------------------------------------------------------------------------------------------------------------------------
 
     // Test with CIFAR
-    std::cout << "\n==============================" << std::endl;
-    std::cout << "\n Testing KNN on CIFAR dataset" << std::endl;
-    std::cout << "\n==============================" << std::endl;
+    std::cout << std::endl;
+    std::cout << "==============================" << std::endl;
+    std::cout << " Testing KNN on CIFAR dataset" << std::endl;
+    std::cout << "==============================" << std::endl;
 
     CIFARLoader cifar;
     const auto &cifar_train_images = cifar.getTrainImages();
