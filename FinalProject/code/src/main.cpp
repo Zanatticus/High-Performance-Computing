@@ -8,8 +8,8 @@
 #include <string>
 #include <vector>
 
-#define K_MNIST 5
-#define K_CIFAR 5
+#define K_MNIST 1
+#define K_CIFAR 1
 
 void saveMetrics(const std::string &dataset, int k, double executionTime, float accuracy, float memoryUsage) {
 	std::ofstream outFile("output/knn_metrics.csv", std::ios::app);
