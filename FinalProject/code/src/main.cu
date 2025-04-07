@@ -8,6 +8,9 @@
 #include <chrono>
 #include <iomanip>
 
+#define K_MNIST 5
+#define K_CIFAR 5
+
 void saveMetrics(const std::string& dataset, int k, double executionTime, float accuracy, float memoryUsage) {
     std::ofstream outFile("output/knn_metrics.csv", std::ios::app);
     
@@ -24,7 +27,10 @@ void saveMetrics(const std::string& dataset, int k, double executionTime, float 
 
 int main() {
     // Test with MNIST
-    std::cout << "=== Testing KNN on MNIST dataset ===" << std::endl;
+    std::cout << "\n==============================" << std::endl;
+    std::cout << "\n Testing KNN on MNIST dataset" << std::endl;
+    std::cout << "\n==============================" << std::endl;
+
     MNISTLoader mnist;
     const auto &mnist_train_images = mnist.getTrainImages();
     const auto &mnist_train_labels = mnist.getTrainLabels();
@@ -35,8 +41,7 @@ int main() {
     std::cout << "MNIST Test Size: " << mnist.getNumTestImages() << "\n";
 
     // Create and train KNN classifier for MNIST
-    int k_mnist = 5;
-    KNNClassifier mnist_knn(k_mnist);
+    KNNClassifier mnist_knn(K_MNIST);
     mnist_knn.trainMNIST(mnist_train_images, mnist_train_labels);
     
     // Test a single image first
@@ -50,10 +55,15 @@ int main() {
     float mnist_accuracy = mnist_knn.evaluateAccuracy(mnist_test_images, mnist_test_labels);
     
     // Save metrics
-    saveMetrics("MNIST", k_mnist, mnist_knn.getLastExecutionTime(), mnist_accuracy, mnist_knn.getGpuMemoryUsage());
+    saveMetrics("MNIST", K_MNIST, mnist_knn.getLastExecutionTime(), mnist_accuracy, mnist_knn.getGpuMemoryUsage());
     
+    // ------------------------------------------------------------------------------------------------------------------------------------
+
     // Test with CIFAR
-    std::cout << "\n=== Testing KNN on CIFAR dataset ===" << std::endl;
+    std::cout << "\n==============================" << std::endl;
+    std::cout << "\n Testing KNN on CIFAR dataset" << std::endl;
+    std::cout << "\n==============================" << std::endl;
+
     CIFARLoader cifar;
     const auto &cifar_train_images = cifar.getTrainImages();
     const auto &cifar_train_labels = cifar.getTrainLabels();
@@ -64,8 +74,7 @@ int main() {
     std::cout << "CIFAR Test Size: " << cifar.getNumTestImages() << "\n";
 
     // Create and train KNN classifier for CIFAR
-    int k_cifar = 5;
-    KNNClassifier cifar_knn(k_cifar);
+    KNNClassifier cifar_knn(K_CIFAR);
     cifar_knn.trainCIFAR(cifar_train_images, cifar_train_labels);
     
     // Test a single image first
@@ -81,7 +90,7 @@ int main() {
     float cifar_accuracy = cifar_knn.evaluateAccuracy(cifar_test_images, cifar_test_labels);
     
     // Save metrics
-    saveMetrics("CIFAR", k_cifar, cifar_knn.getLastExecutionTime(), cifar_accuracy, cifar_knn.getGpuMemoryUsage());
+    saveMetrics("CIFAR", K_CIFAR, cifar_knn.getLastExecutionTime(), cifar_accuracy, cifar_knn.getGpuMemoryUsage());
     
     return 0;
 }
