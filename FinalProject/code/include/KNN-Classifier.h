@@ -94,6 +94,18 @@ class KNNClassifier {
 	float getGpuMemoryUsage() const;
 
 	/**
+	 * @brief Get the GPU device name/type
+	 * @return String containing the GPU device name
+	 */
+	std::string getGpuType() const;
+
+	/**
+	 * @brief Get the number of available CUDA devices
+	 * @return Number of CUDA devices
+	 */
+	int getGpuCount() const;
+
+	/**
 	 * @brief Set a new value for k (number of neighbors)
 	 * @param newK New k value
 	 */

@@ -353,3 +353,15 @@ double KNNClassifier::getLastExecutionTime() const {
 float KNNClassifier::getGpuMemoryUsage() const {
 	return gpuMemoryUsage;
 }
+
+std::string KNNClassifier::getGpuType() const {
+	cudaDeviceProp deviceProp;
+	cudaGetDeviceProperties(&deviceProp, deviceId);
+	return std::string(deviceProp.name);
+}
+
+int KNNClassifier::getGpuCount() const {
+	int deviceCount = 0;
+	cudaGetDeviceCount(&deviceCount);
+	return deviceCount;
+}

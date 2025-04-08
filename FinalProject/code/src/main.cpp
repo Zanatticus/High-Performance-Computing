@@ -11,17 +11,24 @@
 #define K_MNIST 1
 #define K_CIFAR 1
 
-void saveMetrics(
-    const std::string &dataset, int k, double executionTime, float accuracy, float memoryUsage) {
+void saveMetrics(const std::string &dataset,
+                 int                k,
+                 double             executionTime,
+                 float              accuracy,
+                 float              memoryUsage,
+                 const std::string &gpuType,
+                 int                gpuCount) {
 	std::ofstream outFile("output/knn_metrics.csv", std::ios::app);
 
 	// Write header if file is empty
 	if (outFile.tellp() == 0) {
-		outFile << "Dataset,K,ExecutionTime(s),Accuracy(%),MemoryUsage(MB)" << std::endl;
+		outFile << "Dataset,K,ExecutionTime(s),Accuracy(%),MemoryUsage(MB),GPUType,GPUCount"
+		        << std::endl;
 	}
 
 	outFile << dataset << "," << k << "," << std::fixed << std::setprecision(4) << executionTime
-	        << "," << accuracy << "," << memoryUsage << std::endl;
+	        << "," << accuracy << "," << memoryUsage << "," << gpuType << "," << gpuCount
+	        << std::endl;
 
 	outFile.close();
 }
@@ -58,7 +65,9 @@ int main() {
 	            K_MNIST,
 	            mnist_knn.getLastExecutionTime(),
 	            mnist_accuracy,
-	            mnist_knn.getGpuMemoryUsage());
+	            mnist_knn.getGpuMemoryUsage(),
+	            mnist_knn.getGpuType(),
+	            mnist_knn.getGpuCount());
 
 	// ------------------------------------------------------------------------------------------
 
@@ -96,7 +105,9 @@ int main() {
 	            K_CIFAR,
 	            cifar_knn.getLastExecutionTime(),
 	            cifar_accuracy,
-	            cifar_knn.getGpuMemoryUsage());
+	            cifar_knn.getGpuMemoryUsage(),
+	            cifar_knn.getGpuType(),
+	            cifar_knn.getGpuCount());
 
 	return 0;
 }
