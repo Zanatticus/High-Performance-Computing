@@ -11,7 +11,8 @@
 #define K_MNIST 1
 #define K_CIFAR 1
 
-void saveMetrics(const std::string &dataset, int k, double executionTime, float accuracy, float memoryUsage) {
+void saveMetrics(
+    const std::string &dataset, int k, double executionTime, float accuracy, float memoryUsage) {
 	std::ofstream outFile("output/knn_metrics.csv", std::ios::app);
 
 	// Write header if file is empty
@@ -88,7 +89,7 @@ int main() {
 
 	// Evaluate on full test set
 	float cifar_accuracy = cifar_knn.evaluateAccuracy(cifar_test_images, cifar_test_labels);
-	
+
 	/* ------------------------------------------------------------------------------------------ */
 
 	saveMetrics("CIFAR",
