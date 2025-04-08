@@ -15,6 +15,8 @@ BUILD_DIR 	:= $(ROOT_DIR)/build
 P100_ARCH	:= -arch sm_60
 # NVIDIA Tesla V100 Streaming Multiprocessor Architecture: sm_70
 V100_ARCH	:= -arch sm_70
+# NVIDIA A100 Streaming Multiprocessor Architecture: sm_80
+A100_ARCH	:= -arch sm_80
 
 ###########################
 # ----- COMPILATION ----- #

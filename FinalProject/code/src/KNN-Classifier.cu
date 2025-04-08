@@ -9,17 +9,63 @@
 #include <thrust/execution_policy.h>
 #include <thrust/sort.h>
 
-// CUDA kernel for computing Euclidean distances
+// Helper function for CUDA error checking
+inline void checkCudaError(cudaError_t status, const char* errorMsg) {
+	if (status != cudaSuccess) {
+		std::cerr << errorMsg << ": " << cudaGetErrorString(status) << std::endl;
+		exit(1);
+	}
+}
+
+// RAII Timer class for CUDA operations
+class CudaTimer {
+	public:
+	CudaTimer(double& outputTime) : outputTime(outputTime) {
+		cudaEventCreate(&start);
+		cudaEventCreate(&stop);
+		cudaEventRecord(start);
+	}
+
+	~CudaTimer() {
+		cudaEventRecord(stop);
+		cudaEventSynchronize(stop);
+		float milliseconds = 0.0f;
+		cudaEventElapsedTime(&milliseconds, start, stop);
+		outputTime = milliseconds / 1000.0;   // Convert from ms to seconds
+		cudaEventDestroy(start);
+		cudaEventDestroy(stop);
+	}
+
+	private:
+	cudaEvent_t start, stop;
+	double&     outputTime;
+};
+
+// CUDA kernel for computing Euclidean distances with shared memory optimization
 __global__ void computeDistancesKernel(
     float* trainImages, float* testImage, float* distances, int numTrainImages, int imageSize) {
 	int idx = blockIdx.x * blockDim.x + threadIdx.x;
 
+	// Use shared memory to cache the test image for faster access
+	extern __shared__ float sharedTestImage[];
+
+	// Cooperatively load test image into shared memory
+	for (int i = threadIdx.x; i < imageSize; i += blockDim.x) {
+		if (i < imageSize) {
+			sharedTestImage[i] = testImage[i];
+		}
+	}
+	__syncthreads();
+
 	if (idx < numTrainImages) {
 		float sum = 0.0f;
+
+		// Process in chunks to improve memory access patterns
 		for (int i = 0; i < imageSize; i++) {
-			float diff = trainImages[idx * imageSize + i] - testImage[i];
+			float diff = trainImages[idx * imageSize + i] - sharedTestImage[i];
 			sum += diff * diff;
 		}
+
 		distances[idx] = sqrt(sum);
 	}
 }
@@ -29,19 +75,27 @@ __global__ void findMajorityLabelKernel(unsigned char* trainLabels,
                                         int*           indices,
                                         unsigned char* predictedLabel,
                                         int            k) {
-	// This is a simple kernel that runs on a single thread
-	// Could be optimized with shared memory for larger k values
-	if (threadIdx.x == 0 && blockIdx.x == 0) {
-		int labelCounts[10] = {0};   // Assuming max 10 classes for MNIST/CIFAR
+	// Using shared memory for label counts - much faster for larger k values
+	__shared__ int labelCounts[10];   // Assuming max 10 classes for MNIST/CIFAR
 
-		// Count occurrences of each label within k neighbors
-		for (int i = 0; i < k; i++) {
+	// Initialize shared memory
+	if (threadIdx.x < 10) {
+		labelCounts[threadIdx.x] = 0;
+	}
+	__syncthreads();
+
+	// Parallel counting of labels
+	for (int i = threadIdx.x; i < k; i += blockDim.x) {
+		if (i < k) {
 			int           idx   = indices[i];
 			unsigned char label = trainLabels[idx];
-			labelCounts[label]++;
+			atomicAdd(&labelCounts[label], 1);
 		}
+	}
+	__syncthreads();
 
-		// Find label with highest count
+	// Find label with highest count (only thread 0 does this)
+	if (threadIdx.x == 0) {
 		int           maxCount      = -1;
 		unsigned char majorityLabel = 0;
 
@@ -72,10 +126,7 @@ KNNClassifier::KNNClassifier(int k, int deviceId) :
     gpuMemoryUsage(0.0f) {
 	// Set CUDA device
 	cudaError_t cudaStatus = cudaSetDevice(deviceId);
-	if (cudaStatus != cudaSuccess) {
-		std::cerr << "cudaSetDevice failed! Do you have a CUDA-capable GPU installed?" << std::endl;
-		exit(1);
-	}
+	checkCudaError(cudaStatus, "cudaSetDevice failed! Do you have a CUDA-capable GPU installed?");
 }
 
 KNNClassifier::~KNNClassifier() {
@@ -129,14 +180,14 @@ void KNNClassifier::freeDeviceMemory() {
 	d_predictedLabel = nullptr;
 }
 
-void KNNClassifier::trainMNIST(const std::vector<float>&         trainImages,
-                               const std::vector<unsigned char>& trainLabels) {
+void KNNClassifier::train(const std::vector<float>&         trainImages,
+                          const std::vector<unsigned char>& trainLabels,
+                          const std::string&                datasetName) {
 	int numImages = trainLabels.size();
 	int imgSize   = trainImages.size() / numImages;
 
 	allocateDeviceMemory(numImages, imgSize);
 
-	// Copy training data to device
 	cudaMemcpy(d_trainImages,
 	           trainImages.data(),
 	           numTrainImages * imageSize * sizeof(float),
@@ -146,47 +197,24 @@ void KNNClassifier::trainMNIST(const std::vector<float>&         trainImages,
 	           numTrainImages * sizeof(unsigned char),
 	           cudaMemcpyHostToDevice);
 
-	std::cout << "KNN: Loaded MNIST training data with " << numTrainImages << " images of size "
-	          << imageSize << std::endl;
-}
-
-void KNNClassifier::trainCIFAR(const std::vector<float>&         trainImages,
-                               const std::vector<unsigned char>& trainLabels) {
-	int numImages = trainLabels.size();
-	int imgSize   = trainImages.size() / numImages;
-
-	allocateDeviceMemory(numImages, imgSize);
-
-	// Copy training data to device
-	cudaMemcpy(d_trainImages,
-	           trainImages.data(),
-	           numTrainImages * imageSize * sizeof(float),
-	           cudaMemcpyHostToDevice);
-	cudaMemcpy(d_trainLabels,
-	           trainLabels.data(),
-	           numTrainImages * sizeof(unsigned char),
-	           cudaMemcpyHostToDevice);
-
-	std::cout << "KNN: Loaded CIFAR training data with " << numTrainImages << " images of size "
-	          << imageSize << std::endl;
+	std::cout << "KNN: Loaded " << datasetName << " training data with " << numTrainImages
+	          << " images of size " << imageSize << std::endl;
 }
 
 void KNNClassifier::computeDistances(int numTestImages) {
-	// Configure grid and block dimensions
-	int threadsPerBlock = 256;
-	int blocksPerGrid   = (numTrainImages + threadsPerBlock - 1) / threadsPerBlock;
+	// Calculate grid and block dimensions
+	int blockSize = 256;
+	int gridSize  = (numTrainImages + blockSize - 1) / blockSize;
 
-	// Launch kernel
-	computeDistancesKernel<<<blocksPerGrid, threadsPerBlock>>>(
+	// Calculate shared memory size for the test image
+	size_t sharedMemSize = imageSize * sizeof(float);
+
+	// Launch kernel with shared memory allocation
+	computeDistancesKernel<<<gridSize, blockSize, sharedMemSize>>>(
 	    d_trainImages, d_testImage, d_distances, numTrainImages, imageSize);
 
 	// Check for kernel launch errors
-	cudaError_t cudaStatus = cudaGetLastError();
-	if (cudaStatus != cudaSuccess) {
-		std::cerr << "computeDistancesKernel launch failed: " << cudaGetErrorString(cudaStatus)
-		          << std::endl;
-		exit(1);
-	}
+	checkCudaError(cudaGetLastError(), "computeDistancesKernel launch failed");
 }
 
 void KNNClassifier::sortDistancesAndFindMajority() {
@@ -205,33 +233,22 @@ void KNNClassifier::sortDistancesAndFindMajority() {
 	// Copy the first k sorted indices back to our device array
 	cudaMemcpy(d_indices, thrust_indices, k * sizeof(int), cudaMemcpyDeviceToDevice);
 
-	// Find majority label
-	findMajorityLabelKernel<<<1, 1>>>(d_trainLabels, d_indices, d_predictedLabel, k);
+	// Find majority label - use 32 threads (one warp) for better performance
+	findMajorityLabelKernel<<<1, 32>>>(d_trainLabels, d_indices, d_predictedLabel, k);
 
 	// Check for kernel launch errors
-	cudaError_t cudaStatus = cudaGetLastError();
-	if (cudaStatus != cudaSuccess) {
-		std::cerr << "findMajorityLabelKernel launch failed: " << cudaGetErrorString(cudaStatus)
-		          << std::endl;
-		exit(1);
-	}
+	checkCudaError(cudaGetLastError(), "findMajorityLabelKernel launch failed");
 }
 
 unsigned char KNNClassifier::predict(const std::vector<float>& image, int imageIndex) {
-	// Time measurement
-	cudaEvent_t start, stop;
-	cudaEventCreate(&start);
-	cudaEventCreate(&stop);
+	// Use RAII timer to automatically measure execution time
+	CudaTimer timer(executionTime);
 
-	cudaEventRecord(start);
-
-	// Extract single image and copy to device
-	std::vector<float> singleImage(imageSize);
-	for (int i = 0; i < imageSize; i++) {
-		singleImage[i] = image[imageIndex * imageSize + i];
-	}
-
-	cudaMemcpy(d_testImage, singleImage.data(), imageSize * sizeof(float), cudaMemcpyHostToDevice);
+	// Copy test image directly to device
+	cudaMemcpy(d_testImage,
+	           &image[imageIndex * imageSize],
+	           imageSize * sizeof(float),
+	           cudaMemcpyHostToDevice);
 
 	// Compute distances between test image and all training images
 	computeDistances(1);
@@ -243,18 +260,40 @@ unsigned char KNNClassifier::predict(const std::vector<float>& image, int imageI
 	unsigned char predictedLabel;
 	cudaMemcpy(&predictedLabel, d_predictedLabel, sizeof(unsigned char), cudaMemcpyDeviceToHost);
 
-	// Time measurement end
-	cudaEventRecord(stop);
-	cudaEventSynchronize(stop);
-
-	float milliseconds = 0.0f;
-	cudaEventElapsedTime(&milliseconds, start, stop);
-	executionTime = milliseconds / 1000.0;   // Convert from ms to seconds
-
-	cudaEventDestroy(start);
-	cudaEventDestroy(stop);
-
 	return predictedLabel;
+}
+
+void KNNClassifier::predictBatch(const std::vector<float>&   images,
+                                 int                         startIndex,
+                                 int                         batchSize,
+                                 std::vector<unsigned char>& predictions) {
+	// Process multiple images in a batch to reduce kernel launch overhead
+	for (int i = 0; i < batchSize; i++) {
+		int imageIndex = startIndex + i;
+		if (imageIndex >= images.size() / imageSize) {
+			break;   // Avoid out of bounds access
+		}
+
+		// Copy test image to device
+		cudaMemcpy(d_testImage,
+		           &images[imageIndex * imageSize],
+		           imageSize * sizeof(float),
+		           cudaMemcpyHostToDevice);
+
+		// Compute distances between test image and all training images
+		computeDistances(1);
+
+		// Sort distances and find majority label among k nearest neighbors
+		sortDistancesAndFindMajority();
+
+		// Copy result back to host
+		unsigned char predictedLabel;
+		cudaMemcpy(
+		    &predictedLabel, d_predictedLabel, sizeof(unsigned char), cudaMemcpyDeviceToHost);
+
+		// Store the prediction
+		predictions[i] = predictedLabel;
+	}
 }
 
 float KNNClassifier::evaluateAccuracy(const std::vector<float>&         testImages,
@@ -262,37 +301,34 @@ float KNNClassifier::evaluateAccuracy(const std::vector<float>&         testImag
 	int numTestImages = testLabels.size();
 	int correct       = 0;
 
-	// Time measurement
-	cudaEvent_t start, stop;
-	cudaEventCreate(&start);
-	cudaEventCreate(&stop);
+	// Use RAII timer to automatically measure execution time
+	CudaTimer timer(executionTime);
 
-	cudaEventRecord(start);
+	// Process images in batches for better performance
+	const int                  BATCH_SIZE = 100;   // Adjust based on your GPU memory
+	std::vector<unsigned char> batchPredictions(BATCH_SIZE);
 
-	// For each test image
-	for (int i = 0; i < numTestImages; i++) {
-		unsigned char predictedLabel = predict(testImages, i);
-		if (predictedLabel == testLabels[i]) {
-			correct++;
+	for (int batchStart = 0; batchStart < numTestImages; batchStart += BATCH_SIZE) {
+		int currentBatchSize = std::min(BATCH_SIZE, numTestImages - batchStart);
+
+		// Predict batch
+		predictBatch(testImages, batchStart, currentBatchSize, batchPredictions);
+
+		// Count correct predictions
+		for (int i = 0; i < currentBatchSize; i++) {
+			if (batchPredictions[i] == testLabels[batchStart + i]) {
+				correct++;
+			}
 		}
 
-		// Progress update every 1000 images
-		if ((i + 1) % 1000 == 0 || i == numTestImages - 1) {
-			std::cout << "KNN: Processed " << (i + 1) << "/" << numTestImages
-			          << " test images. Current accuracy: " << (100.0f * correct / (i + 1)) << "%"
+		// Progress update
+		int processed = batchStart + currentBatchSize;
+		if (processed % 1000 < BATCH_SIZE || processed == numTestImages) {
+			std::cout << "KNN: Processed " << processed << "/" << numTestImages
+			          << " test images. Current accuracy: " << (100.0f * correct / processed) << "%"
 			          << std::endl;
 		}
 	}
-
-	// Time measurement end
-	cudaEventRecord(stop);
-	cudaEventSynchronize(stop);
-	float milliseconds = 0;
-	cudaEventElapsedTime(&milliseconds, start, stop);
-	executionTime = milliseconds / 1000.0;   // Convert from ms to seconds
-
-	cudaEventDestroy(start);
-	cudaEventDestroy(stop);
 
 	float accuracy = 100.0f * correct / numTestImages;
 	std::cout << "KNN: Final accuracy: " << accuracy << "%" << std::endl;

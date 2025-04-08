@@ -27,6 +27,16 @@ class KNNClassifier {
 	~KNNClassifier();
 
 	/**
+	 * @brief Common training method for all datasets
+	 * @param trainImages Vector of flattened, normalized training images
+	 * @param trainLabels Vector of corresponding training labels
+	 * @param datasetName Name of the dataset for logging
+	 */
+	void train(const std::vector<float>&         trainImages,
+	           const std::vector<unsigned char>& trainLabels,
+	           const std::string&                datasetName);
+
+	/**
 	 * @brief Train the classifier with MNIST dataset
 	 * @param trainImages Vector of flattened, normalized training images
 	 * @param trainLabels Vector of corresponding training labels
@@ -49,6 +59,18 @@ class KNNClassifier {
 	 * @return Predicted class label
 	 */
 	unsigned char predict(const std::vector<float>& image, int imageIndex);
+
+	/**
+	 * @brief Predict classes for a batch of images
+	 * @param images Vector containing all test images
+	 * @param startIndex Starting index of the batch
+	 * @param batchSize Number of images to process in this batch
+	 * @param predictions Vector to store the predictions (must be pre-allocated)
+	 */
+	void predictBatch(const std::vector<float>&   images,
+	                  int                         startIndex,
+	                  int                         batchSize,
+	                  std::vector<unsigned char>& predictions);
 
 	/**
 	 * @brief Evaluate the classifier accuracy on a test set

@@ -41,7 +41,7 @@ int main() {
 
 	// Create and train KNN classifier for MNIST
 	KNNClassifier mnist_knn(K_MNIST);
-	mnist_knn.trainMNIST(mnist_train_images, mnist_train_labels);
+	mnist_knn.train(mnist_train_images, mnist_train_labels, "MNIST");
 
 	// Test on a single image first
 	int           mnist_idx       = 0;
@@ -76,7 +76,7 @@ int main() {
 
 	// Create and train KNN classifier for CIFAR
 	KNNClassifier cifar_knn(K_CIFAR);
-	cifar_knn.trainCIFAR(cifar_train_images, cifar_train_labels);
+	cifar_knn.train(cifar_train_images, cifar_train_labels, "CIFAR");
 
 	// Test on a single image first
 	int cifar_idx   = 0;
