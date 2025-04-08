@@ -19,35 +19,6 @@ inline void checkCudaError(cudaError_t status, const char* errorMsg) {
 	}
 }
 
-// RAII CUDA Timer class for measuring GPU execution time
-class CudaTimer {
-	public:
-	// Constructor - creates events and starts timing
-	CudaTimer(KNNClassifier* parent) : parent_(parent) {
-		cudaEventCreate(&start);
-		cudaEventCreate(&stop);
-		cudaEventRecord(start);
-	}
-
-	// Destructor - stops timing, updates parent's time, and cleans up
-	~CudaTimer() {
-		// Stop timing and update parent's execution time
-		cudaEventRecord(stop);
-		cudaEventSynchronize(stop);
-		float milliseconds = 0.0f;
-		cudaEventElapsedTime(&milliseconds, start, stop);
-		parent_->gpuExecutionTime = milliseconds / 1000.0;   // Convert to seconds
-
-		// Clean up events
-		cudaEventDestroy(start);
-		cudaEventDestroy(stop);
-	}
-
-	private:
-	cudaEvent_t    start, stop;
-	KNNClassifier* parent_;
-};
-
 // CUDA kernel for computing Euclidean distances with shared memory optimization
 __global__ void computeDistancesKernel(
     float* trainImages, float* testImage, float* distances, int numTrainImages, int imageSize) {
@@ -300,12 +271,10 @@ void KNNClassifier::predictBatch(const std::vector<float>&   images,
 	}
 }
 
-float KNNClassifier::evaluateDataset() {
+float KNNClassifier::evaluateDataset(const std::vector<float>&         testImages,
+                                     const std::vector<unsigned char>& testLabels) {
 	int numTestImages = testLabels.size();
 	int correct       = 0;
-
-	// Create timer to measure total GPU execution time
-	CudaTimer timer;
 
 	// For each test image
 	for (int i = 0; i < numTestImages; i++) {
@@ -321,8 +290,6 @@ float KNNClassifier::evaluateDataset() {
 		}
 	}
 
-	cudaEventSynchronize(stop);
-
 	float accuracy = 100.0f * correct / numTestImages;
 	std::cout << "KNN: Final accuracy: " << accuracy << "%" << std::endl;
 	std::cout << "KNN: GPU execution time: " << gpuExecutionTime << " seconds" << std::endl;
@@ -335,9 +302,6 @@ float KNNClassifier::evaluateDatasetBatched(const std::vector<float>&         te
                                             const std::vector<unsigned char>& testLabels) {
 	int numTestImages = testLabels.size();
 	int correct       = 0;
-
-	// Create RAII timer to measure total GPU execution time
-	CudaTimer timer;
 
 	// Process images in batches for better performance
 	std::vector<unsigned char> batchPredictions(BATCH_SIZE);

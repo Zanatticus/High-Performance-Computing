@@ -40,9 +40,10 @@ void saveMetrics(const std::string &dataset,
 int main() {
 	// Test with MNIST
 	std::cout << std::endl;
-	std::cout << "==============================" << std::endl;
-	std::cout << " Testing KNN on MNIST dataset" << std::endl;
-	std::cout << "==============================" << std::endl;
+	std::cout << "=========================================================" << std::endl;
+	std::cout << " Testing KNN on MNIST dataset with K=" << K_CIFAR << " nearest neighbors"
+	          << std::endl;
+	std::cout << "=========================================================" << std::endl;
 
 	// Start timing the entire MNIST process
 	auto mnist_start_time = std::chrono::high_resolution_clock::now();
@@ -92,9 +93,10 @@ int main() {
 
 	// Test with CIFAR
 	std::cout << std::endl;
-	std::cout << "==============================" << std::endl;
-	std::cout << " Testing KNN on CIFAR dataset" << std::endl;
-	std::cout << "==============================" << std::endl;
+	std::cout << "=========================================================" << std::endl;
+	std::cout << " Testing KNN on CIFAR dataset with K=" << K_CIFAR << " nearest neighbors"
+	          << std::endl;
+	std::cout << "=========================================================" << std::endl;
 
 	// Start timing the entire CIFAR process
 	auto cifar_start_time = std::chrono::high_resolution_clock::now();
