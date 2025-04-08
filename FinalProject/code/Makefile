@@ -41,7 +41,7 @@ TARGET 		:= $(BUILD_DIR)/main
 
 # Compile C++ sources, CUDA sources, and link the target executable
 $(TARGET):
-	module load nvidia-hpc-sdk && $(NVCC) $(NVCCFLAGS) -o $(TARGET) $(P100_ARCH) $(CU_SRCS) $(CPP_SRCS)
+	module load nvidia-hpc-sdk && $(NVCC) $(NVCCFLAGS) -o $(TARGET) $(A100_ARCH) $(CU_SRCS) $(CPP_SRCS)
 
 ###########################
 # -------- RULES -------- #
