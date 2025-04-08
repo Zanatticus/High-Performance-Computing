@@ -1,3 +1,2 @@
 Dataset,K,ExecutionTime(s),Accuracy(%),MemoryUsage(MB)
-MNIST,5,47.9018,96.8800,182.0000
-CIFAR,5,157.1632,33.9800,586.0000
+
