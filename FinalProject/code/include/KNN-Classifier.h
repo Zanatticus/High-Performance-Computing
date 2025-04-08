@@ -37,22 +37,6 @@ class KNNClassifier {
 	           const std::string&                datasetName);
 
 	/**
-	 * @brief Train the classifier with MNIST dataset
-	 * @param trainImages Vector of flattened, normalized training images
-	 * @param trainLabels Vector of corresponding training labels
-	 */
-	void trainMNIST(const std::vector<float>&         trainImages,
-	                const std::vector<unsigned char>& trainLabels);
-
-	/**
-	 * @brief Train the classifier with CIFAR-10 dataset
-	 * @param trainImages Vector of flattened, normalized training images
-	 * @param trainLabels Vector of corresponding training labels
-	 */
-	void trainCIFAR(const std::vector<float>&         trainImages,
-	                const std::vector<unsigned char>& trainLabels);
-
-	/**
 	 * @brief Predict the class of a single image
 	 * @param image Vector containing all test images
 	 * @param imageIndex Index of the specific image to classify
@@ -67,10 +51,10 @@ class KNNClassifier {
 	 * @param batchSize Number of images to process in this batch
 	 * @param predictions Vector to store the predictions (must be pre-allocated)
 	 */
-	void predictBatch(const std::vector<float>&   images,
-	                  int                         startIndex,
-	                  int                         batchSize,
-	                  std::vector<unsigned char>& predictions);
+	 void predictBatch(const std::vector<float>&   images,
+		int                         startIndex,
+		int                         batchSize,
+		std::vector<unsigned char>& predictions);
 
 	/**
 	 * @brief Evaluate the classifier accuracy on a test set
@@ -78,14 +62,23 @@ class KNNClassifier {
 	 * @param testLabels Vector of corresponding test labels
 	 * @return Classification accuracy as a percentage (0-100)
 	 */
-	float evaluateAccuracy(const std::vector<float>&         testImages,
-	                       const std::vector<unsigned char>& testLabels);
+	float evaluateDataset(const std::vector<float>&         testImages,
+	                      const std::vector<unsigned char>& testLabels);
+	
+	/**
+	 * @brief Evaluate the classifier accuracy on a test set with batched processing
+	 * @param testImages Vector of flattened, normalized test images
+	 * @param testLabels Vector of corresponding test labels
+	 * @return Classification accuracy as a percentage (0-100)
+	 */
+	float evaluateDatasetBatched(const std::vector<float>&         testImages,
+		const std::vector<unsigned char>& testLabels);
 
 	/**
-	 * @brief Get the execution time of the last prediction or evaluation operation
-	 * @return Execution time in seconds
+	 * @brief Get the GPU execution time of the classifier
+	 * @return GPU execution time in seconds
 	 */
-	double getLastExecutionTime() const;
+	double getGpuExecutionTime() const;
 
 	/**
 	 * @brief Get the GPU memory usage of the classifier
@@ -105,18 +98,6 @@ class KNNClassifier {
 	 */
 	int getGpuCount() const;
 
-	/**
-	 * @brief Set a new value for k (number of neighbors)
-	 * @param newK New k value
-	 */
-	void setK(int newK);
-
-	/**
-	 * @brief Get the current k value
-	 * @return Current number of neighbors considered
-	 */
-	int getK() const;
-
 	private:
 	// Device data
 	float*         d_trainImages;      ///< Training images in device memory
@@ -133,8 +114,8 @@ class KNNClassifier {
 	int deviceId;         ///< CUDA device ID
 
 	// Performance metrics
-	double executionTime;    ///< Time for last operation in seconds
-	float  gpuMemoryUsage;   ///< GPU memory usage in MB
+	double gpuExecutionTime;    ///< Time for GPU execution in seconds
+	float  gpuMemoryUsage;      ///< GPU memory usage in MB
 
 	/**
 	 * @brief Allocate device memory for training and test data

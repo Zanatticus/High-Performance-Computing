@@ -9,6 +9,8 @@
 #include <thrust/execution_policy.h>
 #include <thrust/sort.h>
 
+#define BATCH_SIZE 100 // Adjust based on GPU mem
+
 // Helper function for CUDA error checking
 inline void checkCudaError(cudaError_t status, const char* errorMsg) {
 	if (status != cudaSuccess) {
@@ -17,29 +19,34 @@ inline void checkCudaError(cudaError_t status, const char* errorMsg) {
 	}
 }
 
-// RAII Timer class for CUDA operations
+// RAII CUDA Timer class for measuring GPU execution time
 class CudaTimer {
-	public:
-	CudaTimer(double& outputTime) : outputTime(outputTime) {
-		cudaEventCreate(&start);
-		cudaEventCreate(&stop);
-		cudaEventRecord(start);
-	}
+    public:
+        // Constructor - creates events and starts timing
+        CudaTimer(KNNClassifier* parent) : parent_(parent) {
+            cudaEventCreate(&start);
+            cudaEventCreate(&stop);
+            cudaEventRecord(start);
+        }
 
-	~CudaTimer() {
-		cudaEventRecord(stop);
-		cudaEventSynchronize(stop);
-		float milliseconds = 0.0f;
-		cudaEventElapsedTime(&milliseconds, start, stop);
-		outputTime = milliseconds / 1000.0;   // Convert from ms to seconds
-		cudaEventDestroy(start);
-		cudaEventDestroy(stop);
-	}
+        // Destructor - stops timing, updates parent's time, and cleans up
+        ~CudaTimer() {
+            // Stop timing and update parent's execution time
+            cudaEventRecord(stop);
+            cudaEventSynchronize(stop);
+            float milliseconds = 0.0f;
+            cudaEventElapsedTime(&milliseconds, start, stop);
+            parent_->gpuExecutionTime = milliseconds / 1000.0; // Convert to seconds
+            
+            // Clean up events
+            cudaEventDestroy(start);
+            cudaEventDestroy(stop);
+        }
 
-	private:
-	cudaEvent_t start, stop;
-	double&     outputTime;
-};
+    private:
+        cudaEvent_t start, stop;
+        KNNClassifier* parent_;
+    };
 
 // CUDA kernel for computing Euclidean distances with shared memory optimization
 __global__ void computeDistancesKernel(
@@ -122,7 +129,7 @@ KNNClassifier::KNNClassifier(int k, int deviceId) :
     d_predictedLabel(nullptr),
     numTrainImages(0),
     imageSize(0),
-    executionTime(0.0),
+    gpuExecutionTime(0.0),
     gpuMemoryUsage(0.0f) {
 	// Set CUDA device
 	cudaError_t cudaStatus = cudaSetDevice(deviceId);
@@ -145,12 +152,12 @@ void KNNClassifier::allocateDeviceMemory(int numImages, int imgSize) {
 	cudaMemGetInfo(&free_before, &total);
 
 	// Allocate device memory
-	cudaMalloc((void**) &d_trainImages, numTrainImages * imageSize * sizeof(float));
-	cudaMalloc((void**) &d_trainLabels, numTrainImages * sizeof(unsigned char));
-	cudaMalloc((void**) &d_testImage, imageSize * sizeof(float));
-	cudaMalloc((void**) &d_distances, numTrainImages * sizeof(float));
-	cudaMalloc((void**) &d_indices, numTrainImages * sizeof(int));
-	cudaMalloc((void**) &d_predictedLabel, sizeof(unsigned char));
+	cudaMalloc(&d_trainImages, numTrainImages * imageSize * sizeof(float));
+	cudaMalloc(&d_trainLabels, numTrainImages * sizeof(unsigned char));
+	cudaMalloc(&d_testImage, imageSize * sizeof(float));
+	cudaMalloc(&d_distances, numTrainImages * sizeof(float));
+	cudaMalloc(&d_indices, numTrainImages * sizeof(int));
+	cudaMalloc(&d_predictedLabel, sizeof(unsigned char));
 
 	// Record memory usage after allocation
 	size_t free_after;
@@ -241,9 +248,6 @@ void KNNClassifier::sortDistancesAndFindMajority() {
 }
 
 unsigned char KNNClassifier::predict(const std::vector<float>& image, int imageIndex) {
-	// Use RAII timer to automatically measure execution time
-	CudaTimer timer(executionTime);
-
 	// Copy test image directly to device
 	cudaMemcpy(d_testImage,
 	           &image[imageIndex * imageSize],
@@ -296,16 +300,46 @@ void KNNClassifier::predictBatch(const std::vector<float>&   images,
 	}
 }
 
-float KNNClassifier::evaluateAccuracy(const std::vector<float>&         testImages,
-                                      const std::vector<unsigned char>& testLabels) {
+float KNNClassifier::evaluateDataset() {
+	int numTestImages = testLabels.size();
+    int correct = 0;
+
+	// Create timer to measure total GPU execution time
+	CudaTimer timer;
+
+    // For each test image
+    for (int i = 0; i < numTestImages; i++) {
+        unsigned char predictedLabel = predict(testImages, i);
+        if (predictedLabel == testLabels[i]) {
+            correct++;
+        }
+        // Progress update every 1000 images
+        if ((i + 1) % 1000 == 0 || i == numTestImages - 1) {
+            std::cout << "KNN: Processed " << (i + 1) << "/" << numTestImages 
+                      << " test images. Current accuracy: " 
+                      << (100.0f * correct / (i + 1)) << "%" << std::endl;
+        }
+    }
+
+    cudaEventSynchronize(stop);
+
+    float accuracy = 100.0f * correct / numTestImages;
+    std::cout << "KNN: Final accuracy: " << accuracy << "%" << std::endl;
+    std::cout << "KNN: GPU execution time: " << gpuExecutionTime << " seconds" << std::endl;
+    std::cout << "KNN: GPU memory usage: " << gpuMemoryUsage << " MB" << std::endl;
+
+    return accuracy;
+}
+
+float KNNClassifier::evaluateDatasetBatched(const std::vector<float>&         testImages,
+                                     		const std::vector<unsigned char>& testLabels) {
 	int numTestImages = testLabels.size();
 	int correct       = 0;
 
-	// Use RAII timer to automatically measure execution time
-	CudaTimer timer(executionTime);
+	// Create RAII timer to measure total GPU execution time
+	CudaTimer timer;
 
 	// Process images in batches for better performance
-	const int                  BATCH_SIZE = 100;   // Adjust based on your GPU memory
 	std::vector<unsigned char> batchPredictions(BATCH_SIZE);
 
 	for (int batchStart = 0; batchStart < numTestImages; batchStart += BATCH_SIZE) {
@@ -332,22 +366,14 @@ float KNNClassifier::evaluateAccuracy(const std::vector<float>&         testImag
 
 	float accuracy = 100.0f * correct / numTestImages;
 	std::cout << "KNN: Final accuracy: " << accuracy << "%" << std::endl;
-	std::cout << "KNN: Total evaluation time: " << executionTime << " seconds" << std::endl;
+	std::cout << "KNN: GPU execution time: " << gpuExecutionTime << " seconds" << std::endl;
 	std::cout << "KNN: GPU memory usage: " << gpuMemoryUsage << " MB" << std::endl;
 
 	return accuracy;
 }
 
-void KNNClassifier::setK(int newK) {
-	k = newK;
-}
-
-int KNNClassifier::getK() const {
-	return k;
-}
-
-double KNNClassifier::getLastExecutionTime() const {
-	return executionTime;
+double KNNClassifier::getGpuExecutionTime() const {
+	return gpuExecutionTime;
 }
 
 float KNNClassifier::getGpuMemoryUsage() const {
