@@ -24,15 +24,15 @@ void saveMetrics(const std::string &dataset,
 
 	// Write header if file is empty
 	if (outFile.tellp() == 0) {
-		outFile << "Dataset,K,GPUType,GPUCount,TotalExecutionTime(s),GPUExecutionTime(s),MemoryUsage(MB),Accuracy(%)"
-		        << std::endl;
+		outFile
+		    << "Dataset,K,GPUType,GPUCount,TotalExecutionTime(s),GPUExecutionTime(s),MemoryUsage(MB),Accuracy(%)"
+		    << std::endl;
 	}
 
-	outFile << dataset << "," << k << "," << gpuType << "," << gpuCount << ","
-	        << std::fixed << std::setprecision(4) << totalExecutionTime << ","
-	        << std::fixed << std::setprecision(4) << gpuExecutionTime << ","
-	        << std::fixed << std::setprecision(4) << memoryUsage << ","
-	        << std::fixed << std::setprecision(4) << accuracy << std::endl;
+	outFile << dataset << "," << k << "," << gpuType << "," << gpuCount << "," << std::fixed
+	        << std::setprecision(4) << totalExecutionTime << "," << std::fixed
+	        << std::setprecision(4) << gpuExecutionTime << "," << std::fixed << std::setprecision(4)
+	        << memoryUsage << "," << std::fixed << std::setprecision(4) << accuracy << std::endl;
 
 	outFile.close();
 }
@@ -68,19 +68,23 @@ int main() {
 	float mnist_accuracy = mnist_knn.evaluateDatasetBatched(mnist_test_images, mnist_test_labels);
 
 	// End timing and calculate total time
-	auto mnist_end_time = std::chrono::high_resolution_clock::now();
-	double mnist_total_time = std::chrono::duration<double>(mnist_end_time - mnist_start_time).count();
-	std::cout << "MNIST: Total dataset processing time: " << mnist_total_time << " seconds" << std::endl;
-	std::cout << "MNIST: GPU-only execution time: " << mnist_knn.getGpuExecutionTime() << " seconds" << std::endl;
-	std::cout << "MNIST: Non-GPU overhead time: " << (mnist_total_time - mnist_knn.getGpuExecutionTime()) << " seconds" << std::endl;
+	auto   mnist_end_time = std::chrono::high_resolution_clock::now();
+	double mnist_total_time =
+	    std::chrono::duration<double>(mnist_end_time - mnist_start_time).count();
+	std::cout << "MNIST: Total dataset processing time: " << mnist_total_time << " seconds"
+	          << std::endl;
+	std::cout << "MNIST: GPU-only execution time: " << mnist_knn.getGpuExecutionTime() << " seconds"
+	          << std::endl;
+	std::cout << "MNIST: Non-GPU overhead time: "
+	          << (mnist_total_time - mnist_knn.getGpuExecutionTime()) << " seconds" << std::endl;
 
 	// Save metrics
 	saveMetrics("MNIST",
 	            K_MNIST,
 	            mnist_knn.getGpuType(),
 	            mnist_knn.getGpuCount(),
-	            mnist_total_time, // Total time including data loading
-	            mnist_knn.getGpuExecutionTime(), // GPU-specific execution time
+	            mnist_total_time,                  // Total time including data loading
+	            mnist_knn.getGpuExecutionTime(),   // GPU-specific execution time
 	            mnist_knn.getGpuMemoryUsage(),
 	            mnist_accuracy);
 
@@ -118,11 +122,15 @@ int main() {
 	float cifar_accuracy = cifar_knn.evaluateDatasetBatched(cifar_test_images, cifar_test_labels);
 
 	// End timing and calculate total time
-	auto cifar_end_time = std::chrono::high_resolution_clock::now();
-	double cifar_total_time = std::chrono::duration<double>(cifar_end_time - cifar_start_time).count();
-	std::cout << "CIFAR: Total dataset processing time: " << cifar_total_time << " seconds" << std::endl;
-	std::cout << "CIFAR: GPU-only execution time: " << cifar_knn.getGpuExecutionTime() << " seconds" << std::endl;
-	std::cout << "CIFAR: Non-GPU overhead time: " << (cifar_total_time - cifar_knn.getGpuExecutionTime()) << " seconds" << std::endl;
+	auto   cifar_end_time = std::chrono::high_resolution_clock::now();
+	double cifar_total_time =
+	    std::chrono::duration<double>(cifar_end_time - cifar_start_time).count();
+	std::cout << "CIFAR: Total dataset processing time: " << cifar_total_time << " seconds"
+	          << std::endl;
+	std::cout << "CIFAR: GPU-only execution time: " << cifar_knn.getGpuExecutionTime() << " seconds"
+	          << std::endl;
+	std::cout << "CIFAR: Non-GPU overhead time: "
+	          << (cifar_total_time - cifar_knn.getGpuExecutionTime()) << " seconds" << std::endl;
 
 	/* ------------------------------------------------------------------------------------------ */
 
@@ -130,8 +138,8 @@ int main() {
 	            K_CIFAR,
 	            cifar_knn.getGpuType(),
 	            cifar_knn.getGpuCount(),
-	            cifar_total_time, // Total time including data loading
-	            cifar_knn.getGpuExecutionTime(), // GPU-specific execution time
+	            cifar_total_time,                  // Total time including data loading
+	            cifar_knn.getGpuExecutionTime(),   // GPU-specific execution time
 	            cifar_knn.getGpuMemoryUsage(),
 	            cifar_accuracy);
 

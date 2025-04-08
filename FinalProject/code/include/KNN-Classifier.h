@@ -51,10 +51,10 @@ class KNNClassifier {
 	 * @param batchSize Number of images to process in this batch
 	 * @param predictions Vector to store the predictions (must be pre-allocated)
 	 */
-	 void predictBatch(const std::vector<float>&   images,
-		int                         startIndex,
-		int                         batchSize,
-		std::vector<unsigned char>& predictions);
+	void predictBatch(const std::vector<float>&   images,
+	                  int                         startIndex,
+	                  int                         batchSize,
+	                  std::vector<unsigned char>& predictions);
 
 	/**
 	 * @brief Evaluate the classifier accuracy on a test set
@@ -64,7 +64,7 @@ class KNNClassifier {
 	 */
 	float evaluateDataset(const std::vector<float>&         testImages,
 	                      const std::vector<unsigned char>& testLabels);
-	
+
 	/**
 	 * @brief Evaluate the classifier accuracy on a test set with batched processing
 	 * @param testImages Vector of flattened, normalized test images
@@ -72,7 +72,7 @@ class KNNClassifier {
 	 * @return Classification accuracy as a percentage (0-100)
 	 */
 	float evaluateDatasetBatched(const std::vector<float>&         testImages,
-		const std::vector<unsigned char>& testLabels);
+	                             const std::vector<unsigned char>& testLabels);
 
 	/**
 	 * @brief Get the GPU execution time of the classifier
@@ -114,8 +114,8 @@ class KNNClassifier {
 	int deviceId;         ///< CUDA device ID
 
 	// Performance metrics
-	double gpuExecutionTime;    ///< Time for GPU execution in seconds
-	float  gpuMemoryUsage;      ///< GPU memory usage in MB
+	double gpuExecutionTime;   ///< GPU execution time in seconds
+	float  gpuMemoryUsage;     ///< GPU memory usage in MB
 
 	/**
 	 * @brief Allocate device memory for training and test data
