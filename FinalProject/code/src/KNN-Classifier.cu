@@ -383,21 +383,11 @@ float KNNClassifier::evaluateDatasetBatched(const std::vector<float>&         te
 
 	// Process images in batches for better performance
 	std::vector<unsigned char> batchPredictions(BATCH_SIZE);
-    int batchStart, currentBatchSize;
 
-	for (batchStart = 0; batchStart < numTestImages; batchStart += BATCH_SIZE) {
-		currentBatchSize = std::min(BATCH_SIZE, numTestImages - batchStart);
+	for (int batchStart = 0; batchStart < numTestImages; batchStart += BATCH_SIZE) {
+		int currentBatchSize = std::min(BATCH_SIZE, numTestImages - batchStart);
 		predictBatch(testImages, batchStart, currentBatchSize, batchPredictions);
 	
-	}
-
-	// End Timer
-	auto end = std::chrono::high_resolution_clock::now();
-	std::chrono::duration<double> elapsed = end - start;
-	gpuExecutionTime = elapsed.count();   // in seconds
-
-	for (batchStart = 0; batchStart < numTestImages; batchStart += BATCH_SIZE) {
-		currentBatchSize = std::min(BATCH_SIZE, numTestImages - batchStart);
 
 		// Count correct predictions
 		for (int i = 0; i < currentBatchSize; i++) {
@@ -415,7 +405,10 @@ float KNNClassifier::evaluateDatasetBatched(const std::vector<float>&         te
 		}
 	}
 
-
+	// End Timer
+	auto end = std::chrono::high_resolution_clock::now();
+	std::chrono::duration<double> elapsed = end - start;
+	gpuExecutionTime = elapsed.count();   // in seconds
 
 	float accuracy = 100.0f * correct / numTestImages;
 	std::cout << "KNN: Final accuracy: " << accuracy << "%" << std::endl;
