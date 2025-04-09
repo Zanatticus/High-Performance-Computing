@@ -269,10 +269,6 @@ void KNNClassifier::sortDistancesAndFindMajority() {
 	thrust::sort_by_key(
 	    thrust::device, thrust_distances, thrust_distances + numTrainImages, d_idx.begin());
 
-	// Sort indices by distances on CPU
-	// thrust::sort_by_key(
-	//     thrust::host, thrust_distances, thrust_distances + numTrainImages, d_idx.begin());
-
 	// Copy the first k sorted indices back to our device array
 	cudaMemcpy(d_indices, thrust_indices, k * sizeof(int), cudaMemcpyDeviceToDevice);
 
