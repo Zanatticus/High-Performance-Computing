@@ -135,10 +135,15 @@ class KNNClassifier {
 	void sortDistancesAndFindMajority();
 
 	/**
-	 * @brief Compute distances between test images and all training images using CUDA
-	 * @param numTestImages Number of test images to process
+	 * @brief Compute distances between test images and all training images
 	 */
-	void computeDistances(int numTestImages);
+	void computeDistances();
+
+	/**
+	 * @brief Compute distances between test images and all training images using shared memory
+	 */
+	void computeDistancesShared();
+
 };
 
 #endif   // KNN_CLASSIFIER_H

@@ -19,8 +19,26 @@ inline void checkCudaError(cudaError_t status, const char* errorMsg) {
 	}
 }
 
-// CUDA kernel for computing Euclidean distances with shared memory optimization
+// CUDA kernel for computing Euclidean distances
 __global__ void computeDistancesKernel(
+    float* trainImages, float* testImage, float* distances, int numTrainImages, int imageSize) {
+	int idx = blockIdx.x * blockDim.x + threadIdx.x;
+
+	if (idx < numTrainImages) {
+		float sum = 0.0f;
+
+		// Process in chunks to improve memory access patterns
+		for (int i = 0; i < imageSize; i++) {
+			float diff = trainImages[idx * imageSize + i] - testImage[i];
+			sum += diff * diff;
+		}
+
+		distances[idx] = sqrt(sum);
+	}
+}
+
+// CUDA kernel for computing Euclidean distances with shared memory optimization
+__global__ void computeDistancesSharedKernel(
     float* trainImages, float* testImage, float* distances, int numTrainImages, int imageSize) {
 	int idx = blockIdx.x * blockDim.x + threadIdx.x;
 
@@ -48,11 +66,40 @@ __global__ void computeDistancesKernel(
 	}
 }
 
-// CUDA kernel for counting occurrences of each label within k neighbors
+// CUDA kernel for finding the majority label among k nearest neighbors
 __global__ void findMajorityLabelKernel(unsigned char* trainLabels,
                                         int*           indices,
                                         unsigned char* predictedLabel,
                                         int            k) {
+	// This is a simple kernel that runs on a single thread
+	// Could be optimized with shared memory for larger k values
+	if (threadIdx.x == 0 && blockIdx.x == 0) {
+		int labelCounts[10] = {0};   // Assuming max 10 classes for MNIST/CIFAR
+
+		// Count occurrences of each label within k neighbors
+		for (int i = 0; i < k; i++) {
+			int           idx   = indices[i];
+			unsigned char label = trainLabels[idx];
+			labelCounts[label]++;
+		}
+		// Find label with highest count
+		int           maxCount      = -1;
+		unsigned char majorityLabel = 0;
+		for (unsigned char label = 0; label < 10; label++) {
+			if (labelCounts[label] > maxCount) {
+				maxCount      = labelCounts[label];
+				majorityLabel = label;
+			}
+		}
+		*predictedLabel = majorityLabel;
+	}
+}
+
+// CUDA kernel for find the majority label among k nearest neighbors using shared memory optimization
+__global__ void findMajorityLabelSharedKernel(unsigned char* trainLabels,
+                                              int*           indices,
+                                              unsigned char* predictedLabel,
+                                              int            k) {
 	// Using shared memory for label counts - much faster for larger k values
 	__shared__ int labelCounts[10];   // Assuming max 10 classes for MNIST/CIFAR
 
@@ -179,7 +226,20 @@ void KNNClassifier::train(const std::vector<float>&         trainImages,
 	          << " images of size " << imageSize << std::endl;
 }
 
-void KNNClassifier::computeDistances(int numTestImages) {
+void KNNClassifier::computeDistances() {
+	// Calculate grid and block dimensions
+	int blockSize = 256;
+	int gridSize  = (numTrainImages + blockSize - 1) / blockSize;
+
+	// Launch kernel with shared memory allocation
+	computeDistancesKernel<<<gridSize, blockSize>>>(
+	    d_trainImages, d_testImage, d_distances, numTrainImages, imageSize);
+
+	// Check for kernel launch errors
+	checkCudaError(cudaGetLastError(), "computeDistancesKernel launch failed");
+}
+
+void KNNClassifier::computeDistancesShared() {
 	// Calculate grid and block dimensions
 	int blockSize = 256;
 	int gridSize  = (numTrainImages + blockSize - 1) / blockSize;
@@ -188,7 +248,7 @@ void KNNClassifier::computeDistances(int numTestImages) {
 	size_t sharedMemSize = imageSize * sizeof(float);
 
 	// Launch kernel with shared memory allocation
-	computeDistancesKernel<<<gridSize, blockSize, sharedMemSize>>>(
+	computeDistancesSharedKernel<<<gridSize, blockSize, sharedMemSize>>>(
 	    d_trainImages, d_testImage, d_distances, numTrainImages, imageSize);
 
 	// Check for kernel launch errors
@@ -212,7 +272,7 @@ void KNNClassifier::sortDistancesAndFindMajority() {
 	cudaMemcpy(d_indices, thrust_indices, k * sizeof(int), cudaMemcpyDeviceToDevice);
 
 	// Find majority label - use 32 threads (one warp) for better performance
-	findMajorityLabelKernel<<<1, 32>>>(d_trainLabels, d_indices, d_predictedLabel, k);
+	findMajorityLabelKernel<<<1, 32>>>(d_trainLabels, d_indices, d_predictedLabel, k);   // TODO
 
 	// Check for kernel launch errors
 	checkCudaError(cudaGetLastError(), "findMajorityLabelKernel launch failed");
@@ -226,7 +286,7 @@ unsigned char KNNClassifier::predict(const std::vector<float>& image, int imageI
 	           cudaMemcpyHostToDevice);
 
 	// Compute distances between test image and all training images
-	computeDistances(1);
+	computeDistances();
 
 	// Sort distances and find majority label among k nearest neighbors
 	sortDistancesAndFindMajority();
@@ -256,7 +316,7 @@ void KNNClassifier::predictBatch(const std::vector<float>&   images,
 		           cudaMemcpyHostToDevice);
 
 		// Compute distances between test image and all training images
-		computeDistances(1);
+		computeDistances();
 
 		// Sort distances and find majority label among k nearest neighbors
 		sortDistancesAndFindMajority();
@@ -282,6 +342,7 @@ float KNNClassifier::evaluateDataset(const std::vector<float>&         testImage
 		if (predictedLabel == testLabels[i]) {
 			correct++;
 		}
+
 		// Progress update every 1000 images
 		if ((i + 1) % 1000 == 0 || i == numTestImages - 1) {
 			std::cout << "KNN: Processed " << (i + 1) << "/" << numTestImages
