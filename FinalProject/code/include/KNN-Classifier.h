@@ -66,15 +66,6 @@ class KNNClassifier {
 	                      const std::vector<unsigned char>& testLabels);
 
 	/**
-	 * @brief Evaluate the classifier accuracy on a test set with batched processing
-	 * @param testImages Vector of flattened, normalized test images
-	 * @param testLabels Vector of corresponding test labels
-	 * @return Classification accuracy as a percentage (0-100)
-	 */
-	float evaluateDatasetBatched(const std::vector<float>&         testImages,
-	                             const std::vector<unsigned char>& testLabels);
-
-	/**
 	 * @brief Get the GPU execution time of the classifier
 	 * @return GPU execution time in seconds
 	 */
@@ -138,12 +129,6 @@ class KNNClassifier {
 	 * @brief Compute distances between test images and all training images
 	 */
 	void computeDistances();
-
-	/**
-	 * @brief Compute distances between test images and all training images using shared memory
-	 */
-	void computeDistancesShared();
-
 };
 
 #endif   // KNN_CLASSIFIER_H
