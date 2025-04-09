@@ -9,8 +9,8 @@
 #include <string>
 #include <vector>
 
-#define K_MNIST 1
-#define K_CIFAR 1
+#define K_MNIST 5
+#define K_CIFAR 5
 
 void saveMetrics(const std::string &dataset,
                  int                k,
@@ -66,7 +66,7 @@ int main() {
 	mnist.writeImageToPPM(mnist_test_images, mnist_idx, "output/mnist_image.ppm");
 
 	// Evaluate on full test set
-	float mnist_accuracy = mnist_knn.evaluateDatasetBatched(mnist_test_images, mnist_test_labels);
+	float mnist_accuracy = mnist_knn.evaluateDataset(mnist_test_images, mnist_test_labels);
 
 	// End timing and calculate total time
 	auto   mnist_end_time = std::chrono::high_resolution_clock::now();
@@ -121,7 +121,7 @@ int main() {
 	cifar.writeImageToPPM(cifar_test_images, cifar_idx, "output/cifar_image.ppm");
 
 	// Evaluate on full test set
-	float cifar_accuracy = cifar_knn.evaluateDatasetBatched(cifar_test_images, cifar_test_labels);
+	float cifar_accuracy = cifar_knn.evaluateDataset(cifar_test_images, cifar_test_labels);
 
 	// End timing and calculate total time
 	auto   cifar_end_time = std::chrono::high_resolution_clock::now();
