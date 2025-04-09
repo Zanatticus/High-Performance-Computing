@@ -11,6 +11,7 @@
 #include <thrust/sort.h>
 
 #define BATCH_SIZE 1000   // Adjust based on GPU memory
+#define USE_SHARED_MEMORY true
 
 // Helper function for CUDA error checking
 inline void checkCudaError(cudaError_t status, const char* errorMsg) {
@@ -232,25 +233,19 @@ void KNNClassifier::computeDistances() {
 	int blockSize = 256;
 	int gridSize  = (numTrainImages + blockSize - 1) / blockSize;
 
-	// Launch kernel with shared memory allocation
-	computeDistancesKernel<<<gridSize, blockSize>>>(
-	    d_trainImages, d_testImage, d_distances, numTrainImages, imageSize);
+	if (USE_SHARED_MEMORY) {
+		// Calculate shared memory size for the test image
+		size_t sharedMemSize = imageSize * sizeof(float);
 
-	// Check for kernel launch errors
-	checkCudaError(cudaGetLastError(), "computeDistancesKernel launch failed");
-}
-
-void KNNClassifier::computeDistancesShared() {
-	// Calculate grid and block dimensions
-	int blockSize = 256;
-	int gridSize  = (numTrainImages + blockSize - 1) / blockSize;
-
-	// Calculate shared memory size for the test image
-	size_t sharedMemSize = imageSize * sizeof(float);
-
-	// Launch kernel with shared memory allocation
-	computeDistancesSharedKernel<<<gridSize, blockSize, sharedMemSize>>>(
-	    d_trainImages, d_testImage, d_distances, numTrainImages, imageSize);
+		// Launch kernel with shared memory
+		computeDistancesSharedKernel<<<gridSize, blockSize, sharedMemSize>>>(
+			d_trainImages, d_testImage, d_distances, numTrainImages, imageSize);
+	}
+	else {
+		// Launch kernel without shared memory
+		computeDistancesKernel<<<gridSize, blockSize>>>(
+			d_trainImages, d_testImage, d_distances, numTrainImages, imageSize);
+	}
 
 	// Check for kernel launch errors
 	checkCudaError(cudaGetLastError(), "computeDistancesKernel launch failed");
@@ -272,8 +267,14 @@ void KNNClassifier::sortDistancesAndFindMajority() {
 	// Copy the first k sorted indices back to our device array
 	cudaMemcpy(d_indices, thrust_indices, k * sizeof(int), cudaMemcpyDeviceToDevice);
 
-	// Find majority label - use 32 threads (one warp) for better performance
-	findMajorityLabelKernel<<<1, 32>>>(d_trainLabels, d_indices, d_predictedLabel, k);   // TODO
+	if (USE_SHARED_MEMORY) {
+		// Launch kernel with shared memory
+		findMajorityLabelSharedKernel<<<1, 32>>>(d_trainLabels, d_indices, d_predictedLabel, k);
+	}
+	else {
+		// Launch kernel without shared memory
+		findMajorityLabelKernel<<<1, 32>>>(d_trainLabels, d_indices, d_predictedLabel, k);
+	}
 
 	// Check for kernel launch errors
 	checkCudaError(cudaGetLastError(), "findMajorityLabelKernel launch failed");
