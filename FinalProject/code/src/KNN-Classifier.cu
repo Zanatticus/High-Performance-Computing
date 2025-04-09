@@ -10,7 +10,7 @@
 #include <thrust/execution_policy.h>
 #include <thrust/sort.h>
 
-#define BATCH_SIZE 100   // Adjust based on GPU memory
+#define BATCH_SIZE 1000   // Adjust based on GPU memory
 
 // Helper function for CUDA error checking
 inline void checkCudaError(cudaError_t status, const char* errorMsg) {
@@ -265,9 +265,13 @@ void KNNClassifier::sortDistancesAndFindMajority() {
 	float* thrust_distances = d_distances;
 	int*   thrust_indices   = thrust::raw_pointer_cast(d_idx.data());
 
-	// Sort indices by distances
+	// Sort indices by distances on GPU
 	thrust::sort_by_key(
 	    thrust::device, thrust_distances, thrust_distances + numTrainImages, d_idx.begin());
+
+	// Sort indices by distances on CPU
+	// thrust::sort_by_key(
+	//     thrust::host, thrust_distances, thrust_distances + numTrainImages, d_idx.begin());
 
 	// Copy the first k sorted indices back to our device array
 	cudaMemcpy(d_indices, thrust_indices, k * sizeof(int), cudaMemcpyDeviceToDevice);
@@ -343,6 +347,7 @@ float KNNClassifier::evaluateDataset(const std::vector<float>&         testImage
 	// For each test image
 	for (int i = 0; i < numTestImages; i++) {
 		unsigned char predictedLabel = predict(testImages, i);
+
 		if (predictedLabel == testLabels[i]) {
 			correct++;
 		}
@@ -375,15 +380,24 @@ float KNNClassifier::evaluateDatasetBatched(const std::vector<float>&         te
 
 	// Start Timer
 	auto start = std::chrono::high_resolution_clock::now();
-	
+
 	// Process images in batches for better performance
 	std::vector<unsigned char> batchPredictions(BATCH_SIZE);
+    int batchStart, currentBatchSize;
 
-	for (int batchStart = 0; batchStart < numTestImages; batchStart += BATCH_SIZE) {
-		int currentBatchSize = std::min(BATCH_SIZE, numTestImages - batchStart);
-
-		// Predict batch
+	for (batchStart = 0; batchStart < numTestImages; batchStart += BATCH_SIZE) {
+		currentBatchSize = std::min(BATCH_SIZE, numTestImages - batchStart);
 		predictBatch(testImages, batchStart, currentBatchSize, batchPredictions);
+	
+	}
+
+	// End Timer
+	auto end = std::chrono::high_resolution_clock::now();
+	std::chrono::duration<double> elapsed = end - start;
+	gpuExecutionTime = elapsed.count();   // in seconds
+
+	for (batchStart = 0; batchStart < numTestImages; batchStart += BATCH_SIZE) {
+		currentBatchSize = std::min(BATCH_SIZE, numTestImages - batchStart);
 
 		// Count correct predictions
 		for (int i = 0; i < currentBatchSize; i++) {
@@ -401,10 +415,7 @@ float KNNClassifier::evaluateDatasetBatched(const std::vector<float>&         te
 		}
 	}
 
-	// End Timer
-	auto end = std::chrono::high_resolution_clock::now();
-	std::chrono::duration<double> elapsed = end - start;
-	gpuExecutionTime = elapsed.count();   // in seconds
+
 
 	float accuracy = 100.0f * correct / numTestImages;
 	std::cout << "KNN: Final accuracy: " << accuracy << "%" << std::endl;
