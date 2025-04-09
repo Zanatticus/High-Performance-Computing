@@ -1,6 +1,7 @@
 #include "KNN-Classifier.h"
 
 #include <algorithm>
+#include <chrono>
 #include <cmath>
 #include <cuda_runtime.h>
 #include <device_launch_parameters.h>
@@ -336,6 +337,9 @@ float KNNClassifier::evaluateDataset(const std::vector<float>&         testImage
 	int numTestImages = testLabels.size();
 	int correct       = 0;
 
+	// Start Timer
+	auto start = std::chrono::high_resolution_clock::now();
+
 	// For each test image
 	for (int i = 0; i < numTestImages; i++) {
 		unsigned char predictedLabel = predict(testImages, i);
@@ -351,6 +355,11 @@ float KNNClassifier::evaluateDataset(const std::vector<float>&         testImage
 		}
 	}
 
+	// End Timer
+	auto end = std::chrono::high_resolution_clock::now();
+	std::chrono::duration<double> elapsed = end - start;
+	gpuExecutionTime = elapsed.count();   // in seconds
+
 	float accuracy = 100.0f * correct / numTestImages;
 	std::cout << "KNN: Final accuracy: " << accuracy << "%" << std::endl;
 	std::cout << "KNN: GPU execution time: " << gpuExecutionTime << " seconds" << std::endl;
@@ -364,6 +373,9 @@ float KNNClassifier::evaluateDatasetBatched(const std::vector<float>&         te
 	int numTestImages = testLabels.size();
 	int correct       = 0;
 
+	// Start Timer
+	auto start = std::chrono::high_resolution_clock::now();
+	
 	// Process images in batches for better performance
 	std::vector<unsigned char> batchPredictions(BATCH_SIZE);
 
@@ -388,6 +400,11 @@ float KNNClassifier::evaluateDatasetBatched(const std::vector<float>&         te
 			          << std::endl;
 		}
 	}
+
+	// End Timer
+	auto end = std::chrono::high_resolution_clock::now();
+	std::chrono::duration<double> elapsed = end - start;
+	gpuExecutionTime = elapsed.count();   // in seconds
 
 	float accuracy = 100.0f * correct / numTestImages;
 	std::cout << "KNN: Final accuracy: " << accuracy << "%" << std::endl;
