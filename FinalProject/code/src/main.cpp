@@ -175,36 +175,33 @@ int main() {
 			stl_knn.train(stl_train_images, stl_train_labels, "STL-10");
 
 			// Test on a single image first
-			int stl_idx = 0;
-			// unsigned char predicted_label = stl_knn.predict(stl_test_images, stl_idx);
-			// std::cout << "STL-10 Test Image Actual Label: " << (int) stl_test_labels[stl_idx] <<
-			// "\n"; std::cout << "STL-10 Test Image Predicted Label: " << (int) predicted_label <<
-			// "\n";
+			int           stl_idx         = 0;
+			unsigned char predicted_label = stl_knn.predict(stl_test_images, stl_idx);
+			std::cout << "STL-10 Test Image Actual Label: " << (int) stl_test_labels[stl_idx] << "\n";
+			std::cout << "STL-10 Test Image Predicted Label: " << (int) predicted_label << "\n";
 			stl.writeImageToPPM(stl_test_images, stl_idx, "output/stl_image.ppm");
 
-			// // Evaluate on full test set
-			// float stl_accuracy = stl_knn.evaluateDataset(stl_test_images, stl_test_labels);
+			// Evaluate on full test set
+			float stl_accuracy = stl_knn.evaluateDataset(stl_test_images, stl_test_labels);
 
-			// // End timing and calculate total time
-			// auto   stl_end_time = std::chrono::high_resolution_clock::now();
-			// double stl_total_time =
-			// 	std::chrono::duration<double>(stl_end_time - stl_start_time).count();
+			// End timing and calculate total time
+			auto   stl_end_time   = std::chrono::high_resolution_clock::now();
+			double stl_total_time = std::chrono::duration<double>(stl_end_time - stl_start_time).count();
 
-			// std::cout << "STL-10: Total dataset processing time: " << stl_total_time << "
-			// seconds\n"; std::cout << "STL-10: GPU-only execution time: " <<
-			// stl_knn.getGpuExecutionTime() << " seconds\n"; std::cout << "STL-10: Non-GPU overhead
-			// time: "
-			// 		<< (stl_total_time - stl_knn.getGpuExecutionTime()) << " seconds\n";
+			std::cout << "STL-10: Total dataset processing time: " << stl_total_time << " seconds\n";
+			std::cout << "STL-10: GPU-only execution time: " << stl_knn.getGpuExecutionTime() << " seconds\n";
+			std::cout << "STL-10: Non-GPU overhead time: " << (stl_total_time - stl_knn.getGpuExecutionTime())
+			          << " seconds\n";
 
-			// // Save metrics
-			// saveMetrics("STL-10",
-			// 			K_STL,
-			// 			stl_knn.getGpuType(),
-			// 			stl_knn.getGpuCount(),
-			// 			stl_total_time,
-			// 			stl_knn.getGpuExecutionTime(),
-			// 			stl_knn.getGpuMemoryUsage(),
-			// 			stl_accuracy);
+			// Save metrics
+			saveMetrics("STL-10",
+			            K_STL,
+			            stl_knn.getGpuType(),
+			            stl_knn.getGpuCount(),
+			            stl_total_time,
+			            stl_knn.getGpuExecutionTime(),
+			            stl_knn.getGpuMemoryUsage(),
+			            stl_accuracy);
 		} catch (const std::exception &e) { std::cerr << "ERROR USING STL-10 DATASET: " << e.what() << std::endl; }
 	}
 
