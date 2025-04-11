@@ -2,7 +2,13 @@
 
 
 
+[ingare.a@explorer-02 code]$ sinfo -p courses-gpu -o "%N %G"
+NODELIST GRES
+c[2184,2188] gpu:p100:3(S:0-1)
+c[2185-2187,2193-2195] gpu:p100:4(S:0-1)
+d1004 gpu:v100-sxm2:4(S:0-1)
 
+THERE ARE DIFFERENT P100s. MAKE NOTE ON THE GPU MEMORY TYPE
 
 
 foir the STL dataset, i have to manually set the size of the shared memory for each block since the size of the image (108 KB) is too big for the default (48 KB) shared memory size. This is overridden at runtime for V100, P100, and A100
