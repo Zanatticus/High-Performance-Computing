@@ -17,7 +17,10 @@
 // Helper function for CUDA error checking
 inline void checkCudaError(cudaError_t status, const char* errorMsg) {
 	if (status != cudaSuccess) {
-		std::cerr << errorMsg << ": " << cudaGetErrorString(status) << std::endl;
+		if (errorMsg != nullptr) {
+			std::cerr << errorMsg << ": ";
+		}
+		std::cerr << cudaGetErrorString(status) << std::endl;
 		exit(1);
 	}
 }
@@ -225,7 +228,7 @@ void KNNClassifier::computeDistances() {
 	int blockSize = 256;
 	int gridSize  = (numTrainImages + blockSize - 1) / blockSize;
 
-	if (USE_SHARED_MEMORY) {
+	if (USE_SHARED_MEMORY && configurableSharedMemory) {
 		// Calculate shared memory size for the test image
 		size_t sharedMemSize = imageSize * sizeof(float);
 
@@ -235,15 +238,30 @@ void KNNClassifier::computeDistances() {
 
 		// If it exceeds, manually set the maximum shared memory size for each block
 		if (sharedMemSize > maxSharedMem) {
-			cudaFuncSetAttribute(
-				computeDistancesSharedKernel,
-				cudaFuncAttributeMaxDynamicSharedMemorySize,
-				sharedMemSize);
-		}
+			if (configurableSharedMemory) {
+				cudaError_t cudaStatus = cudaFuncSetAttribute(
+					computeDistancesSharedKernel, cudaFuncAttributeMaxDynamicSharedMemorySize, sharedMemSize);
+				
+				// If setting the attribute fails, fall back to the non-shared memory kernel since only A100 will work
+				if (cudaStatus != cudaSuccess) {
+					std::cerr << "Shared memory size (" << sharedMemSize <<") exceeds limit (" << maxSharedMem << "). Using fallback non-shared kernel instead." << std::endl;
+					cudaFuncSetAttribute(
+						computeDistancesSharedKernel, cudaFuncAttributeMaxDynamicSharedMemorySize, maxSharedMem);
+					configurableSharedMemory = false;
 
+					// Launch kernel with fallback non-shared method
+					computeDistancesKernel<<<gridSize, blockSize>>>(
+						d_trainImages, d_testImage, d_distances, numTrainImages, imageSize);
+	
+					// Check for kernel launch errors
+					checkCudaError(cudaGetLastError(), "computeDistancesSharedKernel Fallback launch failed");
+					return;
+				}
+			}
+		}
 		// Launch kernel with shared memory
 		computeDistancesSharedKernel<<<gridSize, blockSize, sharedMemSize>>>(
-		    d_trainImages, d_testImage, d_distances, numTrainImages, imageSize);
+			d_trainImages, d_testImage, d_distances, numTrainImages, imageSize);
 
 		// Check for kernel launch errors
 		checkCudaError(cudaGetLastError(), "computeDistancesSharedKernel launch failed");

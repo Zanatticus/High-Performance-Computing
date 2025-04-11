@@ -107,6 +107,9 @@ class KNNClassifier {
 	double gpuExecutionTime;   ///< GPU execution time in seconds
 	float  gpuMemoryUsage;     ///< GPU memory usage in MB
 
+	// Shared memory enable/disable flag
+	bool configurableSharedMemory = true; ///< Flag to indicate shared memory configuration status
+
 	/**
 	 * @brief Allocate device memory for training and test data
 	 * @param numImages Number of training images

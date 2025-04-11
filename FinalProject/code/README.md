@@ -5,7 +5,7 @@
 
 
 
-
+foir the STL dataset, i have to manually set the size of the shared memory for each block since the size of the image (108 KB) is too big for the default (48 KB) shared memory size. This is overridden at runtime for V100, P100, and A100
 
 
 
