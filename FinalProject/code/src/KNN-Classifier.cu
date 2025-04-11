@@ -229,6 +229,18 @@ void KNNClassifier::computeDistances() {
 		// Calculate shared memory size for the test image
 		size_t sharedMemSize = imageSize * sizeof(float);
 
+		// Check if shared memory size exceeds the maximum allowed for each block
+		int maxSharedMem;
+		cudaDeviceGetAttribute(&maxSharedMem, cudaDevAttrMaxSharedMemoryPerBlock, 0);
+
+		// If it exceeds, manually set the maximum shared memory size for each block
+		if (sharedMemSize > maxSharedMem) {
+			cudaFuncSetAttribute(
+				computeDistancesSharedKernel,
+				cudaFuncAttributeMaxDynamicSharedMemorySize,
+				sharedMemSize);
+		}
+
 		// Launch kernel with shared memory
 		computeDistancesSharedKernel<<<gridSize, blockSize, sharedMemSize>>>(
 		    d_trainImages, d_testImage, d_distances, numTrainImages, imageSize);
@@ -239,7 +251,7 @@ void KNNClassifier::computeDistances() {
 		// Launch kernel without shared memory
 		computeDistancesKernel<<<gridSize, blockSize>>>(
 		    d_trainImages, d_testImage, d_distances, numTrainImages, imageSize);
-		
+
 		// Check for kernel launch errors
 		checkCudaError(cudaGetLastError(), "computeDistancesKernel launch failed");
 	}
