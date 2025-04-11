@@ -12,14 +12,14 @@ srun -p courses-gpu -N 1 -n 1 --gres=gpu:1 --pty --time=03:00:00 /bin/bash
 # Obtain a CPU-based node with AVX512 support
 srun -p courses -N 1 --constraint=cascadelake --pty --time=03:00:00 /bin/bash
 
-# Obtain a node with 8 NVIDIA A100 GPUs
-srun --partition=ai-jumpstart --nodes=1 --pty --gres=gpu:8 --ntasks=1 --mem=4GB --time=01:00:00 /bin/bash
+# Obtain a node with 1 NVIDIA Tesla P100 GPU (Max 4)
+srun --partition=courses-gpu --nodes=1 --pty --gres=gpu:p100:1 --time=03:00:00 /bin/bash
 
-# Obtain a node with 4 NVIDIA Tesla P100 GPUs
-srun --partition=courses-gpu --nodes=1 --pty --gres=gpu:4 --time=01:00:00 /bin/bash
+# Obtain a node with 1 NVIDIA Tesla V100 GPU (Max 4)
+srun --partition=courses-gpu --nodelist=d1004 --nodes=1 --pty --gres=gpu:v100-sxm2 --time=03:00:00 /bin/bash
 
-# Obtain a node with 4 NVIDIA V100 GPUs
-srun --partition=courses-gpu --nodelist=d1004 --nodes=1 --pty --gres=gpu:4 --time=01:00:00 /bin/bash
+# Obtain a node with 1 NVIDIA A100 GPU (Max 8)
+srun --partition=ai-jumpstart --nodes=1 --pty --gres=gpu:a100:1 --ntasks=1 --time=03:00:00 /bin/bash
 
 # Obtain a node with 1 GPU and binded CPU cores (for OpenMP)
-srun --cpus-per-task=28 --cpu-bind=cores --partition=courses-gpu --gres=gpu:1 --pty --time=01:00:00 --nodes=1 /bin/bash
+srun --cpus-per-task=28 --cpu-bind=cores --partition=courses-gpu --gres=gpu:1 --pty --time=03:00:00 --nodes=1 /bin/bash
