@@ -232,14 +232,17 @@ void KNNClassifier::computeDistances() {
 		// Launch kernel with shared memory
 		computeDistancesSharedKernel<<<gridSize, blockSize, sharedMemSize>>>(
 		    d_trainImages, d_testImage, d_distances, numTrainImages, imageSize);
+
+		// Check for kernel launch errors
+		checkCudaError(cudaGetLastError(), "computeDistancesSharedKernel launch failed");
 	} else {
 		// Launch kernel without shared memory
 		computeDistancesKernel<<<gridSize, blockSize>>>(
 		    d_trainImages, d_testImage, d_distances, numTrainImages, imageSize);
+		
+		// Check for kernel launch errors
+		checkCudaError(cudaGetLastError(), "computeDistancesKernel launch failed");
 	}
-
-	// Check for kernel launch errors
-	checkCudaError(cudaGetLastError(), "computeDistancesKernel launch failed");
 }
 
 void KNNClassifier::sortDistancesAndFindMajority() {
