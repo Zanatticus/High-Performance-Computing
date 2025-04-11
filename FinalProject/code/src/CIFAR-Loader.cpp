@@ -82,9 +82,7 @@ const char* CIFARLoader::getLabelName(int labelIndex) const {
 	return LABEL_NAMES[labelIndex];
 }
 
-void CIFARLoader::writeImageToPPM(const std::vector<float>& image,
-                                  int                       index,
-                                  const std::string&        filename) const {
+void CIFARLoader::writeImageToPPM(const std::vector<float>& image, int index, const std::string& filename) const {
 	std::ofstream out(filename);
 	if (!out.is_open())
 		throw std::runtime_error("Cannot open PPM file for writing: " + filename);

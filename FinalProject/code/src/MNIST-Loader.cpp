@@ -4,15 +4,11 @@
 #include <stdexcept>
 
 MNISTLoader::MNISTLoader() {
-	loadImagesAndLabels(std::string(BASE_DIR) + TRAIN_IMAGE_FILE,
-	                    std::string(BASE_DIR) + TRAIN_LABEL_FILE,
-	                    trainImages,
-	                    trainLabels);
+	loadImagesAndLabels(
+	    std::string(BASE_DIR) + TRAIN_IMAGE_FILE, std::string(BASE_DIR) + TRAIN_LABEL_FILE, trainImages, trainLabels);
 
-	loadImagesAndLabels(std::string(BASE_DIR) + TEST_IMAGE_FILE,
-	                    std::string(BASE_DIR) + TEST_LABEL_FILE,
-	                    testImages,
-	                    testLabels);
+	loadImagesAndLabels(
+	    std::string(BASE_DIR) + TEST_IMAGE_FILE, std::string(BASE_DIR) + TEST_LABEL_FILE, testImages, testLabels);
 }
 
 int MNISTLoader::readBigEndianInt(FILE *fp) {
@@ -88,9 +84,7 @@ const std::vector<unsigned char> &MNISTLoader::getTestLabels() const {
 	return testLabels;
 }
 
-void MNISTLoader::writeImageToPPM(const std::vector<float> &image,
-                                  int                       index,
-                                  const std::string        &filename) const {
+void MNISTLoader::writeImageToPPM(const std::vector<float> &image, int index, const std::string &filename) const {
 	std::ofstream out(filename);
 	if (!out.is_open())
 		throw std::runtime_error("Cannot open PPM file for writing: " + filename);

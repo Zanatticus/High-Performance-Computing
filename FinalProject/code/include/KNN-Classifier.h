@@ -62,8 +62,7 @@ class KNNClassifier {
 	 * @param testLabels Vector of corresponding test labels
 	 * @return Classification accuracy as a percentage (0-100)
 	 */
-	float evaluateDataset(const std::vector<float>&         testImages,
-	                      const std::vector<unsigned char>& testLabels);
+	float evaluateDataset(const std::vector<float>& testImages, const std::vector<unsigned char>& testLabels);
 
 	/**
 	 * @brief Get the GPU execution time of the classifier

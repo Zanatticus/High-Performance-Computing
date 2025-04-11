@@ -93,9 +93,7 @@ class CIFARLoader {
 	 * @param index Index of the specific image to write
 	 * @param filename Output filename for the PPM file
 	 */
-	void writeImageToPPM(const std::vector<float>& image,
-	                     int                       index,
-	                     const std::string&        filename) const;
+	void writeImageToPPM(const std::vector<float>& image, int index, const std::string& filename) const;
 
 	private:
 	int imageSize;   ///< Total size of each image (width * height * channels)
@@ -114,9 +112,7 @@ class CIFARLoader {
 	 * @param imageVec Output vector for the image data
 	 * @param labelVec Output vector for the label data
 	 */
-	void loadBatchFile(const std::string&          filePath,
-	                   std::vector<float>&         imageVec,
-	                   std::vector<unsigned char>& labelVec);
+	void loadBatchFile(const std::string& filePath, std::vector<float>& imageVec, std::vector<unsigned char>& labelVec);
 
 	/**
 	 * @brief Load all training batch files
@@ -129,12 +125,9 @@ class CIFARLoader {
 	void loadTest();
 
 	static constexpr const char* BASE_DIR         = "datasets/CIFAR-10/";
-	static constexpr const char* TRAIN_BATCHES[5] = {"data_batch_1.bin",
-	                                                 "data_batch_2.bin",
-	                                                 "data_batch_3.bin",
-	                                                 "data_batch_4.bin",
-	                                                 "data_batch_5.bin"};
-	static constexpr const char* TEST_BATCH       = "test_batch.bin";
+	static constexpr const char* TRAIN_BATCHES[5] = {
+	    "data_batch_1.bin", "data_batch_2.bin", "data_batch_3.bin", "data_batch_4.bin", "data_batch_5.bin"};
+	static constexpr const char* TEST_BATCH = "test_batch.bin";
 
 	static constexpr int NUM_CLASSES = 10;
 	static const char*   LABEL_NAMES[NUM_CLASSES];   ///< String names for each class

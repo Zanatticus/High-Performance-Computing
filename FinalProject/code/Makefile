@@ -33,7 +33,8 @@ NVCCFLAGS 	:= -O3 -I$(INCLUDE_DIR)
 # Source files
 CPP_SRCS 	:= $(SRC_DIR)/main.cpp \
 			   $(SRC_DIR)/MNIST-Loader.cpp \
-			   $(SRC_DIR)/CIFAR-Loader.cpp
+			   $(SRC_DIR)/CIFAR-Loader.cpp \
+			   $(SRC_DIR)/STL-Loader.cpp
 CU_SRCS 	:= $(SRC_DIR)/KNN-Classifier.cu
 
 # Target executable

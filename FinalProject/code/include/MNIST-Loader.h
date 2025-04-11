@@ -68,9 +68,7 @@ class MNISTLoader {
 	 * @param index Index of the specific image to write
 	 * @param filename Output filename for the PPM file
 	 */
-	void writeImageToPPM(const std::vector<float>& image,
-	                     int                       index,
-	                     const std::string&        filename) const;
+	void writeImageToPPM(const std::vector<float>& image, int index, const std::string& filename) const;
 
 	private:
 	int numRows;   ///< Number of rows in each image
