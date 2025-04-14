@@ -318,7 +318,6 @@ void KNNClassifier::predictBatch(const std::vector<float>&   images,
 
 float KNNClassifier::evaluateDataset(const std::vector<float>&         testImages,
                                      const std::vector<unsigned char>& testLabels) {
-	int numTestImages = testLabels.size();
 	int correct       = 0;
 
 	// Start Timer
