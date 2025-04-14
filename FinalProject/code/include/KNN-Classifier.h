@@ -45,18 +45,6 @@ public:
 	unsigned char predict(const std::vector<float>& image, int imageIndex);
 
 	/**
-	 * @brief Predict classes for a batch of images
-	 * @param images Vector containing all test images
-	 * @param startIndex Starting index of the batch
-	 * @param batchSize Number of images to process in this batch
-	 * @param predictions Vector to store the predictions (must be pre-allocated)
-	 */
-	void predictBatch(const std::vector<float>&   images,
-	                  int                         startIndex,
-	                  int                         batchSize,
-	                  std::vector<unsigned char>& predictions);
-
-	/**
 	 * @brief Evaluate the classifier accuracy on a test set
 	 * @param testImages Vector of flattened, normalized test images
 	 * @param testLabels Vector of corresponding test labels

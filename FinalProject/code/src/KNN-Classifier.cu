@@ -11,9 +11,6 @@
 #include <thrust/sort.h>
 
 #define USE_SHARED_MEMORY true
-#define USE_BATCHING      true
-#define BATCH_SIZE        1000
-
 #define BLOCK_SIZE        256
 
 // Helper function for CUDA error checking
@@ -287,78 +284,26 @@ unsigned char KNNClassifier::predict(const std::vector<float>& image, int imageI
 	return predictedLabel;
 }
 
-void KNNClassifier::predictBatch(const std::vector<float>&   images,
-                                 int                         startIndex,
-                                 int                         batchSize,
-                                 std::vector<unsigned char>& predictions) {
-	// Process multiple images in a batch to reduce kernel launch overhead
-	for (int i = 0; i < batchSize; i++) {
-		int imageIndex = startIndex + i;
-		if (imageIndex >= images.size() / imageSize) {
-			break;   // Avoid out of bounds access
-		}
-
-		// Copy test image to device
-		cudaMemcpy(d_testImage, &images[imageIndex * imageSize], imageSize * sizeof(float), cudaMemcpyHostToDevice);
-
-		// Compute distances between test image and all training images
-		computeDistances();
-
-		// Sort distances and find majority label among k nearest neighbors
-		sortDistancesAndFindMajority();
-
-		// Copy result back to host
-		unsigned char predictedLabel;
-		cudaMemcpy(&predictedLabel, d_predictedLabel, sizeof(unsigned char), cudaMemcpyDeviceToHost);
-
-		// Store the prediction
-		predictions[i] = predictedLabel;
-	}
-}
-
 float KNNClassifier::evaluateDataset(const std::vector<float>&         testImages,
                                      const std::vector<unsigned char>& testLabels) {
+	int numTestImages = testLabels.size();
 	int correct       = 0;
 
 	// Start Timer
 	auto start = std::chrono::high_resolution_clock::now();
 
-	if (USE_BATCHING) {
-		// Process images in batches for better performance
-		std::vector<unsigned char> batchPredictions(BATCH_SIZE);
+	// For each test image
+	for (int i = 0; i < numTestImages; i++) {
+		unsigned char predictedLabel = predict(testImages, i);
 
-		for (int batchStart = 0; batchStart < numTestImages; batchStart += BATCH_SIZE) {
-			int currentBatchSize = std::min(BATCH_SIZE, numTestImages - batchStart);
-			predictBatch(testImages, batchStart, currentBatchSize, batchPredictions);
-
-			// Count correct predictions
-			for (int i = 0; i < currentBatchSize; i++) {
-				if (batchPredictions[i] == testLabels[batchStart + i]) {
-					correct++;
-				}
-			}
-
-			// Progress update
-			int processed = batchStart + currentBatchSize;
-			if (processed % 1000 < BATCH_SIZE || processed == numTestImages) {
-				std::cout << "KNN: Processed " << processed << "/" << numTestImages
-				          << " test images. Current accuracy: " << (100.0f * correct / processed) << "%" << std::endl;
-			}
+		if (predictedLabel == testLabels[i]) {
+			correct++;
 		}
-	} else {
-		// For each test image
-		for (int i = 0; i < numTestImages; i++) {
-			unsigned char predictedLabel = predict(testImages, i);
 
-			if (predictedLabel == testLabels[i]) {
-				correct++;
-			}
-
-			// Progress update every 1000 images
-			if ((i + 1) % 1000 == 0 || i == numTestImages - 1) {
-				std::cout << "KNN: Processed " << (i + 1) << "/" << numTestImages
-				          << " test images. Current accuracy: " << (100.0f * correct / (i + 1)) << "%" << std::endl;
-			}
+		// Progress update every 1000 images
+		if ((i + 1) % 1000 == 0 || i == numTestImages - 1) {
+			std::cout << "KNN: Processed " << (i + 1) << "/" << numTestImages
+						<< " test images. Current accuracy: " << (100.0f * correct / (i + 1)) << "%" << std::endl;
 		}
 	}
 
