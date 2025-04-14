@@ -77,36 +77,8 @@ __global__ void computeDistancesSharedKernel(
 // CUDA kernel for finding the majority label among k nearest neighbors
 __global__ void
     findMajorityLabelKernel(unsigned char* trainLabels, int* indices, unsigned char* predictedLabel, int k) {
-	// This is a simple kernel that runs on a single thread
-	// Could be optimized with shared memory for larger k values
-	if (threadIdx.x == 0 && blockIdx.x == 0) {
-		int labelCounts[10] = {0};   // Assuming max 10 classes for MNIST/CIFAR
-
-		// Count occurrences of each label within k neighbors
-		for (int i = 0; i < k; i++) {
-			int           idx   = indices[i];
-			unsigned char label = trainLabels[idx];
-			labelCounts[label]++;
-		}
-		// Find label with highest count
-		int           maxCount      = -1;
-		unsigned char majorityLabel = 0;
-		for (unsigned char label = 0; label < 10; label++) {
-			if (labelCounts[label] > maxCount) {
-				maxCount      = labelCounts[label];
-				majorityLabel = label;
-			}
-		}
-		*predictedLabel = majorityLabel;
-	}
-}
-
-// CUDA kernel for find the majority label among k nearest neighbors using shared memory
-// optimization
-__global__ void
-    findMajorityLabelSharedKernel(unsigned char* trainLabels, int* indices, unsigned char* predictedLabel, int k) {
-	// Using shared memory for label counts - much faster for larger k values
-	__shared__ int labelCounts[10];   // Assuming max 10 classes for MNIST/CIFAR
+	// Using shared memory for label counts - faster for larger k values
+	__shared__ int labelCounts[10];   // Assuming max 10 classes
 
 	// Initialize shared memory
 	if (threadIdx.x < 10) {
@@ -116,11 +88,9 @@ __global__ void
 
 	// Parallel counting of labels
 	for (int i = threadIdx.x; i < k; i += blockDim.x) {
-		if (i < k) {
-			int           idx   = indices[i];
-			unsigned char label = trainLabels[idx];
-			atomicAdd(&labelCounts[label], 1);
-		}
+		int           idx   = indices[i];
+		unsigned char label = trainLabels[idx];
+		atomicAdd(&labelCounts[label], 1);
 	}
 	__syncthreads();
 
@@ -292,13 +262,10 @@ void KNNClassifier::sortDistancesAndFindMajority() {
 	// Copy the first k sorted indices back to our device array
 	cudaMemcpy(d_indices, thrust_indices, k * sizeof(int), cudaMemcpyDeviceToDevice);
 
-	int threads = std::min(k, BLOCK_SIZE);
+	int grid_size = 1;
+	int threads	= 10;  // Assuming max 10 classes for our datasets
 
-	if (USE_SHARED_MEMORY) {
-		findMajorityLabelSharedKernel<<<1, threads>>>(d_trainLabels, d_indices, d_predictedLabel, k);
-	} else {
-		findMajorityLabelKernel<<<1, threads>>>(d_trainLabels, d_indices, d_predictedLabel, k);
-	}
+	findMajorityLabelKernel<<<grid_size, threads>>>(d_trainLabels, d_indices, d_predictedLabel, k);
 
 	// Check for kernel launch errors
 	checkCudaError(cudaGetLastError(), "findMajorityLabelKernel launch failed");
