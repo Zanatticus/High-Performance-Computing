@@ -16,6 +16,17 @@
 
 #define BLOCK_SIZE        256
 
+// Helper function for CUDA error checking
+inline void checkCudaError(cudaError_t status, const char* errorMsg) {
+	if (status != cudaSuccess) {
+		if (errorMsg != nullptr) {
+			std::cerr << errorMsg << ": ";
+		}
+		std::cerr << cudaGetErrorString(status) << std::endl;
+		exit(1);
+	}
+}
+
 // CUDA kernel for computing Euclidean distances
 __global__ void
     computeDistancesKernel(float* trainImages, float* testImage, float* distances, int numTrainImages, int imageSize) {
@@ -102,18 +113,17 @@ __global__ void
 // Constructor
 KNNClassifier::KNNClassifier(int k_neighbors, int deviceId) :
     k_neighbors(k_neighbors),
+	numTrainImages(0),
+	imageSize(0),
     deviceId(deviceId),
+    gpuExecutionTime(0.0),
+	gpuMemoryUsage(0.0f),
     d_trainImages(nullptr),
     d_trainLabels(nullptr),
     d_testImage(nullptr),
     d_distances(nullptr),
     d_indices(nullptr),
-    d_predictedLabel(nullptr),
-    numTrainImages(0),
-    imageSize(0),
-    gpuExecutionTime(0.0),
-    gpuMemoryUsage(0.0f) {
-	// Set CUDA device
+    d_predictedLabel(nullptr) {
 	cudaError_t cudaStatus = cudaSetDevice(deviceId);
 	checkCudaError(cudaStatus, "cudaSetDevice failed! Do you have a CUDA-capable GPU installed?");
 }
@@ -249,7 +259,7 @@ void KNNClassifier::sortDistancesAndFindMajority() {
 	thrust::sort_by_key(thrust::device, thrust_distances, thrust_distances + numTrainImages, d_idx.begin());
 
 	// Copy the first k sorted indices back to our device array
-	cudaMemcpy(d_indices, thrust_indices, k * sizeof(int), cudaMemcpyDeviceToDevice);
+	cudaMemcpy(d_indices, thrust_indices, k_neighbors * sizeof(int), cudaMemcpyDeviceToDevice);
 
 	int grid_size = 1;
 	int threads	= 10;  // Assuming max 10 classes for our datasets
@@ -384,15 +394,4 @@ int KNNClassifier::getGpuCount() const {
 	int deviceCount = 0;
 	cudaGetDeviceCount(&deviceCount);
 	return deviceCount;
-}
-
-// Helper function for CUDA error checking
-inline void checkCudaError(cudaError_t status, const char* errorMsg) {
-	if (status != cudaSuccess) {
-		if (errorMsg != nullptr) {
-			std::cerr << errorMsg << ": ";
-		}
-		std::cerr << cudaGetErrorString(status) << std::endl;
-		exit(1);
-	}
 }

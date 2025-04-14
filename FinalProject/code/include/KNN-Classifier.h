@@ -92,13 +92,13 @@ private:
 	// Device data
 	float*         d_trainImages;      ///< Training images in device memory
 	unsigned char* d_trainLabels;      ///< Training labels in device memory
-	float*         d_testImages;       ///< Testing images in device memory
+	float*         d_testImage;        ///< Testing images in device memory
 	float*         d_distances;        ///< Calculated distances in device memory
 	int*           d_indices;          ///< Sorted indices in device memory
 	unsigned char* d_predictedLabel;   ///< Predicted label in device memory
 
 	// Host data
-	int k_neighbors;                ///< Number of neighbors to consider
+	int k_neighbors;      ///< Number of neighbors to consider
 	int numTrainImages;   ///< Number of training images
 	int numTestImages;	  ///< Number of testing images
 	int imageSize;        ///< Size of each image in elements
