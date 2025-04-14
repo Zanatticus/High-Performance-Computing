@@ -16,17 +16,6 @@
 
 #define BLOCK_SIZE        256
 
-// Helper function for CUDA error checking
-inline void checkCudaError(cudaError_t status, const char* errorMsg) {
-	if (status != cudaSuccess) {
-		if (errorMsg != nullptr) {
-			std::cerr << errorMsg << ": ";
-		}
-		std::cerr << cudaGetErrorString(status) << std::endl;
-		exit(1);
-	}
-}
-
 // CUDA kernel for computing Euclidean distances
 __global__ void
     computeDistancesKernel(float* trainImages, float* testImage, float* distances, int numTrainImages, int imageSize) {
@@ -45,7 +34,7 @@ __global__ void
 	}
 }
 
-// CUDA kernel for computing Euclidean distances with shared memory optimization
+// CUDA kernel for computing Euclidean distances using shared memory
 __global__ void computeDistancesSharedKernel(
     float* trainImages, float* testImage, float* distances, int numTrainImages, int imageSize) {
 	int idx = blockIdx.x * blockDim.x + threadIdx.x;
@@ -74,7 +63,7 @@ __global__ void computeDistancesSharedKernel(
 	}
 }
 
-// CUDA kernel for finding the majority label among k nearest neighbors
+// CUDA kernel for finding the majority label among k nearest neighbors using shared memory
 __global__ void
     findMajorityLabelKernel(unsigned char* trainLabels, int* indices, unsigned char* predictedLabel, int k) {
 	// Using shared memory for label counts - faster for larger k values
@@ -395,4 +384,15 @@ int KNNClassifier::getGpuCount() const {
 	int deviceCount = 0;
 	cudaGetDeviceCount(&deviceCount);
 	return deviceCount;
+}
+
+// Helper function for CUDA error checking
+inline void checkCudaError(cudaError_t status, const char* errorMsg) {
+	if (status != cudaSuccess) {
+		if (errorMsg != nullptr) {
+			std::cerr << errorMsg << ": ";
+		}
+		std::cerr << cudaGetErrorString(status) << std::endl;
+		exit(1);
+	}
 }
