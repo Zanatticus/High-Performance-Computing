@@ -10,9 +10,11 @@
 #include <thrust/execution_policy.h>
 #include <thrust/sort.h>
 
-#define BATCH_SIZE        1000   // Adjust based on GPU memory
 #define USE_SHARED_MEMORY true
 #define USE_BATCHING      true
+#define BATCH_SIZE        1000
+
+#define BLOCK_SIZE        256
 
 // Helper function for CUDA error checking
 inline void checkCudaError(cudaError_t status, const char* errorMsg) {
@@ -225,8 +227,7 @@ void KNNClassifier::train(const std::vector<float>&         trainImages,
 
 void KNNClassifier::computeDistances() {
 	// Calculate grid and block dimensions
-	int blockSize = 256;
-	int gridSize  = (numTrainImages + blockSize - 1) / blockSize;
+	int gridSize = (numTrainImages + BLOCK_SIZE - 1) / BLOCK_SIZE;
 
 	if (USE_SHARED_MEMORY && configurableSharedMemory) {
 		// Calculate shared memory size for the test image
@@ -240,19 +241,20 @@ void KNNClassifier::computeDistances() {
 		if (sharedMemSize > maxSharedMem) {
 			if (configurableSharedMemory) {
 				cudaError_t cudaStatus = cudaFuncSetAttribute(
-					computeDistancesSharedKernel, cudaFuncAttributeMaxDynamicSharedMemorySize, sharedMemSize);
-				
+				    computeDistancesSharedKernel, cudaFuncAttributeMaxDynamicSharedMemorySize, sharedMemSize);
+
 				// If setting the attribute fails, fall back to the non-shared memory kernel since only A100 will work
 				if (cudaStatus != cudaSuccess) {
-					std::cerr << "Shared memory size (" << sharedMemSize <<") exceeds limit (" << maxSharedMem << "). Using fallback non-shared kernel instead." << std::endl;
+					std::cerr << "Shared memory size (" << sharedMemSize << ") exceeds limit (" << maxSharedMem
+					          << "). Using fallback non-shared kernel instead." << std::endl;
 					cudaFuncSetAttribute(
-						computeDistancesSharedKernel, cudaFuncAttributeMaxDynamicSharedMemorySize, maxSharedMem);
+					    computeDistancesSharedKernel, cudaFuncAttributeMaxDynamicSharedMemorySize, maxSharedMem);
 					configurableSharedMemory = false;
 
 					// Launch kernel with fallback non-shared method
-					computeDistancesKernel<<<gridSize, blockSize>>>(
-						d_trainImages, d_testImage, d_distances, numTrainImages, imageSize);
-	
+					computeDistancesKernel<<<gridSize, BLOCK_SIZE>>>(
+					    d_trainImages, d_testImage, d_distances, numTrainImages, imageSize);
+
 					// Check for kernel launch errors
 					checkCudaError(cudaGetLastError(), "computeDistancesSharedKernel Fallback launch failed");
 					return;
@@ -260,14 +262,14 @@ void KNNClassifier::computeDistances() {
 			}
 		}
 		// Launch kernel with shared memory
-		computeDistancesSharedKernel<<<gridSize, blockSize, sharedMemSize>>>(
-			d_trainImages, d_testImage, d_distances, numTrainImages, imageSize);
+		computeDistancesSharedKernel<<<gridSize, BLOCK_SIZE, sharedMemSize>>>(
+		    d_trainImages, d_testImage, d_distances, numTrainImages, imageSize);
 
 		// Check for kernel launch errors
 		checkCudaError(cudaGetLastError(), "computeDistancesSharedKernel launch failed");
 	} else {
 		// Launch kernel without shared memory
-		computeDistancesKernel<<<gridSize, blockSize>>>(
+		computeDistancesKernel<<<gridSize, BLOCK_SIZE>>>(
 		    d_trainImages, d_testImage, d_distances, numTrainImages, imageSize);
 
 		// Check for kernel launch errors
@@ -290,12 +292,14 @@ void KNNClassifier::sortDistancesAndFindMajority() {
 	// Copy the first k sorted indices back to our device array
 	cudaMemcpy(d_indices, thrust_indices, k * sizeof(int), cudaMemcpyDeviceToDevice);
 
+	int grid_size = (k + BLOCK_SIZE - 1) / BLOCK_SIZE;
+
 	if (USE_SHARED_MEMORY) {
 		// Launch kernel with shared memory
-		findMajorityLabelSharedKernel<<<1, 32>>>(d_trainLabels, d_indices, d_predictedLabel, k);
+		findMajorityLabelSharedKernel<<<grid_size, BLOCK_SIZE>>>(d_trainLabels, d_indices, d_predictedLabel, k);
 	} else {
 		// Launch kernel without shared memory
-		findMajorityLabelKernel<<<1, 32>>>(d_trainLabels, d_indices, d_predictedLabel, k);
+		findMajorityLabelKernel<<<grid_size, BLOCK_SIZE>>>(d_trainLabels, d_indices, d_predictedLabel, k);
 	}
 
 	// Check for kernel launch errors
