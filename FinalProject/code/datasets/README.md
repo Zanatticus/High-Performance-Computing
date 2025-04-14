@@ -1,9 +1,5 @@
 # Final Project Datasets
 
-## Iris Dataset
-
-The Iris Dataset consists of 3 classes of 50 instances each, where each class refers to a type of iris plant. One class is linearly separable from the other 2; the latter are not linearly separable from each other.
-
 ## MNIST Dataset
 
 The MNIST database of handwritten digits has a training set of 60,000 examples, and a test set of 10,000 examples. These images are 28x28 pixels and anti-aliased (greyscaled). A sample MNIST reader in Python can be found here (https://www.kaggle.com/code/hojjatk/read-mnist-dataset).
