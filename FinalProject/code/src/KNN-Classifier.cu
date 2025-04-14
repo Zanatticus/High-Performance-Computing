@@ -292,14 +292,12 @@ void KNNClassifier::sortDistancesAndFindMajority() {
 	// Copy the first k sorted indices back to our device array
 	cudaMemcpy(d_indices, thrust_indices, k * sizeof(int), cudaMemcpyDeviceToDevice);
 
-	int grid_size = (k + BLOCK_SIZE - 1) / BLOCK_SIZE;
+	int threads = std::min(k, BLOCK_SIZE);
 
 	if (USE_SHARED_MEMORY) {
-		// Launch kernel with shared memory
-		findMajorityLabelSharedKernel<<<grid_size, BLOCK_SIZE>>>(d_trainLabels, d_indices, d_predictedLabel, k);
+		findMajorityLabelSharedKernel<<<1, threads>>>(d_trainLabels, d_indices, d_predictedLabel, k);
 	} else {
-		// Launch kernel without shared memory
-		findMajorityLabelKernel<<<grid_size, BLOCK_SIZE>>>(d_trainLabels, d_indices, d_predictedLabel, k);
+		findMajorityLabelKernel<<<1, threads>>>(d_trainLabels, d_indices, d_predictedLabel, k);
 	}
 
 	// Check for kernel launch errors
