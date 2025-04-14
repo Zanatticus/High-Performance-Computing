@@ -12,7 +12,7 @@
  * images and labels, and write image data to PPM format for visualization.
  */
 class CIFARLoader {
-	public:
+public:
 	/**
 	 * @brief Constructor - loads both training and test datasets automatically
 	 *
@@ -95,7 +95,7 @@ class CIFARLoader {
 	 */
 	void writeImageToPPM(const std::vector<float>& image, int index, const std::string& filename) const;
 
-	private:
+private:
 	int imageSize;   ///< Total size of each image (width * height * channels)
 	int width;       ///< Width of each image
 	int height;      ///< Height of each image

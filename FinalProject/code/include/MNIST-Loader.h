@@ -12,7 +12,7 @@
  * and labels, and write image data to PPM format for visualization.
  */
 class MNISTLoader {
-	public:
+public:
 	/**
 	 * @brief Constructor - loads both training and test datasets automatically
 	 *
@@ -70,7 +70,7 @@ class MNISTLoader {
 	 */
 	void writeImageToPPM(const std::vector<float>& image, int index, const std::string& filename) const;
 
-	private:
+private:
 	int numRows;   ///< Number of rows in each image
 	int numCols;   ///< Number of columns in each image
 

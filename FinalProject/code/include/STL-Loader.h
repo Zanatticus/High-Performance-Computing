@@ -5,7 +5,7 @@
 #include <vector>
 
 class STLLoader {
-	public:
+public:
 	STLLoader();
 
 	int getImageSize() const;
@@ -23,7 +23,7 @@ class STLLoader {
 
 	void writeImageToPPM(const std::vector<float>& image, int index, const std::string& filename) const;
 
-	private:
+private:
 	static constexpr const char* BASE_DIR    = "datasets/STL-10/";
 	static constexpr const char* TRAIN_IMAGE = "train_X.bin";
 	static constexpr const char* TRAIN_LABEL = "train_y.bin";

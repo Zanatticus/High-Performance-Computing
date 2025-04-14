@@ -13,7 +13,7 @@
  * for efficient processing of image data from datasets like MNIST and CIFAR-10.
  */
 class KNNClassifier {
-	public:
+public:
 	/**
 	 * @brief Constructor for the KNN classifier
 	 * @param k Number of nearest neighbors to consider (default: 5)
@@ -88,7 +88,7 @@ class KNNClassifier {
 	 */
 	int getGpuCount() const;
 
-	private:
+private:
 	// Device data
 	float*         d_trainImages;      ///< Training images in device memory
 	unsigned char* d_trainLabels;      ///< Training labels in device memory
@@ -108,7 +108,7 @@ class KNNClassifier {
 	float  gpuMemoryUsage;     ///< GPU memory usage in MB
 
 	// Shared memory enable/disable flag
-	bool configurableSharedMemory = true; ///< Flag to indicate shared memory configuration status
+	bool configurableSharedMemory = true;   ///< Flag to indicate shared memory configuration status
 
 	/**
 	 * @brief Allocate device memory for training and test data
