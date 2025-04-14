@@ -65,7 +65,7 @@ __global__ void computeDistancesSharedKernel(
 
 // CUDA kernel for finding the majority label among k nearest neighbors using shared memory
 __global__ void
-    findMajorityLabelKernel(unsigned char* trainLabels, int* indices, unsigned char* predictedLabel, int k) {
+    findMajorityLabelKernel(unsigned char* trainLabels, int* indices, unsigned char* predictedLabel, int k_neighbors) {
 	// Using shared memory for label counts - faster for larger k values
 	__shared__ int labelCounts[10];   // Assuming max 10 classes
 
@@ -76,7 +76,7 @@ __global__ void
 	__syncthreads();
 
 	// Parallel counting of labels
-	for (int i = threadIdx.x; i < k; i += blockDim.x) {
+	for (int i = threadIdx.x; i < k_neighbors; i += blockDim.x) {
 		int           idx   = indices[i];
 		unsigned char label = trainLabels[idx];
 		atomicAdd(&labelCounts[label], 1);
@@ -100,8 +100,8 @@ __global__ void
 }
 
 // Constructor
-KNNClassifier::KNNClassifier(int k, int deviceId) :
-    k(k),
+KNNClassifier::KNNClassifier(int k_neighbors, int deviceId) :
+    k_neighbors(k_neighbors),
     deviceId(deviceId),
     d_trainImages(nullptr),
     d_trainLabels(nullptr),
@@ -254,7 +254,7 @@ void KNNClassifier::sortDistancesAndFindMajority() {
 	int grid_size = 1;
 	int threads	= 10;  // Assuming max 10 classes for our datasets
 
-	findMajorityLabelKernel<<<grid_size, threads>>>(d_trainLabels, d_indices, d_predictedLabel, k);
+	findMajorityLabelKernel<<<grid_size, threads>>>(d_trainLabels, d_indices, d_predictedLabel, k_neighbors);
 
 	// Check for kernel launch errors
 	checkCudaError(cudaGetLastError(), "findMajorityLabelKernel launch failed");
