@@ -48,7 +48,7 @@ int main() {
 			// Test with MNIST
 			std::cout << std::endl;
 			std::cout << "=========================================================" << std::endl;
-			std::cout << " Testing KNN on MNIST dataset with K=" << K_CIFAR << " nearest neighbors" << std::endl;
+			std::cout << " Testing KNN on MNIST dataset with K=" << K_MNIST << " nearest neighbors" << std::endl;
 			std::cout << "=========================================================" << std::endl;
 
 			// Start timing the entire MNIST process
