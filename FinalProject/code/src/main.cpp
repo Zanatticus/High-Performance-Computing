@@ -14,14 +14,15 @@
 #define K_CIFAR 5
 #define K_STL   5
 
-#define TEST_MNIST false
-#define TEST_CIFAR false
+#define TEST_MNIST true
+#define TEST_CIFAR true
 #define TEST_STL   true
 
 void saveMetrics(const std::string &dataset,
                  int                k,
                  const std::string &gpuType,
                  int                gpuCount,
+				 int                blockSize,
                  double             totalExecutionTime,
                  double             gpuExecutionTime,
                  float              memoryUsage,
@@ -30,11 +31,11 @@ void saveMetrics(const std::string &dataset,
 
 	// Write header if file is empty
 	if (outFile.tellp() == 0) {
-		outFile << "Dataset,K,GPUType,GPUCount,TotalExecutionTime(s),GPUExecutionTime(s),MemoryUsage(MB),Accuracy(%)"
+		outFile << "Dataset,K,GPUType,GPUCount,BlockSize,TotalExecutionTime(s),GPUExecutionTime(s),MemoryUsage(MB),Accuracy(%)"
 		        << std::endl;
 	}
 
-	outFile << dataset << "," << k << "," << gpuType << "," << gpuCount << "," << std::fixed << std::setprecision(4)
+	outFile << dataset << "," << k << "," << gpuType << "," << gpuCount << "," << blockSize << "," << std::fixed << std::setprecision(4)
 	        << totalExecutionTime << "," << std::fixed << std::setprecision(4) << gpuExecutionTime << "," << std::fixed
 	        << std::setprecision(4) << memoryUsage << "," << std::fixed << std::setprecision(4) << accuracy
 	        << std::endl;
@@ -89,6 +90,7 @@ int main() {
 			            K_MNIST,
 			            mnist_knn.getGpuType(),
 			            mnist_knn.getGpuCount(),
+						mnist_knn.getBlockSize(),
 			            mnist_total_time,                  // Total time including data loading
 			            mnist_knn.getGpuExecutionTime(),   // GPU-specific execution time
 			            mnist_knn.getGpuMemoryUsage(),
@@ -138,6 +140,7 @@ int main() {
 						K_MNIST,
 						mnist_batched_knn.getGpuType(),
 						mnist_batched_knn.getGpuCount(),
+						mnist_batched_knn.getBlockSize(),
 						mnist_batched_total_time,
 						mnist_batched_knn.getGpuExecutionTime(),
 						mnist_batched_knn.getGpuMemoryUsage(),
@@ -197,6 +200,7 @@ int main() {
 			            K_CIFAR,
 			            cifar_knn.getGpuType(),
 			            cifar_knn.getGpuCount(),
+						cifar_knn.getBlockSize(),
 			            cifar_total_time,                  // Total time including data loading
 			            cifar_knn.getGpuExecutionTime(),   // GPU-specific execution time
 			            cifar_knn.getGpuMemoryUsage(),
@@ -244,6 +248,7 @@ int main() {
 						K_CIFAR,
 						cifar_batched_knn.getGpuType(),
 						cifar_batched_knn.getGpuCount(),
+						cifar_batched_knn.getBlockSize(),
 						cifar_batched_total_time,
 						cifar_batched_knn.getGpuExecutionTime(),
 						cifar_batched_knn.getGpuMemoryUsage(),
@@ -301,6 +306,7 @@ int main() {
 			            K_STL,
 			            stl_knn.getGpuType(),
 			            stl_knn.getGpuCount(),
+						stl_knn.getBlockSize(),
 			            stl_total_time,
 			            stl_knn.getGpuExecutionTime(),
 			            stl_knn.getGpuMemoryUsage(),
@@ -347,6 +353,7 @@ int main() {
 						K_STL,
 						stl_batched_knn.getGpuType(),
 						stl_batched_knn.getGpuCount(),
+						stl_batched_knn.getBlockSize(),
 						stl_batched_total_time,
 						stl_batched_knn.getGpuExecutionTime(),
 						stl_batched_knn.getGpuMemoryUsage(),

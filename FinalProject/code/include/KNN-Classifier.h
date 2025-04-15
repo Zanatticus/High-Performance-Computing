@@ -30,6 +30,7 @@ public:
 	float getGpuMemoryUsage() const;
 	std::string getGpuType() const;
 	int getGpuCount() const;
+	int getBlockSize() const;
 
 private:
 	// Device memory
@@ -57,6 +58,7 @@ private:
 	double gpuExecutionTime;
 	float  gpuMemoryUsage;
 	bool   useBatchMode = false; // Flag for batch processing mode
+	int   blockSize = 256; // For testing, range this from 64 to 1024 in log scale {64, 128, 256, 512, 1024}
 
 	void allocateDeviceMemory();
 	void allocateDeviceMemoryBatched(); // For batch processing

@@ -10,9 +10,6 @@
 #include <thrust/execution_policy.h>
 #include <thrust/sort.h>
 
-#define BLOCK_SIZE 256
-#define TILE_SIZE  16   // Number of training images per tile
-
 // Helper function for CUDA error checking
 inline void checkCudaError(cudaError_t status, const char* errorMsg) {
 	if (status != cudaSuccess) {
@@ -310,7 +307,6 @@ void KNNClassifier::trainBatched() {
 }
 
 void KNNClassifier::computeDistances() {
-	int blockSize = BLOCK_SIZE;
 	int gridSize = (numTrainImages + blockSize - 1) / blockSize;
 	
 	computeDistancesKernel<<<gridSize, blockSize>>>(
@@ -332,7 +328,7 @@ void KNNClassifier::sortDistancesAndFindMajority() {
 	// Copy the first k sorted indices back to our device array
 	cudaMemcpy(d_indices, thrust_indices, k_neighbors * sizeof(int), cudaMemcpyDeviceToDevice);
 
-	findMajorityLabelKernel<<<1, BLOCK_SIZE>>>(d_trainLabels, d_indices, d_predictedLabel, k_neighbors);
+	findMajorityLabelKernel<<<1, blockSize>>>(d_trainLabels, d_indices, d_predictedLabel, k_neighbors);
 
 	// Check for kernel launch errors
 	checkCudaError(cudaGetLastError(), "findMajorityLabelKernel launch failed");
@@ -407,12 +403,20 @@ float KNNClassifier::evaluateDatasetBatched() {
     auto start = std::chrono::high_resolution_clock::now();
     
     // Step 1: Compute all distances between all test images and all training images
-    int blockSize = BLOCK_SIZE;
     int gridSize = numTrainImages; // One block per training image
     
     // Each block loads one training image into shared memory and compares against all test images
     size_t sharedMemSize = imageSize * sizeof(float); // For one training image
-    
+	
+	// Attempt to dynamically change the maximum shared memory size for the streaming multiprocessor block
+	cudaError_t err = cudaFuncSetAttribute(computeDistancesBatchedKernel, cudaFuncAttributeMaxDynamicSharedMemorySize, sharedMemSize);
+
+	if (err != cudaSuccess) {
+		std::cerr << "Warning: Failed to set shared memory size to " << sharedMemSize 
+              << " bytes: " << cudaGetErrorString(err) << std::endl;
+		return 0.0f;	
+	}
+
     computeDistancesBatchedKernel<<<gridSize, blockSize, sharedMemSize>>>(
         d_trainImages, d_testImages, d_distances, 
         numTrainImages, numTestImages, imageSize);
@@ -520,4 +524,8 @@ int KNNClassifier::getGpuCount() const {
 	int deviceCount = 0;
 	cudaGetDeviceCount(&deviceCount);
 	return deviceCount;
+}
+
+int KNNClassifier::getBlockSize() const {
+	return blockSize;
 }
