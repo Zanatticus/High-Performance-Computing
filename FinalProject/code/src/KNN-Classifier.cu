@@ -175,12 +175,12 @@ KNNClassifier::KNNClassifier(const std::vector<float>&         trainImages,
     h_testLabels(testLabels),
     datasetName(datasetName),
     k_neighbors(k),
-    useBatchMode(useBatchMode),
     numTrainImages(trainLabels.size()),
     numTestImages(testLabels.size()),
     imageSize(static_cast<int>(trainImages.size() / trainLabels.size())),
     gpuExecutionTime(0.0),
     gpuMemoryUsage(0.0f),
+    useBatchMode(useBatchMode),
     deviceId(deviceId) {
 	cudaError_t cudaStatus = cudaSetDevice(deviceId);
 	checkCudaError(cudaStatus, "cudaSetDevice failed! Do you have a CUDA-capable GPU installed?");
@@ -274,15 +274,20 @@ void KNNClassifier::freeDeviceMemory() {
 }
 
 void KNNClassifier::train() {
-    useBatchMode = false;
-	allocateDeviceMemory();
+    if (useBatchMode) {
+        trainBatched();
+        return;
+    }
 
-	cudaMemcpy(d_trainImages, h_trainImages.data(), sizeof(float) * h_trainImages.size(), cudaMemcpyHostToDevice);
-	cudaMemcpy(
-	    d_trainLabels, h_trainLabels.data(), sizeof(unsigned char) * h_trainLabels.size(), cudaMemcpyHostToDevice);
+    // Regular training approach
+    allocateDeviceMemory();
 
-	std::cout << "KNN: Loaded " << datasetName << " training data with " << numTrainImages << " images of size "
-	          << imageSize << std::endl;
+    cudaMemcpy(d_trainImages, h_trainImages.data(), sizeof(float) * h_trainImages.size(), cudaMemcpyHostToDevice);
+    cudaMemcpy(
+        d_trainLabels, h_trainLabels.data(), sizeof(unsigned char) * h_trainLabels.size(), cudaMemcpyHostToDevice);
+
+    std::cout << "KNN: Loaded " << datasetName << " training data with " << numTrainImages << " images of size "
+              << imageSize << std::endl;
 }
 
 void KNNClassifier::trainBatched() {
@@ -353,41 +358,42 @@ unsigned char KNNClassifier::predict(int imageIndex) {
 }
 
 float KNNClassifier::evaluateDataset() {
-	if (useBatchMode) {
-		return evaluateDatasetBatched();
-	}
+    if (useBatchMode) {
+        return evaluateDatasetBatched();
+    }
 
-	int correct = 0;
+    // Regular non-batched evaluation
+    int correct = 0;
 
-	// Start Timer
-	auto start = std::chrono::high_resolution_clock::now();
+    // Start Timer
+    auto start = std::chrono::high_resolution_clock::now();
 
-	// For each test image
-	for (int i = 0; i < numTestImages; i++) {
-		unsigned char predictedLabel = predict(i);
+    // For each test image
+    for (int i = 0; i < numTestImages; i++) {
+        unsigned char predictedLabel = predict(i);
 
-		if (predictedLabel == h_testLabels[i]) {
-			correct++;
-		}
+        if (predictedLabel == h_testLabels[i]) {
+            correct++;
+        }
 
-		// Progress update every 1000 images
-		if ((i + 1) % 1000 == 0 || i == numTestImages - 1) {
-			std::cout << "KNN: Processed " << (i + 1) << "/" << numTestImages
-			          << " test images. Current accuracy: " << (100.0f * correct / (i + 1)) << "%" << std::endl;
-		}
-	}
+        // Progress update every 1000 images
+        if ((i + 1) % 1000 == 0 || i == numTestImages - 1) {
+            std::cout << "KNN: Processed " << (i + 1) << "/" << numTestImages
+                      << " test images. Current accuracy: " << (100.0f * correct / (i + 1)) << "%" << std::endl;
+        }
+    }
 
-	// End Timer
-	auto end = std::chrono::high_resolution_clock::now();
-	std::chrono::duration<double> elapsed = end - start;
-	gpuExecutionTime = elapsed.count();   // in seconds
+    // End Timer
+    auto end = std::chrono::high_resolution_clock::now();
+    std::chrono::duration<double> elapsed = end - start;
+    gpuExecutionTime = elapsed.count();   // in seconds
 
-	float accuracy = 100.0f * correct / numTestImages;
-	std::cout << "KNN: Final accuracy: " << accuracy << "%" << std::endl;
-	std::cout << "KNN: GPU execution time: " << gpuExecutionTime << " seconds" << std::endl;
-	std::cout << "KNN: GPU memory usage: " << gpuMemoryUsage << " MB" << std::endl;
+    float accuracy = 100.0f * correct / numTestImages;
+    std::cout << "KNN: Final accuracy: " << accuracy << "%" << std::endl;
+    std::cout << "KNN: GPU execution time: " << gpuExecutionTime << " seconds" << std::endl;
+    std::cout << "KNN: GPU memory usage: " << gpuMemoryUsage << " MB" << std::endl;
 
-	return accuracy;
+    return accuracy;
 }
 
 float KNNClassifier::evaluateDatasetBatched() {

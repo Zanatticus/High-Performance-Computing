@@ -14,8 +14,8 @@
 #define K_CIFAR 5
 #define K_STL   5
 
-#define TEST_MNIST true
-#define TEST_CIFAR true
+#define TEST_MNIST false
+#define TEST_CIFAR false
 #define TEST_STL   true
 
 void saveMetrics(const std::string &dataset,
@@ -113,13 +113,15 @@ int main() {
 			const auto &mnist_test_images  = mnist_batched.getTestImages();
 			const auto &mnist_test_labels  = mnist_batched.getTestLabels();
 	
-			// Create and train KNN classifier for MNIST with batched approach
+			// Create and train KNN classifier for MNIST with batched approach (true = use batch mode)
 			KNNClassifier mnist_batched_knn(
 				mnist_train_images, mnist_train_labels, mnist_test_images, mnist_test_labels, "MNIST-Batched", K_MNIST, true);
-			mnist_batched_knn.trainBatched();
+			
+			// Just call train() - it will use trainBatched() internally
+			mnist_batched_knn.train();
 	
-			// Evaluate using batched approach
-			float mnist_batched_accuracy = mnist_batched_knn.evaluateDatasetBatched();
+			// Just call evaluateDataset() - it will use evaluateDatasetBatched() internally
+			float mnist_batched_accuracy = mnist_batched_knn.evaluateDataset();
 	
 			// End timing and calculate total time
 			auto   mnist_batched_end_time   = std::chrono::high_resolution_clock::now();
@@ -127,7 +129,7 @@ int main() {
 			std::cout << "MNIST Batched: Total dataset processing time: " << mnist_batched_total_time << " seconds" << std::endl;
 			std::cout << "MNIST Batched: GPU-only execution time: " << mnist_batched_knn.getGpuExecutionTime() << " seconds"
 					  << std::endl;
-			std::cout << "MNIST Batched: Non-GPU overhead time: " 
+			std::cout << "MNIST Batched: Non-GPU overhead time: "
 					  << (mnist_batched_total_time - mnist_batched_knn.getGpuExecutionTime())
 					  << " seconds" << std::endl;
 	
@@ -140,8 +142,8 @@ int main() {
 						mnist_batched_knn.getGpuExecutionTime(),
 						mnist_batched_knn.getGpuMemoryUsage(),
 						mnist_batched_accuracy);
-		} catch (const std::exception &e) { 
-			std::cerr << "ERROR USING BATCHED MNIST DATASET: " << e.what() << std::endl; 
+		} catch (const std::exception &e) {
+			std::cerr << "ERROR USING BATCHED MNIST DATASET: " << e.what() << std::endl;
 		}
 	}
 
@@ -202,6 +204,55 @@ int main() {
 		} catch (const std::exception &e) { std::cerr << "ERROR USING CIFAR-10 DATASET: " << e.what() << std::endl; }
 	}
 
+
+	if (TEST_CIFAR) {
+		try {
+			// Test with CIFAR-10 using batched approach
+			std::cout << std::endl;
+			std::cout << "==================================================================" << std::endl;
+			std::cout << " Testing Batched KNN on CIFAR-10 dataset with K=" << K_CIFAR << " nearest neighbors" << std::endl;
+			std::cout << "==================================================================" << std::endl;
+	
+			// Start timing the entire CIFAR-10 batched process
+			auto cifar_batched_start_time = std::chrono::high_resolution_clock::now();
+	
+			CIFARLoader cifar_batched;
+			const auto &cifar_train_images = cifar_batched.getTrainImages();
+			const auto &cifar_train_labels = cifar_batched.getTrainLabels();
+			const auto &cifar_test_images = cifar_batched.getTestImages();
+			const auto &cifar_test_labels = cifar_batched.getTestLabels();
+	
+			// Create and train KNN classifier for CIFAR-10 with batched approach (true = use batch mode)
+			KNNClassifier cifar_batched_knn(
+				cifar_train_images, cifar_train_labels, cifar_test_images, cifar_test_labels, "CIFAR-10-Batched", K_CIFAR, true);
+			
+			// Just call train() - it will use trainBatched() internally
+			cifar_batched_knn.train();
+	
+			// Just call evaluateDataset() - it will use evaluateDatasetBatched() internally
+			float cifar_batched_accuracy = cifar_batched_knn.evaluateDataset();
+	
+			// End timing and calculate total time
+			auto cifar_batched_end_time = std::chrono::high_resolution_clock::now();
+			double cifar_batched_total_time = std::chrono::duration<double>(cifar_batched_end_time - cifar_batched_start_time).count();
+			std::cout << "CIFAR-10 Batched: Total dataset processing time: " << cifar_batched_total_time << " seconds" << std::endl;
+			std::cout << "CIFAR-10 Batched: GPU-only execution time: " << cifar_batched_knn.getGpuExecutionTime() << " seconds" << std::endl;
+			std::cout << "CIFAR-10 Batched: Non-GPU overhead time: " << (cifar_batched_total_time - cifar_batched_knn.getGpuExecutionTime()) << " seconds" << std::endl;
+	
+			// Save metrics
+			saveMetrics("CIFAR-10-Batched",
+						K_CIFAR,
+						cifar_batched_knn.getGpuType(),
+						cifar_batched_knn.getGpuCount(),
+						cifar_batched_total_time,
+						cifar_batched_knn.getGpuExecutionTime(),
+						cifar_batched_knn.getGpuMemoryUsage(),
+						cifar_batched_accuracy);
+		} catch (const std::exception &e) {
+			std::cerr << "ERROR USING BATCHED CIFAR-10 DATASET: " << e.what() << std::endl;
+		}
+	}
+
 	/* ----------------------------------------------------------------------------------------------- */
 
 	if (TEST_STL) {
@@ -257,6 +308,53 @@ int main() {
 		} catch (const std::exception &e) { std::cerr << "ERROR USING STL-10 DATASET: " << e.what() << std::endl; }
 	}
 
+	if (TEST_STL) {
+		try {
+			// Test with STL-10 using batched approach
+			std::cout << std::endl;
+			std::cout << "==================================================================" << std::endl;
+			std::cout << " Testing Batched KNN on STL-10 dataset with K=" << K_STL << " nearest neighbors" << std::endl;
+			std::cout << "==================================================================" << std::endl;
+	
+			// Start timing the entire STL-10 batched process
+			auto stl_batched_start_time = std::chrono::high_resolution_clock::now();
+	
+			STLLoader stl_batched;
+			const auto &stl_train_images = stl_batched.getTrainImages();
+			const auto &stl_train_labels = stl_batched.getTrainLabels();
+			const auto &stl_test_images = stl_batched.getTestImages();
+			const auto &stl_test_labels = stl_batched.getTestLabels();
+	
+			// Create and train KNN classifier for STL-10 with batched approach (true = use batch mode)
+			KNNClassifier stl_batched_knn(
+				stl_train_images, stl_train_labels, stl_test_images, stl_test_labels, "STL-10-Batched", K_STL, true);
+			
+			// Just call train() - it will use trainBatched() internally
+			stl_batched_knn.train();
+	
+			// Just call evaluateDataset() - it will use evaluateDatasetBatched() internally
+			float stl_batched_accuracy = stl_batched_knn.evaluateDataset();
+	
+			// End timing and calculate total time
+			auto stl_batched_end_time = std::chrono::high_resolution_clock::now();
+			double stl_batched_total_time = std::chrono::duration<double>(stl_batched_end_time - stl_batched_start_time).count();
+			std::cout << "STL-10 Batched: Total dataset processing time: " << stl_batched_total_time << " seconds" << std::endl;
+			std::cout << "STL-10 Batched: GPU-only execution time: " << stl_batched_knn.getGpuExecutionTime() << " seconds" << std::endl;
+			std::cout << "STL-10 Batched: Non-GPU overhead time: " << (stl_batched_total_time - stl_batched_knn.getGpuExecutionTime()) << " seconds" << std::endl;
+	
+			// Save metrics
+			saveMetrics("STL-10-Batched",
+						K_STL,
+						stl_batched_knn.getGpuType(),
+						stl_batched_knn.getGpuCount(),
+						stl_batched_total_time,
+						stl_batched_knn.getGpuExecutionTime(),
+						stl_batched_knn.getGpuMemoryUsage(),
+						stl_batched_accuracy);
+		} catch (const std::exception &e) {
+			std::cerr << "ERROR USING BATCHED STL-10 DATASET: " << e.what() << std::endl;
+		}
+	}
 	/* ------------------------------------------------------------------------------------------------- */
 
 	return 0;
