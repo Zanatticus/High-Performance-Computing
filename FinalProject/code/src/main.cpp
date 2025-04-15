@@ -96,6 +96,55 @@ int main() {
 		} catch (const std::exception &e) { std::cerr << "ERROR USING MNIST DATASET: " << e.what() << std::endl; }
 	}
 
+	if (TEST_MNIST) {
+		try {
+			// Test with MNIST using batched approach
+			std::cout << std::endl;
+			std::cout << "==================================================================" << std::endl;
+			std::cout << " Testing Batched KNN on MNIST dataset with K=" << K_MNIST << " nearest neighbors" << std::endl;
+			std::cout << "==================================================================" << std::endl;
+	
+			// Start timing the entire MNIST batched process
+			auto mnist_batched_start_time = std::chrono::high_resolution_clock::now();
+	
+			MNISTLoader mnist_batched;
+			const auto &mnist_train_images = mnist_batched.getTrainImages();
+			const auto &mnist_train_labels = mnist_batched.getTrainLabels();
+			const auto &mnist_test_images  = mnist_batched.getTestImages();
+			const auto &mnist_test_labels  = mnist_batched.getTestLabels();
+	
+			// Create and train KNN classifier for MNIST with batched approach
+			KNNClassifier mnist_batched_knn(
+				mnist_train_images, mnist_train_labels, mnist_test_images, mnist_test_labels, "MNIST-Batched", K_MNIST, true);
+			mnist_batched_knn.trainBatched();
+	
+			// Evaluate using batched approach
+			float mnist_batched_accuracy = mnist_batched_knn.evaluateDatasetBatched();
+	
+			// End timing and calculate total time
+			auto   mnist_batched_end_time   = std::chrono::high_resolution_clock::now();
+			double mnist_batched_total_time = std::chrono::duration<double>(mnist_batched_end_time - mnist_batched_start_time).count();
+			std::cout << "MNIST Batched: Total dataset processing time: " << mnist_batched_total_time << " seconds" << std::endl;
+			std::cout << "MNIST Batched: GPU-only execution time: " << mnist_batched_knn.getGpuExecutionTime() << " seconds"
+					  << std::endl;
+			std::cout << "MNIST Batched: Non-GPU overhead time: " 
+					  << (mnist_batched_total_time - mnist_batched_knn.getGpuExecutionTime())
+					  << " seconds" << std::endl;
+	
+			// Save metrics
+			saveMetrics("MNIST-Batched",
+						K_MNIST,
+						mnist_batched_knn.getGpuType(),
+						mnist_batched_knn.getGpuCount(),
+						mnist_batched_total_time,
+						mnist_batched_knn.getGpuExecutionTime(),
+						mnist_batched_knn.getGpuMemoryUsage(),
+						mnist_batched_accuracy);
+		} catch (const std::exception &e) { 
+			std::cerr << "ERROR USING BATCHED MNIST DATASET: " << e.what() << std::endl; 
+		}
+	}
+
 	/* ------------------------------------------------------------------------------------------------- */
 
 	if (TEST_CIFAR) {
