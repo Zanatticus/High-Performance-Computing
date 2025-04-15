@@ -16,7 +16,7 @@ srun -p courses -N 1 --constraint=cascadelake --pty --time=03:00:00 /bin/bash
 srun --partition=courses-gpu --nodes=1 --pty --gres=gpu:p100:1 --time=03:00:00 /bin/bash
 
 # Obtain a node with 1 NVIDIA Tesla V100 GPU (Max 4)
-srun --partition=courses-gpu --nodelist=d1004 --nodes=1 --pty --gres=gpu:v100-sxm2 --time=03:00:00 /bin/bash
+srun --partition=courses-gpu --nodes=1 --pty --gres=gpu:v100-sxm2:1 --time=03:00:00 /bin/bash
 
 # Obtain a node with 1 NVIDIA A100 GPU (Max 8)
 srun --partition=ai-jumpstart --nodes=1 --pty --gres=gpu:a100:1 --ntasks=1 --time=03:00:00 /bin/bash
