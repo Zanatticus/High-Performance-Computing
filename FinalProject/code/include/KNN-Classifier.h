@@ -12,25 +12,25 @@ public:
 	              const std::vector<float>&         testImages,
 	              const std::vector<unsigned char>& testLabels,
 	              const std::string&                datasetName,
-	              int                               k        = 5,
-				  bool 							    useBatchMode = false,
-	              int                               deviceId = 0);
+	              int                               k            = 5,
+	              bool                              useBatchMode = false,
+	              int                               deviceId     = 0);
 
 	~KNNClassifier();
 
 	void train();
-	void trainBatched(); // New method for batch processing setup
+	void trainBatched();   // New method for batch processing setup
 
 	unsigned char predict(int imageIndex);
 
 	float evaluateDataset();
-	float evaluateDatasetBatched(); // New method for batch evaluation
+	float evaluateDatasetBatched();   // New method for batch evaluation
 
-	double getGpuExecutionTime() const;
-	float getGpuMemoryUsage() const;
+	double      getGpuExecutionTime() const;
+	float       getGpuMemoryUsage() const;
 	std::string getGpuType() const;
-	int getGpuCount() const;
-	int getBlockSize() const;
+	int         getGpuCount() const;
+	int         getBlockSize() const;
 
 private:
 	// Device memory
@@ -57,14 +57,14 @@ private:
 
 	double gpuExecutionTime;
 	float  gpuMemoryUsage;
-	bool   useBatchMode = false; // Flag for batch processing mode
-	int   blockSize = 256; // For testing, range this from 64 to 1024 in log scale {64, 128, 256, 512, 1024}
+	bool   useBatchMode = false;   // Flag for batch processing mode
+	int    blockSize    = 256;     // For testing, range this from 32 to 1024 in log scale {32, 64, 128, 256, 512, 1024}
 
 	void allocateDeviceMemory();
-	void allocateDeviceMemoryBatched(); // For batch processing
+	void allocateDeviceMemoryBatched();   // For batch processing
 	void freeDeviceMemory();
 	void sortDistancesAndFindMajority();
 	void computeDistances();
 };
 
-#endif // KNN_CLASSIFIER_H
+#endif   // KNN_CLASSIFIER_H
