@@ -61,18 +61,19 @@ int main() {
 			const auto &mnist_test_labels  = mnist.getTestLabels();
 
 			// Create and train KNN classifier for MNIST
-			KNNClassifier mnist_knn(K_MNIST);
-			mnist_knn.train(mnist_train_images, mnist_train_labels, "MNIST");
+			KNNClassifier mnist_knn(
+			    mnist_train_images, mnist_train_labels, mnist_test_images, mnist_test_labels, "MNIST", K_MNIST);
+			mnist_knn.train();
 
 			// Test on a single image first
 			int           mnist_idx       = 0;
-			unsigned char predicted_label = mnist_knn.predict(mnist_test_images, mnist_idx);
+			unsigned char predicted_label = mnist_knn.predict(mnist_idx);
 			std::cout << "MNIST Test Image Actual Label: " << (int) mnist_test_labels[mnist_idx] << "\n";
 			std::cout << "MNIST Test Image Predicted Label: " << (int) predicted_label << "\n";
 			mnist.writeImageToPPM(mnist_test_images, mnist_idx, "output/mnist_image.ppm");
 
 			// Evaluate on full test set
-			float mnist_accuracy = mnist_knn.evaluateDataset(mnist_test_images, mnist_test_labels);
+			float mnist_accuracy = mnist_knn.evaluateDataset();
 
 			// End timing and calculate total time
 			auto   mnist_end_time   = std::chrono::high_resolution_clock::now();
@@ -115,12 +116,13 @@ int main() {
 			const auto &cifar_test_labels  = cifar.getTestLabels();
 
 			// Create and train KNN classifier for CIFAR-10
-			KNNClassifier cifar_knn(K_CIFAR);
-			cifar_knn.train(cifar_train_images, cifar_train_labels, "CIFAR-10");
+			KNNClassifier cifar_knn(
+			    cifar_train_images, cifar_train_labels, cifar_test_images, cifar_test_labels, "CIFAR-10", K_CIFAR);
+			cifar_knn.train();
 
 			// Test on a single image first
 			int           cifar_idx       = 0;
-			unsigned char predicted_label = cifar_knn.predict(cifar_test_images, cifar_idx);
+			unsigned char predicted_label = cifar_knn.predict(cifar_idx);
 			std::cout << "CIFAR-10 Test Image Actual Label: " << (int) cifar_test_labels[cifar_idx] << " ("
 			          << cifar.getLabelName(cifar_test_labels[cifar_idx]) << ")\n";
 			std::cout << "CIFAR-10 Test Image Predicted Label: " << (int) predicted_label << " ("
@@ -128,7 +130,7 @@ int main() {
 			cifar.writeImageToPPM(cifar_test_images, cifar_idx, "output/cifar_image.ppm");
 
 			// Evaluate on full test set
-			float cifar_accuracy = cifar_knn.evaluateDataset(cifar_test_images, cifar_test_labels);
+			float cifar_accuracy = cifar_knn.evaluateDataset();
 
 			// End timing and calculate total time
 			auto   cifar_end_time   = std::chrono::high_resolution_clock::now();
@@ -171,18 +173,19 @@ int main() {
 			const auto &stl_test_labels  = stl.getTestLabels();
 
 			// Create and train KNN classifier for STL-10
-			KNNClassifier stl_knn(K_STL);
-			stl_knn.train(stl_train_images, stl_train_labels, "STL-10");
+			KNNClassifier stl_knn(
+			    stl_train_images, stl_train_labels, stl_test_images, stl_test_labels, "STL-10", K_STL);
+			stl_knn.train();
 
 			// Test on a single image first
 			int           stl_idx         = 0;
-			unsigned char predicted_label = stl_knn.predict(stl_test_images, stl_idx);
+			unsigned char predicted_label = stl_knn.predict(stl_idx);
 			std::cout << "STL-10 Test Image Actual Label: " << (int) stl_test_labels[stl_idx] << "\n";
 			std::cout << "STL-10 Test Image Predicted Label: " << (int) predicted_label << "\n";
 			stl.writeImageToPPM(stl_test_images, stl_idx, "output/stl_image.ppm");
 
 			// Evaluate on full test set
-			float stl_accuracy = stl_knn.evaluateDataset(stl_test_images, stl_test_labels);
+			float stl_accuracy = stl_knn.evaluateDataset();
 
 			// End timing and calculate total time
 			auto   stl_end_time   = std::chrono::high_resolution_clock::now();

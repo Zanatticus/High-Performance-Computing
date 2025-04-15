@@ -107,20 +107,31 @@ __global__ void
 	}
 }
 
-// Constructor
-KNNClassifier::KNNClassifier(int k_neighbors, int deviceId) :
-    k_neighbors(k_neighbors),
-	numTrainImages(0),
-	imageSize(0),
-    deviceId(deviceId),
-    gpuExecutionTime(0.0),
-	gpuMemoryUsage(0.0f),
+KNNClassifier::KNNClassifier(const std::vector<float>&         trainImages,
+                             const std::vector<unsigned char>& trainLabels,
+                             const std::vector<float>&         testImages,
+                             const std::vector<unsigned char>& testLabels,
+                             const std::string&                datasetName,
+                             int                               k,
+                             int                               deviceId) :
     d_trainImages(nullptr),
     d_trainLabels(nullptr),
     d_testImage(nullptr),
     d_distances(nullptr),
     d_indices(nullptr),
-    d_predictedLabel(nullptr) {
+    d_predictedLabel(nullptr),
+    h_trainImages(trainImages),
+    h_trainLabels(trainLabels),
+    h_testImages(testImages),
+    h_testLabels(testLabels),
+    datasetName(datasetName),
+    k_neighbors(k),
+    numTrainImages(trainLabels.size()),
+    numTestImages(testLabels.size()),
+    imageSize(static_cast<int>(trainImages.size() / trainLabels.size())),
+    gpuExecutionTime(0.0),
+    gpuMemoryUsage(0.0f),
+    deviceId(deviceId) {
 	cudaError_t cudaStatus = cudaSetDevice(deviceId);
 	checkCudaError(cudaStatus, "cudaSetDevice failed! Do you have a CUDA-capable GPU installed?");
 }
@@ -129,12 +140,9 @@ KNNClassifier::~KNNClassifier() {
 	freeDeviceMemory();
 }
 
-void KNNClassifier::allocateDeviceMemory(int numImages, int imgSize) {
+void KNNClassifier::allocateDeviceMemory() {
 	// Free previous memory if any
 	freeDeviceMemory();
-
-	numTrainImages = numImages;
-	imageSize      = imgSize;
 
 	// Record memory usage before allocation
 	size_t free_before, total;
@@ -151,7 +159,9 @@ void KNNClassifier::allocateDeviceMemory(int numImages, int imgSize) {
 	// Record memory usage after allocation
 	size_t free_after;
 	cudaMemGetInfo(&free_after, &total);
-	gpuMemoryUsage = (free_before - free_after) / (1024.0f * 1024.0f);   // in MB
+	gpuMemoryUsage = (numTrainImages * imageSize * sizeof(float) + numTrainImages * sizeof(unsigned char) +
+	                  imageSize * sizeof(float) + numTrainImages * sizeof(int) + sizeof(unsigned char)) /
+	                 (1024.0f * 1024.0f);   // in MB
 }
 
 void KNNClassifier::freeDeviceMemory() {
@@ -176,16 +186,12 @@ void KNNClassifier::freeDeviceMemory() {
 	d_predictedLabel = nullptr;
 }
 
-void KNNClassifier::train(const std::vector<float>&         trainImages,
-                          const std::vector<unsigned char>& trainLabels,
-                          const std::string&                datasetName) {
-	int numImages = trainLabels.size();
-	int imgSize   = trainImages.size() / numImages;
+void KNNClassifier::train() {
+	allocateDeviceMemory();
 
-	allocateDeviceMemory(numImages, imgSize);
-
-	cudaMemcpy(d_trainImages, trainImages.data(), numTrainImages * imageSize * sizeof(float), cudaMemcpyHostToDevice);
-	cudaMemcpy(d_trainLabels, trainLabels.data(), numTrainImages * sizeof(unsigned char), cudaMemcpyHostToDevice);
+	cudaMemcpy(d_trainImages, h_trainImages.data(), sizeof(float) * h_trainImages.size(), cudaMemcpyHostToDevice);
+	cudaMemcpy(
+	    d_trainLabels, h_trainLabels.data(), sizeof(unsigned char) * h_trainLabels.size(), cudaMemcpyHostToDevice);
 
 	std::cout << "KNN: Loaded " << datasetName << " training data with " << numTrainImages << " images of size "
 	          << imageSize << std::endl;
@@ -258,18 +264,17 @@ void KNNClassifier::sortDistancesAndFindMajority() {
 	// Copy the first k sorted indices back to our device array
 	cudaMemcpy(d_indices, thrust_indices, k_neighbors * sizeof(int), cudaMemcpyDeviceToDevice);
 
-	int grid_size = 1;
-	int threads	= 10;  // Assuming max 10 classes for our datasets
-
-	findMajorityLabelKernel<<<grid_size, threads>>>(d_trainLabels, d_indices, d_predictedLabel, k_neighbors);
+	findMajorityLabelKernel<<<1, 10>>>(d_trainLabels, d_indices, d_predictedLabel, k_neighbors);
 
 	// Check for kernel launch errors
 	checkCudaError(cudaGetLastError(), "findMajorityLabelKernel launch failed");
 }
 
-unsigned char KNNClassifier::predict(const std::vector<float>& image, int imageIndex) {
+unsigned char KNNClassifier::predict(int imageIndex) {
+	const float* image_ptr = h_testImages.data() + imageIndex * imageSize;
+
 	// Copy test image directly to device
-	cudaMemcpy(d_testImage, &image[imageIndex * imageSize], imageSize * sizeof(float), cudaMemcpyHostToDevice);
+	cudaMemcpy(d_testImage, image_ptr, imageSize * sizeof(float), cudaMemcpyHostToDevice);
 
 	// Compute distances between test image and all training images
 	computeDistances();
@@ -284,26 +289,24 @@ unsigned char KNNClassifier::predict(const std::vector<float>& image, int imageI
 	return predictedLabel;
 }
 
-float KNNClassifier::evaluateDataset(const std::vector<float>&         testImages,
-                                     const std::vector<unsigned char>& testLabels) {
-	int numTestImages = testLabels.size();
-	int correct       = 0;
+float KNNClassifier::evaluateDataset() {
+	int correct = 0;
 
 	// Start Timer
 	auto start = std::chrono::high_resolution_clock::now();
 
 	// For each test image
 	for (int i = 0; i < numTestImages; i++) {
-		unsigned char predictedLabel = predict(testImages, i);
+		unsigned char predictedLabel = predict(i);
 
-		if (predictedLabel == testLabels[i]) {
+		if (predictedLabel == h_testLabels[i]) {
 			correct++;
 		}
 
 		// Progress update every 1000 images
 		if ((i + 1) % 1000 == 0 || i == numTestImages - 1) {
 			std::cout << "KNN: Processed " << (i + 1) << "/" << numTestImages
-						<< " test images. Current accuracy: " << (100.0f * correct / (i + 1)) << "%" << std::endl;
+			          << " test images. Current accuracy: " << (100.0f * correct / (i + 1)) << "%" << std::endl;
 		}
 	}
 
